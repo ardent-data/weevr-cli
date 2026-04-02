@@ -1,12 +1,15 @@
 name: CodeQL
 
+# Disabled until repo is public (GHAS required for private repos).
+# To re-enable: uncomment the triggers and add `actions: read` to permissions.
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch: # manual trigger only
+  # push:
+  #   branches:
+  #     - main
+  # pull_request:
+  #   branches:
+  #     - main
 
 jobs:
   analyze:
