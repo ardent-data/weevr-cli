@@ -17,11 +17,11 @@ The weevr engine runs inside Fabric notebooks; the CLI runs on your workstation 
 ## Installation
 
 ```bash
-# With pipx (recommended)
-pipx install weevr-cli
-
-# With uv
+# With uv (recommended)
 uv tool install weevr-cli
+
+# With pipx
+pipx install weevr-cli
 
 # With pip
 pip install weevr-cli

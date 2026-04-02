@@ -14,11 +14,7 @@ build/
 venv/
 ENV/
 
-# uv
-uv.lock
-
 # IDE
-.vscode/
 .idea/
 *.swp
 *.swo
