@@ -101,16 +101,24 @@ def init(
     try:
         init_project(name, examples=examples, interactive=interactive, state=state)
     except SystemExit as exc:
-        raise typer.Exit(code=exc.code or 1) from exc
+        raise typer.Exit(code=int(exc.code) if exc.code is not None else 1) from exc
 
 
 @app.command()
 def new(
+    ctx: typer.Context,
     file_type: str = typer.Argument(..., help="File type: thread, weave, or loom."),
     name: str = typer.Argument(..., help="Name for the new file."),
+    force: bool = typer.Option(False, "--force", help="Overwrite existing file."),
 ) -> None:
     """Generate a new thread, weave, or loom file from a template."""
-    typer.echo(f"Creating {file_type}: {name}")
+    from weevr_cli.commands.new import new_file
+
+    state: AppState = ctx.obj
+    try:
+        new_file(file_type, name, force=force, state=state)
+    except SystemExit as exc:
+        raise typer.Exit(code=int(exc.code) if exc.code is not None else 1) from exc
 
 
 @app.command()
