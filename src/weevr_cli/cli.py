@@ -33,6 +33,12 @@ def _version_callback(ctx: typer.Context, value: bool) -> None:
 @app.callback()
 def main(
     ctx: typer.Context,
+    json: bool = typer.Option(
+        False,
+        "--json",
+        help="Output in JSON format for machine consumption.",
+        is_eager=True,
+    ),
     version: Optional[bool] = typer.Option(
         None,
         "--version",
@@ -40,11 +46,6 @@ def main(
         help="Show version and exit.",
         callback=_version_callback,
         is_eager=True,
-    ),
-    json: bool = typer.Option(
-        False,
-        "--json",
-        help="Output in JSON format for machine consumption.",
     ),
 ) -> None:
     """Weevr CLI — manage weevr projects from your terminal."""
