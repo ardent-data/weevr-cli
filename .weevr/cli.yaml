@@ -1,0 +1,20 @@
+# weevr CLI configuration
+# See: https://github.com/ardent-data/weevr-cli
+
+# Deploy target environments
+targets:
+  dev:
+    workspace_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    lakehouse_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    path_prefix: "weevr/my-project"
+  prod:
+    workspace_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    lakehouse_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    path_prefix: "weevr/my-project"
+
+# Default target for deploy commands
+default_target: dev
+
+# Schema settings
+schema:
+  version: "1.11"
