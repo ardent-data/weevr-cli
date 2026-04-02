@@ -1,10 +1,15 @@
 """Main CLI application."""
 
+from __future__ import annotations
+
 from typing import Optional
 
 import typer
 
 from weevr_cli import __version__
+from weevr_cli.config import ConfigError, find_project_root, load_config
+from weevr_cli.output import create_console, print_error, print_json
+from weevr_cli.state import AppState
 
 app = typer.Typer(
     name="weevr",
@@ -13,25 +18,74 @@ app = typer.Typer(
 )
 
 
-def version_callback(value: bool) -> None:
+def _version_callback(ctx: typer.Context, value: bool) -> None:
     """Print version and exit."""
-    if value:
+    if not value:
+        return
+    json_mode = ctx.params.get("json", False)
+    if json_mode:
+        print_json({"version": __version__})
+    else:
         typer.echo(f"weevr {__version__}")
-        raise typer.Exit()
+    raise typer.Exit()
 
 
 @app.callback()
 def main(
+    ctx: typer.Context,
     version: Optional[bool] = typer.Option(
         None,
         "--version",
         "-v",
         help="Show version and exit.",
-        callback=version_callback,
+        callback=_version_callback,
         is_eager=True,
+    ),
+    json: bool = typer.Option(
+        False,
+        "--json",
+        help="Output in JSON format for machine consumption.",
     ),
 ) -> None:
     """Weevr CLI — manage weevr projects from your terminal."""
+    console = create_console(json_mode=json)
+
+    config = None
+    project_root = find_project_root()
+    if project_root is not None:
+        config_path = project_root / ".weevr" / "cli.yaml"
+        try:
+            config = load_config(config_path)
+        except ConfigError as exc:
+            print_error(str(exc), exc.code, json_mode=json, console=console)
+            raise typer.Exit(code=1) from exc
+
+    ctx.obj = AppState(console=console, config=config, json_mode=json)
+
+
+def require_config(ctx: typer.Context) -> AppState:
+    """Get AppState from context, failing if config is not loaded.
+
+    Args:
+        ctx: Typer context with AppState in obj.
+
+    Returns:
+        AppState with a guaranteed non-None config.
+
+    Raises:
+        typer.Exit: If no config is available.
+    """
+    state: AppState = ctx.obj
+    if state.config is None:
+        print_error(
+            "No weevr project found. Run 'weevr init' to create one, "
+            "or run this command from within a weevr project directory.",
+            "config_not_found",
+            json_mode=state.json_mode,
+            console=state.console,
+        )
+        raise typer.Exit(code=1)
+    return state
 
 
 @app.command()
@@ -55,16 +109,19 @@ def new(
 
 @app.command()
 def validate(
+    ctx: typer.Context,
     path: Optional[str] = typer.Argument(None, help="File or directory to validate."),
     strict: bool = typer.Option(False, "--strict", help="Treat warnings as errors."),
 ) -> None:
     """Validate project files against schemas and check reference integrity."""
+    require_config(ctx)
     target = path or "entire project"
     typer.echo(f"Validating: {target}")
 
 
 @app.command()
 def deploy(
+    ctx: typer.Context,
     paths: Optional[list[str]] = typer.Argument(  # noqa: B008
         None, help="Specific files to deploy."
     ),
@@ -80,20 +137,24 @@ def deploy(
     ),
 ) -> None:
     """Deploy project files to a Fabric Lakehouse."""
+    require_config(ctx)
     typer.echo("Deploying...")
 
 
 @app.command()
 def status(
+    ctx: typer.Context,
     target: str = typer.Option("", "--target", "-t", help="Named deploy target."),
 ) -> None:
     """Show diff between local files and deployed state."""
+    require_config(ctx)
     typer.echo("Checking status...")
 
 
 @app.command(name="list")
-def list_cmd() -> None:
+def list_cmd(ctx: typer.Context) -> None:
     """Display project structure and dependency relationships."""
+    require_config(ctx)
     typer.echo("Listing project structure...")
 
 
