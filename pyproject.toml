@@ -1,0 +1,92 @@
+[project]
+name = "weevr-cli"
+version = "0.1.0"
+description = "CLI for managing weevr projects — scaffolding, validation, and deployment to Microsoft Fabric."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Pierre LaFromboise", email = "44212292+DataInsightPro@users.noreply.github.com" }
+]
+requires-python = ">=3.11"
+keywords = ["weevr", "fabric", "onelake", "cli", "yaml", "deployment", "data-pipeline"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Utilities",
+    "Typing :: Typed",
+]
+dependencies = [
+    "typer>=0.15.0",
+    "rich>=13.0.0",
+    "pyyaml>=6.0,<7.0",
+    "jsonschema>=4.0,<5.0",
+    "azure-storage-file-datalake>=12.0.0",
+    "azure-identity>=1.0.0",
+]
+
+[project.scripts]
+weevr = "weevr_cli.cli:app"
+
+[project.urls]
+Repository = "https://github.com/ardent-data/weevr-cli"
+Issues = "https://github.com/ardent-data/weevr-cli/issues"
+Changelog = "https://github.com/ardent-data/weevr-cli/blob/main/CHANGELOG.md"
+
+[build-system]
+requires = ["uv_build>=0.9.28,<1.0.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.408",
+    "pytest>=9.0.0",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.15.0",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "D"]
+ignore = ["D203", "D213", "UP045"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["D"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.isort]
+known-first-party = ["weevr_cli"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pyright]
+pythonVersion = "3.11"
+typeCheckingMode = "standard"
+
+include = ["src", "tests"]
+exclude = ["**/__pycache__", ".venv", ".git", ".github"]
+
+venvPath = "."
+venv = ".venv"
+
+reportMissingTypeStubs = false
+reportMissingImports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.uv]
+default-groups = ["dev"]

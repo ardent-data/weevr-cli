@@ -1,0 +1,62 @@
+{
+    "name": "weevr-cli",
+
+    "image": "mcr.microsoft.com/devcontainers/python:3.11",
+
+    "features": {
+        "ghcr.io/devcontainers/features/common-utils:2": {},
+        "ghcr.io/devcontainers/features/github-cli:1": {},
+        "ghcr.io/devcontainers/features/copilot-cli:1": {},
+        "ghcr.io/devcontainers/features/node:1": {},
+        "ghcr.io/jsburckhardt/devcontainer-features/uv:1": {},
+        "ghcr.io/jsburckhardt/devcontainer-features/codex:1": {},
+        "ghcr.io/devcontainers-extra/features/actionlint:1": {},
+        "ghcr.io/devcontainers-extra/features/shellcheck:1": {}
+    },
+
+    "mounts": [
+        "source=${localEnv:USERPROFILE}/.config/gh,target=/home/vscode/.config/gh,type=bind,consistency=cached",
+        "source=${localEnv:USERPROFILE}/.claude,target=/home/vscode/.claude,type=bind,consistency=cached",
+        "source=${localEnv:USERPROFILE}/.codex,target=/home/vscode/.codex,type=bind,consistency=cached"
+    ],
+
+    "postCreateCommand": "git config --global --add safe.directory /workspaces/weevr-cli && curl -fsSL https://claude.ai/install.sh | bash && git clone https://github.com/coderabbitai/git-worktree-runner.git /home/vscode/.gtr && sudo ln -sf /home/vscode/.gtr/bin/git-gtr /usr/local/bin/git-gtr && sudo ln -sf /home/vscode/.gtr/bin/gtr /usr/local/bin/gtr && uv sync --dev",
+
+    "postStartCommand": "uv sync",
+
+    "remoteEnv": {
+        "UV_PROJECT_ENVIRONMENT": "/home/vscode/.venv",
+        "UV_PYTHON_PREFERENCE": "system"
+    },
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-pyright.pyright",
+                "charliermarsh.ruff",
+                "the0807.uv-toolkit",
+                "redhat.vscode-yaml",
+                "tamasfe.even-better-toml",
+                "EditorConfig.EditorConfig",
+                "github.vscode-pull-request-github",
+                "github.vscode-github-actions",
+                "davidanson.vscode-markdownlint",
+                "streetsidesoftware.code-spell-checker"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/home/vscode/.venv/bin/python",
+                "editor.rulers": [100],
+                "[python]": {
+                    "editor.defaultFormatter": "charliermarsh.ruff",
+                    "editor.formatOnSave": true,
+                    "editor.codeActionsOnSave": {
+                        "source.organizeImports": "explicit"
+                    }
+                }
+            }
+        }
+    },
+
+    "remoteUser": "vscode"
+}
