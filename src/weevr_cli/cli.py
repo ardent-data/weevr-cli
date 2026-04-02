@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 import typer
 
 from weevr_cli import __version__
@@ -39,7 +37,7 @@ def main(
         help="Output in JSON format for machine consumption.",
         is_eager=True,
     ),
-    version: Optional[bool] = typer.Option(
+    version: bool | None = typer.Option(
         None,
         "--version",
         "-v",
@@ -111,7 +109,7 @@ def new(
 @app.command()
 def validate(
     ctx: typer.Context,
-    path: Optional[str] = typer.Argument(None, help="File or directory to validate."),
+    path: str | None = typer.Argument(None, help="File or directory to validate."),
     strict: bool = typer.Option(False, "--strict", help="Treat warnings as errors."),
 ) -> None:
     """Validate project files against schemas and check reference integrity."""
@@ -123,13 +121,13 @@ def validate(
 @app.command()
 def deploy(
     ctx: typer.Context,
-    paths: Optional[list[str]] = typer.Argument(  # noqa: B008
+    paths: list[str] | None = typer.Argument(  # noqa: B008
         None, help="Specific files to deploy."
     ),
     target: str = typer.Option("", "--target", "-t", help="Named deploy target."),
-    workspace_id: Optional[str] = typer.Option(None, "--workspace-id", help="Override workspace."),
-    lakehouse_id: Optional[str] = typer.Option(None, "--lakehouse-id", help="Override lakehouse."),
-    path_prefix: Optional[str] = typer.Option(None, "--path-prefix", help="Override path prefix."),
+    workspace_id: str | None = typer.Option(None, "--workspace-id", help="Override workspace."),
+    lakehouse_id: str | None = typer.Option(None, "--lakehouse-id", help="Override lakehouse."),
+    path_prefix: str | None = typer.Option(None, "--path-prefix", help="Override path prefix."),
     full: bool = typer.Option(False, "--full", help="Full overwrite instead of smart sync."),
     clean: bool = typer.Option(False, "--clean", help="Remove remote files not present locally."),
     dry_run: bool = typer.Option(False, "--dry-run", help="Show what would change."),
@@ -162,7 +160,7 @@ def list_cmd(ctx: typer.Context) -> None:
 @app.command()
 def schema(
     action: str = typer.Argument("version", help="Action: version or update."),
-    version: Optional[str] = typer.Option(None, "--version", help="Specific schema version."),
+    version: str | None = typer.Option(None, "--version", help="Specific schema version."),
 ) -> None:
     """Manage validation schemas."""
     typer.echo(f"Schema: {action}")
