@@ -8,50 +8,57 @@ VALID_TYPES = ("thread", "weave", "loom")
 
 _THREAD_TEMPLATE = """\
 # Thread: {name}
-# A thread defines a data source for the weevr engine.
+# A thread defines a data source and its transformations.
+# See: https://ardent-data.github.io/weevr/latest/tutorials/your-first-loom/
 
-name: {name}
-type: thread
+config_version: "1.0"
 
-source:
-  # connection: <connection-name>
-  # object: <table-or-view-name>
+sources:
+  {name}:
+    type: csv
+    # path: data/{name}.csv
+    options:
+      header: "true"
+      inferSchema: "true"
 
-columns:
-  # - name: id
-  #   type: integer
-  #   description: Primary key
+steps:
+  # - select:
+  #     columns:
+  #       - id
+  #       - name
+  # - filter:
+  #     expr: "status = 'active'"
+  # - cast:
+  #     columns:
+  #       id: "int"
+
+target:
+  # path: Tables/{name}
+
+write:
+  mode: overwrite
 """
 
 _WEAVE_TEMPLATE = """\
 # Weave: {name}
-# A weave defines a transformation in the weevr engine.
+# A weave orchestrates one or more threads.
+# See: https://ardent-data.github.io/weevr/latest/tutorials/your-first-loom/
 
-name: {name}
-type: weave
+config_version: "1.0"
 
 threads:
-  # - orders
-
-transformations:
-  # - type: select
-  #   columns:
-  #     - id
-  #     - customer_id
-  #     - order_date
+  # - ref: staging/stg_example.thread
 """
 
 _LOOM_TEMPLATE = """\
 # Loom: {name}
-# A loom defines an orchestration pipeline in the weevr engine.
+# A loom orchestrates one or more weaves.
+# See: https://ardent-data.github.io/weevr/latest/tutorials/your-first-loom/
 
-name: {name}
-type: loom
+config_version: "1.0"
 
-steps:
-  # - name: load_source
-  #   weave: customer_dim
-  #   mode: full
+weaves:
+  # - ref: staging.weave
 """
 
 _TEMPLATES: dict[str, str] = {
@@ -60,63 +67,63 @@ _TEMPLATES: dict[str, str] = {
     "loom": _LOOM_TEMPLATE,
 }
 
-# Example files that are self-consistent: loom → weave → thread
+# Example files organized by medallion layer (staging → curated).
+# Self-consistent: loom → weave → thread references are valid.
+# Based on the weevr getting-started tutorial patterns.
+
 _EXAMPLE_THREAD = """\
-name: orders
-type: thread
+config_version: "1.0"
 
-source:
-  connection: sales_db
-  object: dbo.orders
+sources:
+  raw_customers:
+    type: csv
+    path: data/customers.csv
+    options:
+      header: "true"
+      inferSchema: "true"
 
-columns:
-  - name: order_id
-    type: integer
-    description: Primary key
-  - name: customer_id
-    type: integer
-    description: Foreign key to customers
-  - name: order_date
-    type: date
-    description: Date the order was placed
-  - name: total_amount
-    type: decimal
-    description: Order total in USD
+steps:
+  - filter:
+      expr: "status = 'active'"
+  - derive:
+      columns:
+        full_name: "concat(first_name, ' ', last_name)"
+  - select:
+      columns:
+        - customer_id
+        - full_name
+        - email
+        - created_date
+  - cast:
+      columns:
+        customer_id: "int"
+        created_date: "date"
+
+target:
+  path: Tables/stg_customers
+
+write:
+  mode: overwrite
 """
 
 _EXAMPLE_WEAVE = """\
-name: customer_orders
-type: weave
+config_version: "1.0"
 
 threads:
-  - orders
-
-transformations:
-  - type: select
-    columns:
-      - order_id
-      - customer_id
-      - order_date
-      - total_amount
-  - type: filter
-    condition: total_amount > 0
+  - ref: staging/stg_customers.thread
 """
 
 _EXAMPLE_LOOM = """\
-name: daily_orders
-type: loom
+config_version: "1.0"
 
-steps:
-  - name: transform_orders
-    weave: customer_orders
-    mode: incremental
-    schedule: daily
+weaves:
+  - ref: staging.weave
 """
 
 _EXAMPLE_FILES: dict[str, str] = {
-    "threads/orders.thread": _EXAMPLE_THREAD,
-    "weaves/customer_orders.weave": _EXAMPLE_WEAVE,
-    "looms/daily_orders.loom": _EXAMPLE_LOOM,
+    "staging/stg_customers.thread": _EXAMPLE_THREAD,
+    "staging.weave": _EXAMPLE_WEAVE,
+    "daily.loom": _EXAMPLE_LOOM,
 }
 
 _CLI_YAML_TEMPLATE = """\
@@ -164,11 +171,12 @@ def get_template(file_type: str) -> str:
 
 
 def get_example_files() -> dict[str, str]:
-    """Return a dict of example files with self-consistent cross-references.
+    """Return a dict of example files organized by medallion layer.
 
     Returns:
         Dict mapping relative paths to file content.
         Paths use type-specific extensions (.thread, .weave, .loom).
+        Files are self-consistent: loom references weave, weave references thread.
     """
     return dict(_EXAMPLE_FILES)
 

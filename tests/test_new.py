@@ -15,8 +15,9 @@ def test_new_thread(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     assert result.exit_code == 0
     assert (tmp_path / "orders.thread").is_file()
     content = (tmp_path / "orders.thread").read_text()
-    assert "name: orders" in content
-    assert "type: thread" in content
+    assert "config_version" in content
+    assert "sources:" in content
+    assert "orders" in content
 
 
 def test_new_weave(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -55,7 +56,7 @@ def test_new_force_overwrite(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) ->
     assert result.exit_code == 0
     content = (tmp_path / "orders.thread").read_text()
     assert "old content" not in content
-    assert "name: orders" in content
+    assert "config_version" in content
 
 
 def test_new_json_success(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

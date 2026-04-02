@@ -18,18 +18,23 @@ def test_init_creates_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -
 
     project = tmp_path / "my-project"
     assert (project / ".weevr" / "cli.yaml").is_file()
-    assert (project / "threads").is_dir()
-    assert (project / "weaves").is_dir()
-    assert (project / "looms").is_dir()
+
+
+def test_init_no_forced_directories(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    runner.invoke(app, ["init", "my-project"])
+    project = tmp_path / "my-project"
+    # Default init should NOT create type-based directories
+    assert not (project / "threads").exists()
+    assert not (project / "weaves").exists()
+    assert not (project / "looms").exists()
 
 
 def test_init_dot_current_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(tmp_path)
     result = runner.invoke(app, ["init", "."])
     assert result.exit_code == 0
-
     assert (tmp_path / ".weevr" / "cli.yaml").is_file()
-    assert (tmp_path / "threads").is_dir()
 
 
 def test_init_existing_project_errors(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -56,7 +61,7 @@ def test_init_cli_yaml_content(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
     monkeypatch.chdir(tmp_path)
     runner.invoke(app, ["init", "my-project"])
     content = (tmp_path / "my-project" / ".weevr" / "cli.yaml").read_text()
-    assert "#" in content  # Should have comments
+    assert "#" in content
     assert "targets" in content.lower()
     assert "schema" in content.lower()
 
@@ -68,6 +73,7 @@ def test_init_json_output(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> No
     data = json.loads(result.output)
     assert "created" in data
     assert "files" in data
+    assert ".weevr/cli.yaml" in data["files"]
 
 
 def test_init_existing_project_json_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -90,9 +96,10 @@ def test_init_with_examples(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> 
     assert result.exit_code == 0
 
     project = tmp_path / "my-project"
-    thread_files = list(project.glob("threads/*.thread"))
-    weave_files = list(project.glob("weaves/*.weave"))
-    loom_files = list(project.glob("looms/*.loom"))
+    # Examples use medallion-style layout, not type-based directories
+    thread_files = list(project.rglob("*.thread"))
+    weave_files = list(project.rglob("*.weave"))
+    loom_files = list(project.rglob("*.loom"))
     assert len(thread_files) >= 1
     assert len(weave_files) >= 1
     assert len(loom_files) >= 1
@@ -103,10 +110,10 @@ def test_init_examples_content(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
     runner.invoke(app, ["init", "my-project", "--examples"])
 
     project = tmp_path / "my-project"
-    for thread_file in project.glob("threads/*.thread"):
+    for thread_file in project.rglob("*.thread"):
         content = thread_file.read_text()
-        assert "name:" in content
-        assert "type: thread" in content
+        assert "config_version" in content
+        assert "sources:" in content
 
 
 def test_init_examples_cross_reference(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -114,19 +121,19 @@ def test_init_examples_cross_reference(tmp_path: Path, monkeypatch: pytest.Monke
     runner.invoke(app, ["init", "my-project", "--examples"])
 
     project = tmp_path / "my-project"
-    loom_files = list(project.glob("looms/*.loom"))
-    weave_files = list(project.glob("weaves/*.weave"))
-    thread_files = list(project.glob("threads/*.thread"))
+    loom_files = list(project.rglob("*.loom"))
+    weave_files = list(project.rglob("*.weave"))
+    thread_files = list(project.rglob("*.thread"))
 
-    # Loom references a weave name
-    loom_content = loom_files[0].read_text()
-    weave_name = weave_files[0].stem
-    assert weave_name in loom_content
-
-    # Weave references a thread name
+    # Weave references a thread path
     weave_content = weave_files[0].read_text()
-    thread_name = thread_files[0].stem
-    assert thread_name in weave_content
+    thread_path = str(thread_files[0].relative_to(project))
+    assert thread_path in weave_content
+
+    # Loom references a weave by full relative path
+    loom_content = loom_files[0].read_text()
+    weave_path = str(weave_files[0].relative_to(project))
+    assert weave_path in loom_content
 
 
 def test_init_examples_json(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -135,15 +142,13 @@ def test_init_examples_json(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> 
     assert result.exit_code == 0
     data = json.loads(result.output)
     assert "files" in data
-    # Should have more files than layout-only
-    assert len(data["files"]) > 4
-    extensions = {f.rsplit(".", 1)[-1] for f in data["files"] if "." in f and "/" in f}
-    assert "thread" in extensions or any(".thread" in f for f in data["files"])
+    # Should have cli.yaml plus example files
+    assert len(data["files"]) > 1
+    assert any(f.endswith(".thread") for f in data["files"])
 
 
 def test_init_interactive_basic(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(tmp_path)
-    # Simulate: target name=dev, workspace=ws-123, lakehouse=lh-456, prefix=weevr/proj, no more
     user_input = "dev\nws-123\nlh-456\nweevr/proj\nn\n"
     result = runner.invoke(app, ["init", "my-project", "--interactive"], input=user_input)
     assert result.exit_code == 0
@@ -157,7 +162,6 @@ def test_init_interactive_basic(tmp_path: Path, monkeypatch: pytest.MonkeyPatch)
 
 def test_init_interactive_multiple_targets(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(tmp_path)
-    # Target 1: dev, then add another, Target 2: prod, then choose default
     user_input = "dev\nws-dev\nlh-dev\n\ny\nprod\nws-prod\nlh-prod\n\nn\ndev\n"
     result = runner.invoke(app, ["init", "my-project", "--interactive"], input=user_input)
     assert result.exit_code == 0
@@ -180,13 +184,11 @@ def test_init_interactive_json_output(tmp_path: Path, monkeypatch: pytest.Monkey
 
 def test_init_filesystem_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(tmp_path)
-    # Create a read-only directory to trigger permission error
     readonly = tmp_path / "readonly"
     readonly.mkdir()
     readonly.chmod(stat.S_IRUSR | stat.S_IXUSR)
 
     result = runner.invoke(app, ["init", "readonly/subdir"])
-    # Restore permissions for cleanup
     readonly.chmod(stat.S_IRWXU)
 
     assert result.exit_code == 1
