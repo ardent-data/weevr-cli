@@ -89,12 +89,19 @@ def require_config(ctx: typer.Context) -> AppState:
 
 @app.command()
 def init(
+    ctx: typer.Context,
     name: str = typer.Argument(".", help="Project name or directory."),
     examples: bool = typer.Option(False, "--examples", help="Include example files."),
     interactive: bool = typer.Option(False, "--interactive", "-i", help="Interactive wizard."),
 ) -> None:
     """Create a new weevr project."""
-    typer.echo(f"Initializing weevr project: {name}")
+    from weevr_cli.commands.init import init_project
+
+    state: AppState = ctx.obj
+    try:
+        init_project(name, examples=examples, interactive=interactive, state=state)
+    except SystemExit as exc:
+        raise typer.Exit(code=exc.code or 1) from exc
 
 
 @app.command()
