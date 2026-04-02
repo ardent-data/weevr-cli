@@ -141,6 +141,43 @@ def test_init_examples_json(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> 
     assert "thread" in extensions or any(".thread" in f for f in data["files"])
 
 
+def test_init_interactive_basic(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    # Simulate: target name=dev, workspace=ws-123, lakehouse=lh-456, prefix=weevr/proj, no more
+    user_input = "dev\nws-123\nlh-456\nweevr/proj\nn\n"
+    result = runner.invoke(app, ["init", "my-project", "--interactive"], input=user_input)
+    assert result.exit_code == 0
+
+    config_path = tmp_path / "my-project" / ".weevr" / "cli.yaml"
+    content = config_path.read_text()
+    assert "ws-123" in content
+    assert "lh-456" in content
+    assert "weevr/proj" in content
+
+
+def test_init_interactive_multiple_targets(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    # Target 1: dev, then add another, Target 2: prod, then choose default
+    user_input = "dev\nws-dev\nlh-dev\n\ny\nprod\nws-prod\nlh-prod\n\nn\ndev\n"
+    result = runner.invoke(app, ["init", "my-project", "--interactive"], input=user_input)
+    assert result.exit_code == 0
+
+    config_path = tmp_path / "my-project" / ".weevr" / "cli.yaml"
+    content = config_path.read_text()
+    assert "ws-dev" in content
+    assert "ws-prod" in content
+    assert "dev" in content
+
+
+def test_init_interactive_json_output(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    user_input = "dev\nws-123\nlh-456\n\nn\n"
+    result = runner.invoke(app, ["--json", "init", "my-project", "--interactive"], input=user_input)
+    assert result.exit_code == 0
+    data = json.loads(result.output)
+    assert "created" in data
+
+
 def test_init_filesystem_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(tmp_path)
     # Create a read-only directory to trigger permission error

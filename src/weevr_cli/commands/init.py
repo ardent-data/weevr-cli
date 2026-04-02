@@ -102,10 +102,12 @@ def _run_wizard(state: AppState) -> str:
     console.print("\n[bold]weevr project setup[/bold]\n")
 
     while True:
-        target_name = Prompt.ask("Target name", default="dev" if not targets else "prod")
-        workspace_id = Prompt.ask("Workspace ID")
-        lakehouse_id = Prompt.ask("Lakehouse ID")
-        path_prefix = Prompt.ask("Path prefix (optional)", default="")
+        target_name = Prompt.ask(
+            "Target name", default="dev" if not targets else "prod", console=console
+        )
+        workspace_id = Prompt.ask("Workspace ID", console=console)
+        lakehouse_id = Prompt.ask("Lakehouse ID", console=console)
+        path_prefix = Prompt.ask("Path prefix (optional)", default="", console=console)
 
         target_config: dict[str, str] = {
             "workspace_id": workspace_id,
@@ -118,7 +120,7 @@ def _run_wizard(state: AppState) -> str:
         if first_target is None:
             first_target = target_name
 
-        if not Confirm.ask("Add another target?", default=False):
+        if not Confirm.ask("Add another target?", default=False, console=console):
             break
 
     default_target = first_target
@@ -127,6 +129,7 @@ def _run_wizard(state: AppState) -> str:
             "Default target",
             choices=list(targets.keys()),
             default=first_target,
+            console=console,
         )
 
     return render_cli_yaml(targets=targets, default_target=default_target)
