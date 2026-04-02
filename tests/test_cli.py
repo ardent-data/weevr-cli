@@ -71,7 +71,8 @@ def test_config_not_found_json(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
     assert "config_not_found" in combined
 
 
-def test_appstate_in_context() -> None:
+def test_appstate_in_context(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.chdir(tmp_path)
     result = runner.invoke(app, ["init"])
     assert result.exit_code == 0
 

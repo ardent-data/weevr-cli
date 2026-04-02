@@ -89,21 +89,36 @@ def require_config(ctx: typer.Context) -> AppState:
 
 @app.command()
 def init(
+    ctx: typer.Context,
     name: str = typer.Argument(".", help="Project name or directory."),
     examples: bool = typer.Option(False, "--examples", help="Include example files."),
     interactive: bool = typer.Option(False, "--interactive", "-i", help="Interactive wizard."),
 ) -> None:
     """Create a new weevr project."""
-    typer.echo(f"Initializing weevr project: {name}")
+    from weevr_cli.commands.init import init_project
+
+    state: AppState = ctx.obj
+    try:
+        init_project(name, examples=examples, interactive=interactive, state=state)
+    except SystemExit as exc:
+        raise typer.Exit(code=int(exc.code) if exc.code is not None else 1) from exc
 
 
 @app.command()
 def new(
+    ctx: typer.Context,
     file_type: str = typer.Argument(..., help="File type: thread, weave, or loom."),
     name: str = typer.Argument(..., help="Name for the new file."),
+    force: bool = typer.Option(False, "--force", help="Overwrite existing file."),
 ) -> None:
     """Generate a new thread, weave, or loom file from a template."""
-    typer.echo(f"Creating {file_type}: {name}")
+    from weevr_cli.commands.new import new_file
+
+    state: AppState = ctx.obj
+    try:
+        new_file(file_type, name, force=force, state=state)
+    except SystemExit as exc:
+        raise typer.Exit(code=int(exc.code) if exc.code is not None else 1) from exc
 
 
 @app.command()
