@@ -17,20 +17,23 @@ def test_valid_types() -> None:
 def test_get_template_thread() -> None:
     content = get_template("thread")
     assert isinstance(content, str)
-    assert len(content) > 0
-    assert "thread" in content.lower() or "source" in content.lower()
+    assert "config_version" in content
+    assert "sources:" in content
+    assert "steps:" in content
 
 
 def test_get_template_weave() -> None:
     content = get_template("weave")
     assert isinstance(content, str)
-    assert len(content) > 0
+    assert "config_version" in content
+    assert "threads:" in content
 
 
 def test_get_template_loom() -> None:
     content = get_template("loom")
     assert isinstance(content, str)
-    assert len(content) > 0
+    assert "config_version" in content
+    assert "weaves:" in content
 
 
 def test_get_template_invalid() -> None:
@@ -48,32 +51,36 @@ def test_get_example_files() -> None:
     assert "loom" in extensions
 
 
+def test_example_files_use_real_engine_format() -> None:
+    examples = get_example_files()
+    for path, content in examples.items():
+        assert "config_version" in content, f"{path} missing config_version"
+
+
 def test_example_files_cross_reference() -> None:
     examples = get_example_files()
-    loom_paths = [p for p in examples if p.endswith(".loom")]
-    weave_paths = [p for p in examples if p.endswith(".weave")]
     thread_paths = [p for p in examples if p.endswith(".thread")]
+    weave_paths = [p for p in examples if p.endswith(".weave")]
+    loom_paths = [p for p in examples if p.endswith(".loom")]
 
-    assert len(loom_paths) >= 1
-    assert len(weave_paths) >= 1
     assert len(thread_paths) >= 1
+    assert len(weave_paths) >= 1
+    assert len(loom_paths) >= 1
 
-    # Loom content should reference at least one weave name
-    loom_content = examples[loom_paths[0]]
-    weave_name = weave_paths[0].rsplit("/", 1)[-1].rsplit(".", 1)[0]
-    assert weave_name in loom_content
-
-    # Weave content should reference at least one thread name
+    # Weave references a thread path
     weave_content = examples[weave_paths[0]]
-    thread_name = thread_paths[0].rsplit("/", 1)[-1].rsplit(".", 1)[0]
-    assert thread_name in weave_content
+    assert thread_paths[0] in weave_content
+
+    # Loom references a weave by full path
+    loom_content = examples[loom_paths[0]]
+    assert weave_paths[0] in loom_content
 
 
 def test_render_cli_yaml_default() -> None:
     content = render_cli_yaml()
     assert isinstance(content, str)
-    assert "#" in content  # Should have comments
-    assert "targets" in content.lower() or "target" in content.lower()
+    assert "#" in content
+    assert "targets" in content.lower()
 
 
 def test_render_cli_yaml_with_targets() -> None:

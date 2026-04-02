@@ -8,8 +8,6 @@ from weevr_cli.output import print_error, print_json
 from weevr_cli.state import AppState
 from weevr_cli.templates import get_example_files, render_cli_yaml
 
-_DEFAULT_DIRS = ("threads", "weaves", "looms")
-
 
 def init_project(
     name: str,
@@ -18,7 +16,11 @@ def init_project(
     interactive: bool = False,
     state: AppState,
 ) -> None:
-    """Create a new weevr project with standard directory layout.
+    """Create a new weevr project.
+
+    Creates the project directory (if needed) with a `.weevr/cli.yaml`
+    configuration file. No other directories are created by default —
+    project structure is left to the developer.
 
     Args:
         name: Project directory name, or "." for current directory.
@@ -42,15 +44,12 @@ def init_project(
     # Collect config from wizard or use template
     cli_yaml_content = _run_wizard(state) if interactive else render_cli_yaml()
 
-    # Create project structure
+    # Create project structure — only .weevr/cli.yaml by default
     try:
         target.mkdir(parents=True, exist_ok=True)
         weevr_dir = target / ".weevr"
         weevr_dir.mkdir(exist_ok=True)
         weevr_dir.joinpath("cli.yaml").write_text(cli_yaml_content, encoding="utf-8")
-
-        for dirname in _DEFAULT_DIRS:
-            (target / dirname).mkdir(exist_ok=True)
     except OSError as exc:
         print_error(
             f"Failed to create project: {exc}",
@@ -60,10 +59,7 @@ def init_project(
         )
         raise SystemExit(1) from exc
 
-    created_files: list[str] = [
-        ".weevr/cli.yaml",
-        *[f"{d}/" for d in _DEFAULT_DIRS],
-    ]
+    created_files: list[str] = [".weevr/cli.yaml"]
 
     # Write example files if requested
     if examples:
