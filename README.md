@@ -81,13 +81,13 @@ No custom auth configuration needed.
 
 ## Requirements
 
-- Python 3.10+
+- Python 3.11+
 - Azure CLI (`az login`) or equivalent credential for deploy/status commands
 
 ## Development
 
 ```bash
-# Prerequisites: Python 3.10, uv, Git
+# Prerequisites: Python 3.11, uv, Git
 
 # Setup
 uv sync --dev
@@ -95,7 +95,7 @@ uv sync --dev
 # Quality checks
 uv run ruff check .          # Lint
 uv run ruff format --check . # Format check
-uv run mypy .                # Type check
+uv run pyright .                # Type check
 uv run pytest                # Tests
 ```
 

@@ -7,14 +7,13 @@ license = { file = "LICENSE" }
 authors = [
     { name = "Pierre LaFromboise", email = "44212292+DataInsightPro@users.noreply.github.com" }
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 keywords = ["weevr", "fabric", "onelake", "cli", "yaml", "deployment", "data-pipeline"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Software Development :: Build Tools",
@@ -44,14 +43,14 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
-    "mypy>=1.15.0",
+    "pyright>=1.1.408",
     "pytest>=9.0.0",
     "pytest-cov>=7.0.0",
     "ruff>=0.15.0",
 ]
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py311"
 line-length = 100
 src = ["src", "tests"]
 
@@ -72,24 +71,18 @@ known-first-party = ["weevr_cli"]
 quote-style = "double"
 indent-style = "space"
 
-[tool.mypy]
-python_version = "3.10"
-strict = true
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
+[tool.pyright]
+pythonVersion = "3.11"
+typeCheckingMode = "standard"
 
-[[tool.mypy.overrides]]
-module = "azure.*"
-ignore_missing_imports = true
+include = ["src", "tests"]
+exclude = ["**/__pycache__", ".venv", ".git", ".github"]
 
-[[tool.mypy.overrides]]
-module = "typer.*"
-ignore_missing_imports = true
+venvPath = "."
+venv = ".venv"
 
-[[tool.mypy.overrides]]
-module = "tests.*"
-disallow_untyped_defs = false
+reportMissingTypeStubs = false
+reportMissingImports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

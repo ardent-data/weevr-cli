@@ -4,7 +4,7 @@ Thank you for your interest in contributing. This guide covers what you need to 
 
 ## Prerequisites
 
-- **Python 3.10+** — pinned in `.python-version`
+- **Python 3.11** — pinned in `.python-version`
 - **[uv](https://docs.astral.sh/uv/)** — dependency and virtual environment management
 - **Git** — configured with your name and email
 
@@ -16,7 +16,7 @@ git clone https://github.com/ardent-data/weevr-cli.git
 cd weevr-cli
 
 # Install Python (if needed) and sync dependencies
-uv python install 3.10
+uv python install 3.11
 uv sync --dev
 ```
 
@@ -45,7 +45,7 @@ Before opening a PR, verify everything passes locally:
 ```bash
 uv run ruff check .          # Lint
 uv run ruff format --check . # Format check
-uv run mypy .                # Type check
+uv run pyright .                # Type check
 uv run pytest                # Tests
 ```
 
@@ -75,7 +75,7 @@ The project uses Ruff for linting and formatting, configured in `pyproject.toml`
 - **Line length**: 100 characters
 - **Quotes**: Double quotes
 - **Indent**: 4 spaces
-- **Target**: Python 3.10
+- **Target**: Python 3.11
 - **Rules**: E, F, I, UP, B, SIM, D (Google-style docstrings)
 
 Docstrings are required for all public APIs. Use Google style:
@@ -99,7 +99,7 @@ def deploy(target: str, dry_run: bool = False) -> DeployResult:
 
 ## Type Checking
 
-The project uses mypy in strict mode. All functions require type annotations.
+The project uses pyright in standard mode. All functions require type annotations.
 
 ## Pull Request Guidelines
 
