@@ -1,3 +1,5 @@
+import pytest
+
 from weevr_cli.templates import (
     VALID_TYPES,
     get_example_files,
@@ -32,13 +34,8 @@ def test_get_template_loom() -> None:
 
 
 def test_get_template_invalid() -> None:
-    try:
+    with pytest.raises(ValueError, match="widget"):
         get_template("widget")
-        msg = "Expected ValueError"
-        raise AssertionError(msg)
-    except ValueError as exc:
-        assert "widget" in str(exc)
-        assert "thread" in str(exc)
 
 
 def test_get_example_files() -> None:

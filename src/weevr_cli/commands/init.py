@@ -105,8 +105,12 @@ def _run_wizard(state: AppState) -> str:
         target_name = Prompt.ask(
             "Target name", default="dev" if not targets else "prod", console=console
         )
-        workspace_id = Prompt.ask("Workspace ID", console=console)
-        lakehouse_id = Prompt.ask("Lakehouse ID", console=console)
+        workspace_id = ""
+        while not workspace_id.strip():
+            workspace_id = Prompt.ask("Workspace ID", console=console)
+        lakehouse_id = ""
+        while not lakehouse_id.strip():
+            lakehouse_id = Prompt.ask("Lakehouse ID", console=console)
         path_prefix = Prompt.ask("Path prefix (optional)", default="", console=console)
 
         target_config: dict[str, str] = {

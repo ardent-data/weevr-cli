@@ -16,7 +16,7 @@ def new_file(
     force: bool = False,
     state: AppState,
 ) -> None:
-    """Generate a new weevr file from a template.
+    """Generate a new weevr file from a template in the current directory.
 
     Args:
         file_type: One of "thread", "weave", or "loom".

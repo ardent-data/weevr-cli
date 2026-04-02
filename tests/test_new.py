@@ -73,3 +73,19 @@ def test_new_json_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None
     assert result.exit_code == 1
     combined = result.output + (result.stderr or "")
     assert "file_exists" in combined
+
+
+def test_new_filesystem_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    # Create a read-only directory to trigger permission error
+    readonly = tmp_path / "readonly"
+    readonly.mkdir()
+    readonly.chmod(0o500)
+
+    monkeypatch.chdir(readonly)
+    result = runner.invoke(app, ["new", "thread", "orders"])
+    # Restore permissions for cleanup
+    readonly.chmod(0o700)
+
+    assert result.exit_code == 1
+    assert "filesystem_error" in result.output or "error" in result.output.lower()
