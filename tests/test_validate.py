@@ -201,6 +201,44 @@ def test_validate_json_output(
     assert "issues" in data
 
 
+def test_validate_uses_local_schemas(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Local schema in .weevr/schemas/ overrides bundled (EC-007)."""
+    # Create a local schema that rejects everything (empty required list + no additionalProperties)
+    restrictive_schema = json.dumps({
+        "type": "object",
+        "properties": {"config_version": {"type": "string"}},
+        "required": ["config_version", "nonexistent_field"],
+        "additionalProperties": False,
+    })
+    project = _make_project(tmp_path, {
+        "staging/stg.thread": _THREAD,
+    })
+    schemas_dir = project / ".weevr" / "schemas"
+    schemas_dir.mkdir()
+    (schemas_dir / "thread.json").write_text(restrictive_schema)
+    monkeypatch.chdir(project)
+    # Should fail because local schema requires nonexistent_field
+    result = runner.invoke(app, ["validate"])
+    assert result.exit_code == 1
+
+
+def test_validate_path_traversal_rejected(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Weave with ref: ../outside.thread produces error."""
+    weave = (
+        'config_version: "1.0"\n'
+        "threads:\n"
+        "  - ref: ../outside.thread\n"
+    )
+    project = _make_project(tmp_path, {"staging.weave": weave})
+    monkeypatch.chdir(project)
+    result = runner.invoke(app, ["validate"])
+    assert result.exit_code == 1
+
+
 def test_validate_no_files(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
