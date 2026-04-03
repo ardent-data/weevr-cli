@@ -17,6 +17,7 @@ class OneLakeClient:
     """Wrapper around azure-storage-file-datalake for OneLake operations."""
 
     def __init__(self, target: DeployTarget, credential: TokenCredential) -> None:
+        """Initialize with a deploy target and Azure credential."""
         self._target = target
         self._service_client = DataLakeServiceClient(
             account_url=target.onelake_account_url,
@@ -40,8 +41,11 @@ class OneLakeClient:
                 continue
             # Strip base directory prefix to get relative path
             full_path: str = path_props.name  # type: ignore[assignment]
-            relative = full_path[len(base_dir) + 1 :] if full_path.startswith(base_dir) else full_path
-            content_md5 = getattr(path_props.content_settings, "content_md5", None) if path_props.content_settings else None
+            relative = (
+                full_path[len(base_dir) + 1 :] if full_path.startswith(base_dir) else full_path
+            )
+            settings = getattr(path_props, "content_settings", None)
+            content_md5 = getattr(settings, "content_md5", None) if settings else None
             files.append(
                 RemoteFile(
                     path=relative,

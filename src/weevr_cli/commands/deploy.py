@@ -178,7 +178,15 @@ def run_deploy(
         if state.json_mode:
             from weevr_cli.output import print_json
 
-            print_json({"uploaded": 0, "skipped": len(plan.skips), "deleted": 0, "failed": 0, "actions": []})
+            print_json(
+                {
+                    "uploaded": 0,
+                    "skipped": len(plan.skips),
+                    "deleted": 0,
+                    "failed": 0,
+                    "actions": [],
+                }
+            )
         else:
             state.console.print("\nNothing to deploy — local and remote are in sync.")
         return

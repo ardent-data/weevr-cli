@@ -85,16 +85,15 @@ def compute_diff(
     # Process remote-only files for clean mode
     if clean or clean_all:
         for remote in remote_files:
-            if remote.path not in local_paths:
-                if clean_all or _is_weevr_file(remote.path):
-                    actions.append(
-                        DeployAction(
-                            local_path=None,
-                            remote_path=remote.path,
-                            action=ActionType.DELETE,
-                            reason="remote only",
-                        )
+            if remote.path not in local_paths and (clean_all or _is_weevr_file(remote.path)):
+                actions.append(
+                    DeployAction(
+                        local_path=None,
+                        remote_path=remote.path,
+                        action=ActionType.DELETE,
+                        reason="remote only",
                     )
+                )
 
     return DeployPlan(target=target, actions=actions)
 

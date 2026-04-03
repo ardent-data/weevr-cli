@@ -17,6 +17,7 @@ class TargetError(Exception):
     """Error resolving a deploy target."""
 
     def __init__(self, message: str, code: str) -> None:
+        """Initialize with a human-readable message and machine-readable error code."""
         super().__init__(message)
         self.code = code
 

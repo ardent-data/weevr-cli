@@ -5,7 +5,7 @@ from pathlib import Path
 import pathspec
 import pytest
 
-from weevr_cli.deploy.collector import LocalFile, collect_local_files, compute_md5
+from weevr_cli.deploy.collector import collect_local_files, compute_md5
 
 
 def _empty_spec() -> pathspec.PathSpec:

@@ -77,9 +77,7 @@ def render_result(result: DeployResult, *, json_mode: bool, console: Console) ->
 
     # Show failures
     for r in result.failed:
-        console.print(
-            f"  [red]FAILED[/red] {r.action.remote_path}: {r.error}"
-        )
+        console.print(f"  [red]FAILED[/red] {r.action.remote_path}: {r.error}")
 
     # Summary
     uploaded = sum(1 for r in result.succeeded if r.action.is_upload)
@@ -102,11 +100,13 @@ def _dry_run_json(plan: DeployPlan) -> dict[str, Any]:
     actions = []
     for a in plan.actions:
         label, _ = _ACTION_LABELS.get(a.action, ("unknown", ""))
-        actions.append({
-            "file": a.remote_path,
-            "action": label,
-            "reason": a.reason,
-        })
+        actions.append(
+            {
+                "file": a.remote_path,
+                "action": label,
+                "reason": a.reason,
+            }
+        )
     return {
         "target": target_info,
         "dry_run": True,
