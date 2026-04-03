@@ -134,9 +134,7 @@ class TestListTable:
         assert "Type" in result.output
         assert "daily.loom" in result.output
 
-    def test_orphan_flagged_in_table(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_orphan_flagged_in_table(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         """EC-011: Orphans flagged in table output."""
         project = _make_project(tmp_path)
         _write_yaml(project / "threads" / "orphan.thread", {"name": "orphan"})

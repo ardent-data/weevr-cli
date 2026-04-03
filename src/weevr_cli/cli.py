@@ -199,12 +199,8 @@ def status(
     workspace_id: str | None = typer.Option(None, "--workspace-id", help="Override workspace."),
     lakehouse_id: str | None = typer.Option(None, "--lakehouse-id", help="Override lakehouse."),
     path_prefix: str | None = typer.Option(None, "--path-prefix", help="Override path prefix."),
-    exit_code: bool = typer.Option(
-        False, "--exit-code", help="Exit 1 if differences exist."
-    ),
-    verbose: bool = typer.Option(
-        False, "--verbose", help="Show all files including non-weevr."
-    ),
+    exit_code: bool = typer.Option(False, "--exit-code", help="Exit 1 if differences exist."),
+    verbose: bool = typer.Option(False, "--verbose", help="Show all files including non-weevr."),
 ) -> None:
     """Show diff between local files and deployed state."""
     from weevr_cli.commands.status import run_status

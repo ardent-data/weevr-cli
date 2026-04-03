@@ -34,7 +34,6 @@ def render_table(graph: DependencyGraph, console: Console) -> None:
     table.add_column("Status")
 
     for node in sorted(graph.nodes.values(), key=_sort_key):
-        status = "orphan" if node.is_orphan else "connected"
         status_style = "[dim italic]orphan[/dim italic]" if node.is_orphan else "connected"
         table.add_row(
             node.path,

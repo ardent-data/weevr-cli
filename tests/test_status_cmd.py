@@ -37,23 +37,17 @@ def _setup_project(tmp_path: Path) -> Path:
 
     threads = proj / "threads"
     threads.mkdir()
-    (threads / "orders.thread").write_text(
-        "name: orders\nversion: '1.0'\nsource:\n  type: table\n"
-    )
+    (threads / "orders.thread").write_text("name: orders\nversion: '1.0'\nsource:\n  type: table\n")
     weaves = proj / "weaves"
     weaves.mkdir()
-    (weaves / "customer.weave").write_text(
-        "name: customer_dim\nversion: '1.0'\n"
-    )
+    (weaves / "customer.weave").write_text("name: customer_dim\nversion: '1.0'\n")
     # A non-weevr file
     (proj / "data.csv").write_text("id,name\n1,test\n")
     return proj
 
 
 @pytest.fixture()
-def mock_azure(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> Generator[MagicMock, None, None]:
+def mock_azure(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Generator[MagicMock, None, None]:
     """Patch Azure credential and OneLake client; chdir into a test project."""
     proj = _setup_project(tmp_path)
     monkeypatch.chdir(proj)
@@ -147,9 +141,7 @@ class TestStatusTargetResolution:
         result = runner.invoke(app, ["status", "--target", "dev"], catch_exceptions=False)
         assert result.exit_code == 0
 
-    def test_cli_override_flags(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_cli_override_flags(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         proj = _setup_project(tmp_path)
         monkeypatch.chdir(proj)
         with (
@@ -166,8 +158,10 @@ class TestStatusTargetResolution:
                 app,
                 [
                     "status",
-                    "--workspace-id", VALID_UUID_1,
-                    "--lakehouse-id", VALID_UUID_2,
+                    "--workspace-id",
+                    VALID_UUID_1,
+                    "--lakehouse-id",
+                    VALID_UUID_2,
                 ],
                 catch_exceptions=False,
             )
@@ -183,10 +177,12 @@ class TestStatusExitCode:
         md5_weave = compute_md5(Path("weaves/customer.weave"))
         md5_csv = compute_md5(Path("data.csv"))
         mock_azure.list_files.return_value = [
-            RemoteFile("threads/orders.thread", Path("threads/orders.thread").stat().st_size,
-                       md5_thread),
-            RemoteFile("weaves/customer.weave", Path("weaves/customer.weave").stat().st_size,
-                       md5_weave),
+            RemoteFile(
+                "threads/orders.thread", Path("threads/orders.thread").stat().st_size, md5_thread
+            ),
+            RemoteFile(
+                "weaves/customer.weave", Path("weaves/customer.weave").stat().st_size, md5_weave
+            ),
             RemoteFile("data.csv", Path("data.csv").stat().st_size, md5_csv),
         ]
         result = runner.invoke(app, ["status", "--exit-code"], catch_exceptions=False)

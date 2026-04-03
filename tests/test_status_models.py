@@ -17,8 +17,9 @@ class TestStatusEntry:
     """Tests for StatusEntry construction."""
 
     def test_basic_construction(self) -> None:
-        entry = StatusEntry(path="threads/raw.thread", status="+", reason="new, not deployed",
-                            is_weevr=True)
+        entry = StatusEntry(
+            path="threads/raw.thread", status="+", reason="new, not deployed", is_weevr=True
+        )
         assert entry.path == "threads/raw.thread"
         assert entry.status == "+"
         assert entry.reason == "new, not deployed"
@@ -81,9 +82,9 @@ class TestActionsToStatusEntries:
             DeployAction(Path("data.csv"), "data.csv", ActionType.SKIP, ""),
         ]
         entries = actions_to_status_entries(actions)
-        assert entries[0].is_weevr is True   # .thread
-        assert entries[1].is_weevr is True   # .weave
-        assert entries[2].is_weevr is True   # .loom
+        assert entries[0].is_weevr is True  # .thread
+        assert entries[1].is_weevr is True  # .weave
+        assert entries[2].is_weevr is True  # .loom
         assert entries[3].is_weevr is False  # .csv
 
 
