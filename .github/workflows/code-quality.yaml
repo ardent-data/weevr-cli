@@ -27,7 +27,7 @@ jobs:
           enable-cache: true
 
       - name: Sync (frozen)
-        run: uv sync --frozen --dev
+        run: uv sync --frozen --dev --group docs
 
       - name: Lint
         run: uv run ruff check .
@@ -40,3 +40,6 @@ jobs:
 
       - name: Tests
         run: uv run pytest
+
+      - name: Build docs
+        run: uv run mkdocs build --strict

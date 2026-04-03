@@ -1,0 +1,58 @@
+site_name: weevr-cli
+site_url: https://ardent-data.github.io/weevr-cli/
+site_description: CLI for managing weevr projects — scaffolding, validation, and deployment to Microsoft Fabric.
+repo_url: https://github.com/ardent-data/weevr-cli
+repo_name: ardent-data/weevr-cli
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
+    - toc.follow
+
+plugins:
+  - search
+
+markdown_extensions:
+  - mkdocs-click
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.snippets:
+      base_path: ["."]
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - CLI Reference: cli/index.md
+  - Configuration: configuration/index.md
+  - Guides:
+      - Deploy Workflows: guides/deploy-workflows.md
+      - Plugin Authoring: guides/plugin-authoring.md
+  - Changelog: changelog.md
+
+extra:
+  version:
+    provider: mike
