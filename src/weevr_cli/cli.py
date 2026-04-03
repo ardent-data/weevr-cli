@@ -128,9 +128,13 @@ def validate(
     strict: bool = typer.Option(False, "--strict", help="Treat warnings as errors."),
 ) -> None:
     """Validate project files against schemas and check reference integrity."""
-    require_config(ctx)
-    target = path or "entire project"
-    typer.echo(f"Validating: {target}")
+    from weevr_cli.commands.validate import run_validate
+
+    state: AppState = ctx.obj
+    try:
+        run_validate(path, strict=strict, state=state)
+    except SystemExit as exc:
+        raise typer.Exit(code=int(exc.code) if exc.code is not None else 1) from exc
 
 
 @app.command()
