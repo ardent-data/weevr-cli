@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.5](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v0.1.4...weevr-cli-v0.1.5) (2026-04-03)
+
+
+### Features
+
+* **cli:** add validate and schema commands with JSON schema validation and ref checking ([#12](https://github.com/ardent-data/weevr-cli/issues/12)) ([8a9c94a](https://github.com/ardent-data/weevr-cli/commit/8a9c94ab41d9a9d1b47668bb1355c02de0cf0254))
+
+
+### Bug Fixes
+
+* **ci:** use frozen lockfile to tolerate Release Please version bumps ([#10](https://github.com/ardent-data/weevr-cli/issues/10)) ([d2efed5](https://github.com/ardent-data/weevr-cli/commit/d2efed529560d0aca4b23b1e32a21e32368dcab4))
+
 ## [0.1.4](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v0.1.3...weevr-cli-v0.1.4) (2026-04-03)
 
 
