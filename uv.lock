@@ -1318,7 +1318,7 @@ wheels = [
 
 [[package]]
 name = "weevr-cli"
-version = "0.1.8"
+version = "1.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "azure-identity" },
@@ -1365,8 +1365,8 @@ dev = [
     { name = "ruff", specifier = ">=0.15.0" },
 ]
 docs = [
-    { name = "mike", specifier = ">=2.1.0" },
-    { name = "mkdocs", specifier = ">=1.6.0" },
-    { name = "mkdocs-click", specifier = ">=0.8.0" },
-    { name = "mkdocs-material", specifier = ">=9.5.0" },
+    { name = "mike", specifier = ">=2.1.0,<3" },
+    { name = "mkdocs", specifier = ">=1.6.0,<2" },
+    { name = "mkdocs-click", specifier = ">=0.8.0,<1" },
+    { name = "mkdocs-material", specifier = ">=9.5.0,<10" },
 ]
