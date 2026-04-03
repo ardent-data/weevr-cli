@@ -5,6 +5,7 @@ from __future__ import annotations
 import typer
 
 from weevr_cli import __version__
+from weevr_cli.commands.schema_cmd import schema_app
 from weevr_cli.config import ConfigError, find_project_root, load_config
 from weevr_cli.output import create_console, print_error, print_json
 from weevr_cli.state import AppState
@@ -176,10 +177,4 @@ def list_cmd(ctx: typer.Context) -> None:
     typer.echo("Listing project structure...")
 
 
-@app.command()
-def schema(
-    action: str = typer.Argument("version", help="Action: version or update."),
-    version: str | None = typer.Option(None, "--version", help="Specific schema version."),
-) -> None:
-    """Manage validation schemas."""
-    typer.echo(f"Schema: {action}")
+app.add_typer(schema_app, name="schema")
