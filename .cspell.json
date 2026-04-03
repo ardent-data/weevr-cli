@@ -1,0 +1,35 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "weevr",
+    "loom",
+    "looms",
+    "weave",
+    "weaves",
+    "mkdocs",
+    "onelake",
+    "lakehouse",
+    "lakehouses",
+    "pyright",
+    "pyyaml",
+    "jsonschema",
+    "pathspec",
+    "typer",
+    "pipx",
+    "uncommitted",
+    "overwrite",
+    "nullable",
+    "markdownlint",
+    "cspell",
+    "LaFromboise",
+    "Fromboise",
+    "sublicense"
+  ],
+  "ignorePaths": [
+    "**/*.py",
+    ".claude/**",
+    ".venv/**",
+    "uv.lock"
+  ]
+}

@@ -51,10 +51,10 @@ dev = [
     "ruff>=0.15.0",
 ]
 docs = [
-    "mkdocs>=1.6.0",
-    "mkdocs-material>=9.5.0",
-    "mike>=2.1.0",
-    "mkdocs-click>=0.8.0",
+    "mkdocs>=1.6.0,<2",
+    "mkdocs-material>=9.5.0,<10",
+    "mike>=2.1.0,<3",
+    "mkdocs-click>=0.8.0,<1",
 ]
 
 [tool.ruff]
