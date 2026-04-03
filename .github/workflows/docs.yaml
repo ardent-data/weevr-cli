@@ -21,7 +21,7 @@ jobs:
           python-version-file: ".python-version"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v8
         with:
           enable-cache: true
 
@@ -47,4 +47,9 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Deploy docs
-        run: uv run mike deploy ${{ steps.version.outputs.version }} latest --update-aliases --push
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: uv run mike deploy "$VERSION" latest --update-aliases --push
+
+      - name: Set default version
+        run: uv run mike set-default latest --push

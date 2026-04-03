@@ -35,7 +35,7 @@ Set a default so you don't need `--target` on every command:
 default_target: dev
 ```
 
-When no `--target` flag is provided and no `default_target` is set, commands that require a target will prompt for one.
+When no `--target` flag is provided and no `default_target` is set, commands that require a target exit with an error. You must specify `--target` or set `default_target` in `cli.yaml`.
 
 ### Schema Settings
 
