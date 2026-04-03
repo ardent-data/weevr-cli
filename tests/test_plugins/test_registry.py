@@ -63,12 +63,19 @@ class TestPluginRegistry:
     def test_all(self) -> None:
         registry = PluginRegistry()
         r1 = PluginRecord(
-            entry_point_name="a", display_name="A", version=None,
-            description=None, status="loaded",
+            entry_point_name="a",
+            display_name="A",
+            version=None,
+            description=None,
+            status="loaded",
         )
         r2 = PluginRecord(
-            entry_point_name="b", display_name="B", version=None,
-            description=None, status="failed", error_message="err",
+            entry_point_name="b",
+            display_name="B",
+            version=None,
+            description=None,
+            status="failed",
+            error_message="err",
         )
         registry.add(r1)
         registry.add(r2)
@@ -77,16 +84,27 @@ class TestPluginRegistry:
     def test_by_status(self) -> None:
         registry = PluginRegistry()
         r1 = PluginRecord(
-            entry_point_name="a", display_name="A", version=None,
-            description=None, status="loaded",
+            entry_point_name="a",
+            display_name="A",
+            version=None,
+            description=None,
+            status="loaded",
         )
         r2 = PluginRecord(
-            entry_point_name="b", display_name="B", version=None,
-            description=None, status="failed", error_message="err",
+            entry_point_name="b",
+            display_name="B",
+            version=None,
+            description=None,
+            status="failed",
+            error_message="err",
         )
         r3 = PluginRecord(
-            entry_point_name="c", display_name="C", version=None,
-            description=None, status="skipped", error_message="skip",
+            entry_point_name="c",
+            display_name="C",
+            version=None,
+            description=None,
+            status="skipped",
+            error_message="skip",
         )
         registry.add(r1)
         registry.add(r2)

@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import json
-from unittest.mock import patch
 
 from typer.testing import CliRunner
 
 from weevr_cli.cli import app
-from weevr_cli.plugins.registry import PluginRecord, PluginRegistry, get_registry
+from weevr_cli.plugins.registry import PluginRecord, get_registry
 
 runner = CliRunner()
 

@@ -7,9 +7,9 @@ import typer
 from weevr_cli import __version__
 from weevr_cli.commands.plugins_cmd import plugins_app
 from weevr_cli.commands.schema_cmd import schema_app
-from weevr_cli.plugins.discovery import discover_and_mount_plugins
 from weevr_cli.config import ConfigError, find_project_root, load_config
 from weevr_cli.output import create_console, print_error, print_json
+from weevr_cli.plugins.discovery import discover_and_mount_plugins
 from weevr_cli.state import AppState
 
 app = typer.Typer(
