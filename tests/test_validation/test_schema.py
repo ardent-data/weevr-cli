@@ -89,3 +89,19 @@ def test_unknown_extension(tmp_path: Path) -> None:
     errors = [i for i in issues if i.severity == "error"]
     assert len(errors) >= 1
     assert any("extension" in e.message.lower() or "type" in e.message.lower() for e in errors)
+
+
+def test_corrupted_local_schema(tmp_path: Path) -> None:
+    """Malformed local schema JSON produces an error, not a crash."""
+    project = tmp_path / "test.weevr"
+    project.mkdir()
+    schemas_dir = project / ".weevr" / "schemas"
+    schemas_dir.mkdir(parents=True)
+    (schemas_dir / "thread.json").write_text("not valid json{{{")
+
+    f = tmp_path / "stg.thread"
+    f.write_text('config_version: "1.0"\nsources:\n  raw:\n    type: csv\ntarget:\n  path: t\n')
+    issues = validate_file(f, project_root=project)
+    errors = [i for i in issues if i.severity == "error"]
+    assert len(errors) >= 1
+    assert any("schema" in e.message.lower() for e in errors)

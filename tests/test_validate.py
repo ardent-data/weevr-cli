@@ -218,6 +218,48 @@ def test_validate_path_traversal_rejected(tmp_path: Path, monkeypatch: pytest.Mo
     assert result.exit_code == 1
 
 
+def test_validate_nonexistent_path(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Non-existent path argument produces error."""
+    project = _make_project(tmp_path)
+    monkeypatch.chdir(project)
+    result = runner.invoke(app, ["validate", "does_not_exist.thread"])
+    assert result.exit_code == 1
+
+
+def test_validate_single_file_broken_ref(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Single-file validation detects broken immediate ref."""
+    weave = 'config_version: "1.0"\nthreads:\n  - ref: staging/missing.thread\n'
+    project = _make_project(tmp_path, {"staging.weave": weave})
+    monkeypatch.chdir(project)
+    result = runner.invoke(app, ["validate", "staging.weave"])
+    assert result.exit_code == 1
+
+
+def test_validate_directory_broken_ref(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Directory validation detects broken ref."""
+    weave = 'config_version: "1.0"\nthreads:\n  - ref: staging/missing.thread\n'
+    project = _make_project(
+        tmp_path,
+        {
+            "sub/staging.weave": weave,
+        },
+    )
+    monkeypatch.chdir(project)
+    result = runner.invoke(app, ["validate", "sub"])
+    assert result.exit_code == 1
+
+
+def test_validate_absolute_path_ref_rejected(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Weave with absolute path ref produces error."""
+    weave = 'config_version: "1.0"\nthreads:\n  - ref: /etc/passwd\n'
+    project = _make_project(tmp_path, {"staging.weave": weave})
+    monkeypatch.chdir(project)
+    result = runner.invoke(app, ["validate"])
+    assert result.exit_code == 1
+
+
 def test_validate_no_files(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Empty directory returns no_files_found error."""
     project = _make_project(tmp_path)

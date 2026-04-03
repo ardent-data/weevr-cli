@@ -92,7 +92,7 @@ def update(
     for schema_type in VALID_SCHEMA_TYPES:
         url = f"{_GITHUB_BASE}/{branch}/docs/schema/{schema_type}.json"
         try:
-            with urlopen(url) as resp:  # noqa: S310
+            with urlopen(url) as resp:  # noqa: S310  # host is hardcoded
                 content = resp.read()
             target = schemas_dir / f"{schema_type}.json"
             target.write_bytes(content)

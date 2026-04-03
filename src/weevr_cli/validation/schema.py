@@ -79,7 +79,16 @@ def validate_file(
 
     # Load schema and validate
     schema_path = resolve_schema(schema_type, project_root=project_root)
-    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    try:
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as exc:
+        return [
+            ValidationIssue(
+                severity="error",
+                message=f"Cannot load schema for {schema_type}: {exc}",
+                file=file_str,
+            )
+        ]
 
     issues: list[ValidationIssue] = []
     validator = jsonschema.Draft202012Validator(schema)

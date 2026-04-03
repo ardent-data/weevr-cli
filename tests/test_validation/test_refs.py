@@ -81,6 +81,17 @@ def test_path_traversal_rejected(tmp_path: Path) -> None:
     assert ".." in errors[0].message
 
 
+def test_absolute_path_rejected(tmp_path: Path) -> None:
+    """Ref with absolute path produces error."""
+    weave = 'config_version: "1.0"\nthreads:\n  - ref: /etc/passwd\n'
+    project = _make_project(tmp_path, {"staging.weave": weave})
+    files = _parse_files(project)
+    issues = check_refs(files, project)
+    errors = [i for i in issues if i.severity == "error"]
+    assert len(errors) == 1
+    assert "traversal" in errors[0].message.lower() or "relative" in errors[0].message.lower()
+
+
 def test_orphaned_thread(tmp_path: Path) -> None:
     """Thread not referenced by any weave produces warning."""
     project = _make_project(

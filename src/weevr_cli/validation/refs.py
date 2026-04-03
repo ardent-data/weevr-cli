@@ -53,13 +53,15 @@ def check_refs(
             continue
 
         for ref_value, source_file, location in _extract_refs(data, file_path):
-            # Reject path traversal
-            if ".." in PurePosixPath(ref_value).parts:
+            # Reject absolute paths and path traversal
+            ref_path = PurePosixPath(ref_value)
+            if ref_path.is_absolute() or ".." in ref_path.parts:
                 issues.append(
                     ValidationIssue(
                         severity="error",
                         message=(
-                            f"Path traversal not allowed: '{ref_value}' contains '..' component"
+                            f"Path traversal not allowed: '{ref_value}' "
+                            f"must be a relative path within the project"
                         ),
                         file=source_file,
                         location=location,

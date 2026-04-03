@@ -60,9 +60,7 @@ def main(
         except ConfigError as exc:
             config_error = exc
 
-    ctx.obj = AppState(
-        console=console, config=config, json_mode=json, config_error=config_error
-    )
+    ctx.obj = AppState(console=console, config=config, json_mode=json, config_error=config_error)
 
 
 def require_config(ctx: typer.Context) -> AppState:

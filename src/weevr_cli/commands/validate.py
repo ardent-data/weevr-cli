@@ -27,7 +27,7 @@ def _find_weevr_files(directory: Path) -> list[Path]:
     return sorted(files)
 
 
-def _determine_project_root(target_path: Path | None) -> Path | None:
+def _determine_project_root() -> Path | None:
     """Determine the .weevr project root for ref resolution.
 
     Resolution order:
@@ -102,12 +102,22 @@ def run_validate(
     Raises:
         SystemExit: With code 1 on validation errors or no files found.
     """
-    project_root = _determine_project_root(Path(path).resolve() if path else None)
+    project_root = _determine_project_root()
     if project_root is not None:
         project_root = project_root.resolve()
 
     all_issues: list[ValidationIssue] = []
     target_path = Path(path).resolve() if path else None
+
+    # Check that explicit target exists
+    if target_path is not None and not target_path.exists():
+        print_error(
+            f"Path not found: {path}",
+            "path_not_found",
+            json_mode=state.json_mode,
+            console=state.console,
+        )
+        raise SystemExit(1)
 
     # Determine what to validate
     if target_path is not None and target_path.is_file():
@@ -139,10 +149,13 @@ def run_validate(
 
     # Reference checking
     if project_root is not None:
-        # Parse all files for ref extraction
+        # Parse all files for ref extraction (skip files outside project root)
         parsed: dict[str, Any] = {}
         for file_path in files_to_check:
-            rel = str(file_path.relative_to(project_root))
+            try:
+                rel = str(file_path.relative_to(project_root))
+            except ValueError:
+                continue
             data = _parse_file(file_path)
             if data is not None:
                 parsed[rel] = data
