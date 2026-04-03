@@ -971,12 +971,13 @@ wheels = [
 
 [[package]]
 name = "weevr-cli"
-version = "0.1.5"
+version = "0.1.7"
 source = { editable = "." }
 dependencies = [
     { name = "azure-identity" },
     { name = "azure-storage-file-datalake" },
     { name = "jsonschema" },
+    { name = "packaging" },
     { name = "pathspec" },
     { name = "pyyaml" },
     { name = "rich" },
@@ -996,6 +997,7 @@ requires-dist = [
     { name = "azure-identity", specifier = ">=1.0.0" },
     { name = "azure-storage-file-datalake", specifier = ">=12.0.0" },
     { name = "jsonschema", specifier = ">=4.0,<5.0" },
+    { name = "packaging", specifier = ">=23.0" },
     { name = "pathspec", specifier = ">=0.12.0" },
     { name = "pyyaml", specifier = ">=6.0,<7.0" },
     { name = "rich", specifier = ">=13.0.0" },
