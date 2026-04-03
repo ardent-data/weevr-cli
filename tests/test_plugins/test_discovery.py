@@ -12,10 +12,12 @@ from weevr_cli.plugins.discovery import (
     RESERVED_NAMES,
     check_name_collision,
     check_version_compatibility,
+    discover_and_mount_plugins,
     discover_entry_points,
     load_and_validate_plugin,
     load_plugin,
 )
+from weevr_cli.plugins.registry import get_registry
 
 
 def _make_entry_point(name: str, package: str = "fake-pkg") -> EntryPoint:
@@ -213,3 +215,103 @@ class TestLoadAndValidatePlugin:
         ep = _mock_entry_point("demo", load_return=mod)
         record = load_and_validate_plugin(ep, RESERVED_NAMES, set())
         assert record.status == "loaded"
+
+
+class TestDiscoverAndMountPlugins:
+    def _reset_registry(self) -> None:
+        """Clear the global registry between tests."""
+        reg = get_registry()
+        reg._records.clear()
+        reg._order.clear()
+
+    def test_success(self) -> None:
+        self._reset_registry()
+        plugin_app = typer.Typer()
+
+        @plugin_app.command()
+        def greet() -> None:
+            pass
+
+        mod = _make_module_with_app(app=plugin_app)
+        ep = _mock_entry_point("greet", load_return=mod)
+
+        host_app = typer.Typer()
+        with patch("weevr_cli.plugins.discovery.discover_entry_points", return_value=[ep]):
+            discover_and_mount_plugins(host_app)
+
+        registry = get_registry()
+        assert len(registry.all()) == 1
+        assert registry.all()[0].status == "loaded"
+
+    def test_skips_broken(self) -> None:
+        self._reset_registry()
+        good_mod = _make_module_with_app()
+        good_ep = _mock_entry_point("good", load_return=good_mod)
+        bad_ep = _mock_entry_point("bad", load_side_effect=ImportError("nope"))
+
+        host_app = typer.Typer()
+        with patch(
+            "weevr_cli.plugins.discovery.discover_entry_points",
+            return_value=[bad_ep, good_ep],
+        ):
+            discover_and_mount_plugins(host_app)
+
+        registry = get_registry()
+        assert len(registry.all()) == 2
+        assert registry.get("good").status == "loaded"  # type: ignore[union-attr]
+        assert registry.get("bad").status == "failed"  # type: ignore[union-attr]
+
+    def test_collision(self) -> None:
+        self._reset_registry()
+        mod1 = _make_module_with_app()
+        mod2 = _make_module_with_app()
+        # Use different entry point names so they don't overwrite in the registry
+        ep1 = _mock_entry_point("alpha", load_return=mod1)
+        ep2 = _mock_entry_point("alpha", load_return=mod2)
+
+        host_app = typer.Typer()
+        with patch(
+            "weevr_cli.plugins.discovery.discover_entry_points",
+            return_value=[ep1, ep2],
+        ):
+            discover_and_mount_plugins(host_app)
+
+        registry = get_registry()
+        # Both get added to registry (second overwrites since same key)
+        # but the second was skipped because alpha was already registered
+        record = registry.get("alpha")
+        assert record is not None
+        assert record.status == "skipped"
+
+    def test_version_skip(self) -> None:
+        self._reset_registry()
+        meta = PluginMetadata(name="future", min_cli_version="99.0.0")
+        mod = _make_module_with_app(meta=meta, include_meta=True)
+        ep = _mock_entry_point("future", load_return=mod)
+
+        host_app = typer.Typer()
+        with patch("weevr_cli.plugins.discovery.discover_entry_points", return_value=[ep]):
+            discover_and_mount_plugins(host_app)
+
+        registry = get_registry()
+        assert registry.get("future").status == "skipped"  # type: ignore[union-attr]
+
+    def test_warns_on_failure(self, capsys: object) -> None:
+        self._reset_registry()
+        ep = _mock_entry_point("broken", load_side_effect=ImportError("missing"))
+
+        host_app = typer.Typer()
+        with patch("weevr_cli.plugins.discovery.discover_entry_points", return_value=[ep]):
+            discover_and_mount_plugins(host_app)
+
+        registry = get_registry()
+        assert registry.get("broken").status == "failed"  # type: ignore[union-attr]
+
+    def test_no_plugins(self) -> None:
+        self._reset_registry()
+        host_app = typer.Typer()
+        with patch("weevr_cli.plugins.discovery.discover_entry_points", return_value=[]):
+            discover_and_mount_plugins(host_app)
+
+        registry = get_registry()
+        assert registry.all() == []

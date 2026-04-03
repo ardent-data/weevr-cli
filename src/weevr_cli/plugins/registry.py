@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Literal
 
 
@@ -24,6 +24,7 @@ class PluginRegistry:
     """In-memory store of all discovered plugin records."""
 
     def __init__(self) -> None:
+        """Initialize an empty plugin registry."""
         self._records: dict[str, PluginRecord] = {}
         self._order: list[str] = []
 

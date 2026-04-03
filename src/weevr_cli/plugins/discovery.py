@@ -7,10 +7,11 @@ from importlib.metadata import EntryPoint, entry_points
 
 import typer
 from packaging.version import InvalidVersion, Version
+from rich.console import Console
 
 from weevr_cli import __version__
 from weevr_cli.plugins import PluginMetadata
-from weevr_cli.plugins.registry import PluginRecord
+from weevr_cli.plugins.registry import PluginRecord, get_registry
 
 ENTRY_POINT_GROUP = "weevr.plugins"
 
@@ -191,3 +192,47 @@ def load_and_validate_plugin(
         return replace(record, status="skipped", error_message=version_msg)
 
     return record
+
+
+def discover_and_mount_plugins(
+    app: typer.Typer, console: Console | None = None
+) -> None:
+    """Discover, load, validate, and mount all plugins onto the CLI app.
+
+    Scans ``weevr.plugins`` entry points, validates each plugin, mounts
+    successful ones as sub-apps, and records all results in the global
+    plugin registry. Warnings for failed or skipped plugins are printed
+    to stderr.
+    """
+    if console is None:
+        console = Console(stderr=True, highlight=False)
+
+    registry = get_registry()
+    registered_names: set[str] = set()
+
+    for entry_point in discover_entry_points():
+        record = load_and_validate_plugin(entry_point, RESERVED_NAMES, registered_names)
+        registry.add(record)
+
+        if record.status == "loaded":
+            # Mount the plugin's Typer app as a subcommand
+            try:
+                module = entry_point.load()
+                plugin_app = module.app
+                app.add_typer(plugin_app, name=entry_point.name)
+                registered_names.add(entry_point.name)
+            except Exception as exc:
+                console.print(
+                    f"[yellow]Warning:[/yellow] Plugin '{entry_point.name}' "
+                    f"failed to mount: {exc}",
+                )
+        elif record.status == "failed":
+            console.print(
+                f"[yellow]Warning:[/yellow] Plugin '{entry_point.name}' "
+                f"failed to load: {record.error_message}",
+            )
+        elif record.status == "skipped":
+            console.print(
+                f"[yellow]Warning:[/yellow] Plugin '{entry_point.name}' "
+                f"skipped: {record.error_message}",
+            )
