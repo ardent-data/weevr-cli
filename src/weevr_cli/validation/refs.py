@@ -8,7 +8,7 @@ from typing import Any
 from weevr_cli.validation.results import ValidationIssue
 
 
-def _extract_refs(data: dict[str, Any], file_path: str) -> list[tuple[str, str, str]]:
+def extract_refs(data: dict[str, Any], file_path: str) -> list[tuple[str, str, str]]:
     """Extract ref entries from a parsed weave or loom file.
 
     Returns:
@@ -52,7 +52,7 @@ def check_refs(
         if not isinstance(data, dict):
             continue
 
-        for ref_value, source_file, location in _extract_refs(data, file_path):
+        for ref_value, source_file, location in extract_refs(data, file_path):
             # Reject absolute paths and path traversal
             ref_path = PurePosixPath(ref_value)
             if ref_path.is_absolute() or ".." in ref_path.parts:
@@ -105,7 +105,7 @@ def find_orphans(
     for data in files.values():
         if not isinstance(data, dict):
             continue
-        for ref_value, _, _ in _extract_refs(data, ""):
+        for ref_value, _, _ in extract_refs(data, ""):
             referenced.add(ref_value)
 
     issues: list[ValidationIssue] = []

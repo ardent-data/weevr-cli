@@ -127,9 +127,14 @@ def format_status_json(
             summary["remote_only"] += 1
     summary["total"] = len(entries)
 
-    target_info: dict[str, str] = {"workspace_id": target.workspace_id}
+    target_info: dict[str, str] = {
+        "workspace_id": target.workspace_id,
+        "lakehouse_id": target.lakehouse_id,
+    }
     if target.name:
         target_info["name"] = target.name
+    if target.path_prefix:
+        target_info["path_prefix"] = target.path_prefix
 
     result: dict[str, Any] = {
         "target": target_info,

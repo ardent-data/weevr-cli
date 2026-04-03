@@ -7,7 +7,7 @@ from typing import Any
 from rich.console import Console
 from rich.tree import Tree
 
-from weevr_cli.listing.models import DependencyGraph
+from weevr_cli.listing.models import DependencyGraph, GraphNode
 
 
 def render_tree(graph: DependencyGraph, console: Console) -> None:
@@ -35,7 +35,7 @@ def render_tree(graph: DependencyGraph, console: Console) -> None:
     console.print(tree)
 
 
-def _add_children(graph: DependencyGraph, node: Any, branch: Tree) -> None:
+def _add_children(graph: DependencyGraph, node: GraphNode, branch: Tree) -> None:
     """Recursively add child references to a tree branch."""
     for ref_path in node.refs_out:
         child_node = graph.nodes.get(ref_path)
@@ -70,7 +70,7 @@ def render_tree_json(graph: DependencyGraph) -> dict[str, Any]:
     }
 
 
-def _node_to_dict(graph: DependencyGraph, node: Any) -> dict[str, Any]:
+def _node_to_dict(graph: DependencyGraph, node: GraphNode) -> dict[str, Any]:
     """Recursively convert a node and its children to a dict."""
     children: list[dict[str, Any]] = []
     for ref_path in node.refs_out:

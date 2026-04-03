@@ -49,3 +49,11 @@ def run_list(*, format: str, state: AppState) -> None:
             print_json(render_table_json(graph))
         else:
             render_table(graph, state.console)
+    else:
+        print_error(
+            f"Unknown format: {format}. Valid options are 'tree' or 'table'.",
+            "invalid_format",
+            json_mode=state.json_mode,
+            console=state.console,
+        )
+        raise SystemExit(1)

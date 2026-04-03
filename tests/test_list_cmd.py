@@ -167,6 +167,17 @@ class TestListTable:
 class TestListEdgeCases:
     """Edge case tests for list command."""
 
+    def test_invalid_format_exits_with_error(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Invalid --format value → error, exit 1."""
+        project = _make_project(tmp_path)
+        _write_yaml(project / "threads" / "raw.thread", {"name": "raw"})
+        monkeypatch.chdir(project)
+
+        result = runner.invoke(app, ["list", "--format", "bogus"])
+        assert result.exit_code == 1
+
     def test_no_weevr_files(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         """No weevr files → informational message, exit 0."""
         project = _make_project(tmp_path)

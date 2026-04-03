@@ -108,7 +108,9 @@ def run_status(
         raise SystemExit(1) from exc
 
     # 5. Compute diff (smart sync mode, include remote-only for status)
-    plan = compute_diff(target, local_files, remote_files, clean=True, clean_all=True)
+    plan = compute_diff(
+        target, local_files, remote_files, clean=True, clean_all=True, ignore_spec=ignore_spec
+    )
 
     # 6. Convert to status entries
     entries = actions_to_status_entries(plan.actions)
