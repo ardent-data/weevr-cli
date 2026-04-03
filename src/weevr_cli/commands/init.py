@@ -4,9 +4,39 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from weevr_cli.config import WEEVR_PROJECT_EXT
 from weevr_cli.output import print_error, print_json
 from weevr_cli.state import AppState
 from weevr_cli.templates import get_example_files, render_cli_yaml
+
+
+def _normalize_project_path(name: str) -> Path:
+    """Resolve project directory path, ensuring the .weevr suffix.
+
+    Args:
+        name: Project name or "." for current directory.
+
+    Returns:
+        Resolved Path with .weevr suffix.
+
+    Raises:
+        SystemExit: If "." is used and cwd doesn't end with .weevr.
+    """
+    if name == ".":
+        cwd = Path.cwd()
+        if not cwd.name.endswith(WEEVR_PROJECT_EXT):
+            msg = (
+                f"Current directory '{cwd.name}' does not have the required "
+                f"{WEEVR_PROJECT_EXT} extension. Use 'weevr init <name>' to create "
+                f"a new project directory instead."
+            )
+            raise ValueError(msg)
+        return cwd
+
+    path = Path(name)
+    if not path.name.endswith(WEEVR_PROJECT_EXT):
+        path = Path(f"{name}{WEEVR_PROJECT_EXT}")
+    return path
 
 
 def init_project(
@@ -18,9 +48,9 @@ def init_project(
 ) -> None:
     """Create a new weevr project.
 
-    Creates the project directory (if needed) with a `.weevr/cli.yaml`
-    configuration file. No other directories are created by default —
-    project structure is left to the developer.
+    Creates a project directory with the .weevr suffix and a
+    `.weevr/cli.yaml` configuration file inside it. The .weevr suffix
+    is required by the weevr engine for project root detection.
 
     Args:
         name: Project directory name, or "." for current directory.
@@ -28,7 +58,16 @@ def init_project(
         interactive: Whether to run the interactive wizard.
         state: Application state with console and json_mode.
     """
-    target = Path.cwd() if name == "." else Path(name)
+    try:
+        target = _normalize_project_path(name)
+    except ValueError as exc:
+        print_error(
+            str(exc),
+            "invalid_project_dir",
+            json_mode=state.json_mode,
+            console=state.console,
+        )
+        raise SystemExit(1) from exc
 
     # Check for existing project
     config_path = target / ".weevr" / "cli.yaml"
@@ -71,7 +110,7 @@ def init_project(
             created_files.append(rel_path)
 
     # Output
-    display_name = name if name != "." else str(target.name)
+    display_name = target.name
     if state.json_mode:
         print_json({"created": display_name, "files": created_files})
     else:
