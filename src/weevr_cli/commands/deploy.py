@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import sys
 
-from azure.identity import DefaultAzureCredential
-
 from weevr_cli.config import find_project_root
 from weevr_cli.deploy.collector import collect_local_files
 from weevr_cli.deploy.diff import compute_diff
@@ -15,7 +13,7 @@ from weevr_cli.deploy.onelake import OneLakeClient
 from weevr_cli.deploy.output import render_dry_run, render_result, render_target_header
 from weevr_cli.deploy.target import TargetError, resolve_target
 from weevr_cli.output import print_error
-from weevr_cli.state import AppState
+from weevr_cli.state import AppState, AuthError
 
 
 def run_deploy(
@@ -136,15 +134,9 @@ def run_deploy(
 
     # 7. Authenticate and list remote files
     try:
-        credential = DefaultAzureCredential()
-        client = OneLakeClient(target, credential)
-    except Exception as exc:
-        print_error(
-            f"Authentication failed: {exc}",
-            "auth_failed",
-            json_mode=state.json_mode,
-            console=state.console,
-        )
+        client = OneLakeClient(target, state.credential)
+    except AuthError as exc:
+        print_error(str(exc), "auth_failed", json_mode=state.json_mode, console=state.console)
         raise SystemExit(1) from exc
 
     try:

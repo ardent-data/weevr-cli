@@ -61,7 +61,10 @@ def mock_azure(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Generator[Mag
     proj = _setup_project(tmp_path)
     monkeypatch.chdir(proj)
     with (
-        patch("weevr_cli.commands.deploy.DefaultAzureCredential"),
+        patch(
+            "weevr_cli.state.AppState.credential",
+            new_callable=lambda: property(lambda self: MagicMock()),
+        ),
         patch("weevr_cli.commands.deploy.OneLakeClient") as mock_cls,
     ):
         mock_client = MagicMock()
@@ -78,7 +81,10 @@ def mock_azure_with_ignore(
     proj = _setup_project(tmp_path, deploy_ignore="weaves/\n")
     monkeypatch.chdir(proj)
     with (
-        patch("weevr_cli.commands.deploy.DefaultAzureCredential"),
+        patch(
+            "weevr_cli.state.AppState.credential",
+            new_callable=lambda: property(lambda self: MagicMock()),
+        ),
         patch("weevr_cli.commands.deploy.OneLakeClient") as mock_cls,
     ):
         mock_client = MagicMock()
@@ -215,3 +221,21 @@ class TestDeployJsonOutput:
         data = json.loads(result.output)
         assert "uploaded" in data
         assert "failed" in data
+
+
+class TestDeployAuthError:
+    def test_auth_failure_exits_with_error(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        proj = _setup_project(tmp_path)
+        monkeypatch.chdir(proj)
+        from weevr_cli.state import AuthError
+
+        with patch(
+            "weevr_cli.state.AppState.credential",
+            new_callable=lambda: property(
+                lambda self: (_ for _ in ()).throw(AuthError("No Azure credentials found."))
+            ),
+        ):
+            result = runner.invoke(app, ["deploy", "--skip-validation"], catch_exceptions=False)
+        assert result.exit_code == 1
