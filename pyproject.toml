@@ -1,6 +1,6 @@
 [project]
 name = "weevr-cli"
-version = "0.1.6"
+version = "0.1.7"
 description = "CLI for managing weevr projects — scaffolding, validation, and deployment to Microsoft Fabric."
 readme = "README.md"
 license = { file = "LICENSE" }
