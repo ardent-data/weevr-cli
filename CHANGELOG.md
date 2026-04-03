@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.0](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v0.1.8...weevr-cli-v1.0.0) (2026-04-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* add documentation site and prepare v1.0 release ([#19](https://github.com/ardent-data/weevr-cli/issues/19))
+
+### Features
+
+* add documentation site and prepare v1.0 release ([#19](https://github.com/ardent-data/weevr-cli/issues/19)) ([651ba79](https://github.com/ardent-data/weevr-cli/commit/651ba796ff945de5ba08d902ee50638656f24f71))
+
 ## [0.1.8](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v0.1.7...weevr-cli-v0.1.8) (2026-04-03)
 
 
