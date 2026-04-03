@@ -98,13 +98,13 @@ def test_parse_malformed_yaml(tmp_path: Path) -> None:
 
 
 def test_find_project_root(tmp_path: Path) -> None:
-    project = tmp_path / "my-project"
+    project = tmp_path / "my-project.weevr"
     project.mkdir()
     weevr_dir = project / ".weevr"
     weevr_dir.mkdir()
     (weevr_dir / "cli.yaml").write_text("targets: {}")
 
-    nested = project / "threads" / "deep"
+    nested = project / "staging" / "deep"
     nested.mkdir(parents=True)
 
     root = find_project_root(nested)

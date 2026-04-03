@@ -73,12 +73,14 @@ def test_config_not_found_json(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
 
 def test_appstate_in_context(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(tmp_path)
-    result = runner.invoke(app, ["init"])
+    result = runner.invoke(app, ["init", "test-proj"])
     assert result.exit_code == 0
 
 
 def test_config_loaded_when_present(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    weevr_dir = tmp_path / ".weevr"
+    project = tmp_path / "test.weevr"
+    project.mkdir()
+    weevr_dir = project / ".weevr"
     weevr_dir.mkdir()
     (weevr_dir / "cli.yaml").write_text(
         yaml.dump(
@@ -92,6 +94,6 @@ def test_config_loaded_when_present(tmp_path: Path, monkeypatch: pytest.MonkeyPa
             }
         )
     )
-    monkeypatch.chdir(tmp_path)
+    monkeypatch.chdir(project)
     result = runner.invoke(app, ["validate"])
     assert "config_not_found" not in result.output

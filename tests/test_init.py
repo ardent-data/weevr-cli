@@ -16,51 +16,69 @@ def test_init_creates_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -
     result = runner.invoke(app, ["init", "my-project"])
     assert result.exit_code == 0
 
-    project = tmp_path / "my-project"
+    project = tmp_path / "my-project.weevr"
+    assert project.is_dir()
     assert (project / ".weevr" / "cli.yaml").is_file()
 
 
-def test_init_no_forced_directories(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_init_auto_appends_weevr_suffix(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(tmp_path)
-    runner.invoke(app, ["init", "my-project"])
-    project = tmp_path / "my-project"
-    # Default init should NOT create type-based directories
-    assert not (project / "threads").exists()
-    assert not (project / "weaves").exists()
-    assert not (project / "looms").exists()
+    result = runner.invoke(app, ["init", "my-project"])
+    assert result.exit_code == 0
+    assert (tmp_path / "my-project.weevr").is_dir()
+    assert not (tmp_path / "my-project").exists()
 
 
-def test_init_dot_current_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_init_explicit_weevr_suffix(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(tmp_path)
+    result = runner.invoke(app, ["init", "my-project.weevr"])
+    assert result.exit_code == 0
+    assert (tmp_path / "my-project.weevr").is_dir()
+    assert not (tmp_path / "my-project.weevr.weevr").exists()
+
+
+def test_init_dot_in_weevr_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    project = tmp_path / "my-project.weevr"
+    project.mkdir()
+    monkeypatch.chdir(project)
     result = runner.invoke(app, ["init", "."])
     assert result.exit_code == 0
-    assert (tmp_path / ".weevr" / "cli.yaml").is_file()
+    assert (project / ".weevr" / "cli.yaml").is_file()
+
+
+def test_init_dot_in_non_weevr_dir_errors(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    result = runner.invoke(app, ["init", "."])
+    assert result.exit_code == 1
+    assert "invalid_project_dir" in result.output or ".weevr" in result.output.lower()
 
 
 def test_init_existing_project_errors(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(tmp_path)
-    weevr_dir = tmp_path / ".weevr"
+    project = tmp_path / "my-project.weevr"
+    project.mkdir()
+    weevr_dir = project / ".weevr"
     weevr_dir.mkdir()
     (weevr_dir / "cli.yaml").write_text(
         yaml.dump({"targets": {"dev": {"workspace_id": "ws", "lakehouse_id": "lh"}}})
     )
 
-    result = runner.invoke(app, ["init", "."])
+    result = runner.invoke(app, ["init", "my-project"])
     assert result.exit_code == 1
     assert "project_exists" in result.output or "already exists" in result.output.lower()
 
 
 def test_init_creates_missing_directory(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(tmp_path)
-    result = runner.invoke(app, ["init", "brand-new-dir"])
+    result = runner.invoke(app, ["init", "brand-new"])
     assert result.exit_code == 0
-    assert (tmp_path / "brand-new-dir" / ".weevr" / "cli.yaml").is_file()
+    assert (tmp_path / "brand-new.weevr" / ".weevr" / "cli.yaml").is_file()
 
 
 def test_init_cli_yaml_content(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(tmp_path)
     runner.invoke(app, ["init", "my-project"])
-    content = (tmp_path / "my-project" / ".weevr" / "cli.yaml").read_text()
+    content = (tmp_path / "my-project.weevr" / ".weevr" / "cli.yaml").read_text()
     assert "#" in content
     assert "targets" in content.lower()
     assert "schema" in content.lower()
@@ -71,20 +89,21 @@ def test_init_json_output(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> No
     result = runner.invoke(app, ["--json", "init", "my-project"])
     assert result.exit_code == 0
     data = json.loads(result.output)
-    assert "created" in data
-    assert "files" in data
+    assert data["created"] == "my-project.weevr"
     assert ".weevr/cli.yaml" in data["files"]
 
 
 def test_init_existing_project_json_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(tmp_path)
-    weevr_dir = tmp_path / ".weevr"
+    project = tmp_path / "my-project.weevr"
+    project.mkdir()
+    weevr_dir = project / ".weevr"
     weevr_dir.mkdir()
     (weevr_dir / "cli.yaml").write_text(
         yaml.dump({"targets": {"dev": {"workspace_id": "ws", "lakehouse_id": "lh"}}})
     )
 
-    result = runner.invoke(app, ["--json", "init", "."])
+    result = runner.invoke(app, ["--json", "init", "my-project"])
     assert result.exit_code == 1
     combined = result.output + (result.stderr or "")
     assert "project_exists" in combined
@@ -95,8 +114,7 @@ def test_init_with_examples(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> 
     result = runner.invoke(app, ["init", "my-project", "--examples"])
     assert result.exit_code == 0
 
-    project = tmp_path / "my-project"
-    # Examples use medallion-style layout, not type-based directories
+    project = tmp_path / "my-project.weevr"
     thread_files = list(project.rglob("*.thread"))
     weave_files = list(project.rglob("*.weave"))
     loom_files = list(project.rglob("*.loom"))
@@ -109,7 +127,7 @@ def test_init_examples_content(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
     monkeypatch.chdir(tmp_path)
     runner.invoke(app, ["init", "my-project", "--examples"])
 
-    project = tmp_path / "my-project"
+    project = tmp_path / "my-project.weevr"
     for thread_file in project.rglob("*.thread"):
         content = thread_file.read_text()
         assert "config_version" in content
@@ -120,17 +138,15 @@ def test_init_examples_cross_reference(tmp_path: Path, monkeypatch: pytest.Monke
     monkeypatch.chdir(tmp_path)
     runner.invoke(app, ["init", "my-project", "--examples"])
 
-    project = tmp_path / "my-project"
+    project = tmp_path / "my-project.weevr"
     loom_files = list(project.rglob("*.loom"))
     weave_files = list(project.rglob("*.weave"))
     thread_files = list(project.rglob("*.thread"))
 
-    # Weave references a thread path
     weave_content = weave_files[0].read_text()
     thread_path = str(thread_files[0].relative_to(project))
     assert thread_path in weave_content
 
-    # Loom references a weave by full relative path
     loom_content = loom_files[0].read_text()
     weave_path = str(weave_files[0].relative_to(project))
     assert weave_path in loom_content
@@ -142,7 +158,6 @@ def test_init_examples_json(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> 
     assert result.exit_code == 0
     data = json.loads(result.output)
     assert "files" in data
-    # Should have cli.yaml plus example files
     assert len(data["files"]) > 1
     assert any(f.endswith(".thread") for f in data["files"])
 
@@ -153,11 +168,10 @@ def test_init_interactive_basic(tmp_path: Path, monkeypatch: pytest.MonkeyPatch)
     result = runner.invoke(app, ["init", "my-project", "--interactive"], input=user_input)
     assert result.exit_code == 0
 
-    config_path = tmp_path / "my-project" / ".weevr" / "cli.yaml"
+    config_path = tmp_path / "my-project.weevr" / ".weevr" / "cli.yaml"
     content = config_path.read_text()
     assert "ws-123" in content
     assert "lh-456" in content
-    assert "weevr/proj" in content
 
 
 def test_init_interactive_multiple_targets(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -166,11 +180,10 @@ def test_init_interactive_multiple_targets(tmp_path: Path, monkeypatch: pytest.M
     result = runner.invoke(app, ["init", "my-project", "--interactive"], input=user_input)
     assert result.exit_code == 0
 
-    config_path = tmp_path / "my-project" / ".weevr" / "cli.yaml"
+    config_path = tmp_path / "my-project.weevr" / ".weevr" / "cli.yaml"
     content = config_path.read_text()
     assert "ws-dev" in content
     assert "ws-prod" in content
-    assert "dev" in content
 
 
 def test_init_interactive_json_output(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -179,7 +192,7 @@ def test_init_interactive_json_output(tmp_path: Path, monkeypatch: pytest.Monkey
     result = runner.invoke(app, ["--json", "init", "my-project", "--interactive"], input=user_input)
     assert result.exit_code == 0
     data = json.loads(result.output)
-    assert "created" in data
+    assert data["created"] == "my-project.weevr"
 
 
 def test_init_filesystem_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

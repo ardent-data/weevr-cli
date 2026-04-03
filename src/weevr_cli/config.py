@@ -8,6 +8,8 @@ from typing import Any
 
 import yaml
 
+WEEVR_PROJECT_EXT = ".weevr"
+
 
 class ConfigError(Exception):
     """Error loading or parsing CLI configuration."""
@@ -123,7 +125,11 @@ def load_config(path: Path) -> WeevrConfig:
 
 
 def find_project_root(start: Path | None = None) -> Path | None:
-    """Walk up from start directory to find a .weevr/cli.yaml file.
+    """Find the weevr project root directory.
+
+    A weevr project root is a directory whose name ends with .weevr
+    and contains a .weevr/cli.yaml configuration file. Walks up from
+    the start directory checking each ancestor.
 
     Args:
         start: Directory to start searching from. Defaults to cwd.
@@ -133,7 +139,7 @@ def find_project_root(start: Path | None = None) -> Path | None:
     """
     current = (start or Path.cwd()).resolve()
     while True:
-        if (current / ".weevr" / "cli.yaml").is_file():
+        if current.name.endswith(WEEVR_PROJECT_EXT) and (current / ".weevr" / "cli.yaml").is_file():
             return current
         parent = current.parent
         if parent == current:
