@@ -196,10 +196,32 @@ def deploy(
 def status(
     ctx: typer.Context,
     target: str = typer.Option("", "--target", "-t", help="Named deploy target."),
+    workspace_id: str | None = typer.Option(None, "--workspace-id", help="Override workspace."),
+    lakehouse_id: str | None = typer.Option(None, "--lakehouse-id", help="Override lakehouse."),
+    path_prefix: str | None = typer.Option(None, "--path-prefix", help="Override path prefix."),
+    exit_code: bool = typer.Option(
+        False, "--exit-code", help="Exit 1 if differences exist."
+    ),
+    verbose: bool = typer.Option(
+        False, "--verbose", help="Show all files including non-weevr."
+    ),
 ) -> None:
     """Show diff between local files and deployed state."""
-    require_config(ctx)
-    typer.echo("Checking status...")
+    from weevr_cli.commands.status import run_status
+
+    state = require_config(ctx)
+    try:
+        run_status(
+            target_name=target,
+            workspace_id=workspace_id,
+            lakehouse_id=lakehouse_id,
+            path_prefix=path_prefix,
+            exit_code=exit_code,
+            verbose=verbose,
+            state=state,
+        )
+    except SystemExit as exc:
+        raise typer.Exit(code=int(exc.code) if exc.code is not None else 1) from exc
 
 
 @app.command(name="list")
