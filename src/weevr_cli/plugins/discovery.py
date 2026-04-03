@@ -39,6 +39,7 @@ def _extract_commands(app: typer.Typer) -> list[str]:
             if name:
                 names.append(name)
     except AttributeError:
+        # Command extraction is best-effort; Typer internals may vary across versions.
         pass
     return names
 
@@ -113,6 +114,7 @@ def load_plugin(
             if dist is not None:
                 version = dist.metadata["Version"]
         except (AttributeError, KeyError):
+            # Distribution metadata may be absent for editable installs; leave version as None.
             pass
 
     source_package: str | None = None
@@ -121,6 +123,7 @@ def load_plugin(
         if dist is not None:
             source_package = dist.metadata["Name"]
     except (AttributeError, KeyError):
+        # Distribution or 'Name' metadata may be absent; leave source_package as None.
         pass
 
     commands = _extract_commands(app)
