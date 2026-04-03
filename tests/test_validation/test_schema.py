@@ -28,11 +28,7 @@ def valid_thread(tmp_path: Path) -> Path:
 def valid_weave(tmp_path: Path) -> Path:
     """Create a minimal valid weave file."""
     f = tmp_path / "staging.weave"
-    f.write_text(
-        'config_version: "1.0"\n'
-        "threads:\n"
-        "  - ref: staging/stg_customers.thread\n"
-    )
+    f.write_text('config_version: "1.0"\nthreads:\n  - ref: staging/stg_customers.thread\n')
     return f
 
 
@@ -40,11 +36,7 @@ def valid_weave(tmp_path: Path) -> Path:
 def valid_loom(tmp_path: Path) -> Path:
     """Create a minimal valid loom file."""
     f = tmp_path / "daily.loom"
-    f.write_text(
-        'config_version: "1.0"\n'
-        "weaves:\n"
-        "  - ref: staging.weave\n"
-    )
+    f.write_text('config_version: "1.0"\nweaves:\n  - ref: staging.weave\n')
     return f
 
 
@@ -72,13 +64,7 @@ def test_valid_loom_passes(valid_loom: Path) -> None:
 def test_invalid_thread_missing_config_version(tmp_path: Path) -> None:
     """Missing config_version produces a schema error."""
     f = tmp_path / "bad.thread"
-    f.write_text(
-        "sources:\n"
-        "  raw:\n"
-        "    type: csv\n"
-        "target:\n"
-        "  path: Tables/raw\n"
-    )
+    f.write_text("sources:\n  raw:\n    type: csv\ntarget:\n  path: Tables/raw\n")
     issues = validate_file(f)
     errors = [i for i in issues if i.severity == "error"]
     assert len(errors) >= 1

@@ -24,9 +24,7 @@ def _make_project(tmp_path: Path) -> Path:
     return project
 
 
-def test_schema_version_bundled(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_schema_version_bundled(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Shows bundled version when no local override."""
     project = _make_project(tmp_path)
     monkeypatch.chdir(project)
@@ -35,9 +33,7 @@ def test_schema_version_bundled(
     assert "bundled" in result.output.lower()
 
 
-def test_schema_version_local(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_schema_version_local(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Shows local version when .weevr/schemas/ exists."""
     project = _make_project(tmp_path)
     schemas_dir = project / ".weevr" / "schemas"
@@ -68,9 +64,7 @@ def _mock_urlopen_success(url: str, **kwargs: object) -> object:
     return MockResponse()
 
 
-def test_schema_update_success(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_schema_update_success(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Mocked HTTP fetch writes schemas to .weevr/schemas/."""
     project = _make_project(tmp_path)
     monkeypatch.chdir(project)
@@ -87,9 +81,7 @@ def test_schema_update_success(
     assert (schemas_dir / "loom.json").is_file()
 
 
-def test_schema_update_network_error(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_schema_update_network_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Mocked HTTP failure returns error."""
     project = _make_project(tmp_path)
     monkeypatch.chdir(project)
@@ -101,9 +93,7 @@ def test_schema_update_network_error(
     assert result.exit_code == 1
 
 
-def test_schema_update_json_output(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_schema_update_json_output(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """--json returns structured output."""
     project = _make_project(tmp_path)
     monkeypatch.chdir(project)
@@ -117,9 +107,7 @@ def test_schema_update_json_output(
     assert "schemas_updated" in data or "updated" in data
 
 
-def test_schema_version_json(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_schema_version_json(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """schema version with --json returns structured output."""
     project = _make_project(tmp_path)
     monkeypatch.chdir(project)

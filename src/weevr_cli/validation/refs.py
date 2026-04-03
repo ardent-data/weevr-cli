@@ -59,8 +59,7 @@ def check_refs(
                     ValidationIssue(
                         severity="error",
                         message=(
-                            f"Path traversal not allowed: '{ref_value}' "
-                            f"contains '..' component"
+                            f"Path traversal not allowed: '{ref_value}' contains '..' component"
                         ),
                         file=source_file,
                         location=location,

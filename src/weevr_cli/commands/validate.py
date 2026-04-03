@@ -55,8 +55,7 @@ def _render_rich(result: ValidationResult, state: AppState) -> None:
     """Render validation results using Rich."""
     if result.is_valid and not result.warnings:
         state.console.print(
-            f"[green]Validation passed[/green] "
-            f"({result.files_checked} files checked)"
+            f"[green]Validation passed[/green] ({result.files_checked} files checked)"
         )
         return
 
@@ -103,9 +102,7 @@ def run_validate(
     Raises:
         SystemExit: With code 1 on validation errors or no files found.
     """
-    project_root = _determine_project_root(
-        Path(path).resolve() if path else None
-    )
+    project_root = _determine_project_root(Path(path).resolve() if path else None)
     if project_root is not None:
         project_root = project_root.resolve()
 
@@ -161,10 +158,7 @@ def run_validate(
             all_issues.extend(orphan_issues)
     elif target_path is not None and target_path.is_file():
         # Single file without project root — warn about limited checking
-        state.console.print(
-            "[yellow]No project root found — "
-            "ref checking skipped[/yellow]"
-        )
+        state.console.print("[yellow]No project root found — ref checking skipped[/yellow]")
 
     result = ValidationResult(
         issues=all_issues,

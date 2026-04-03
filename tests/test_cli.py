@@ -99,30 +99,21 @@ def test_config_loaded_when_present(tmp_path: Path, monkeypatch: pytest.MonkeyPa
     assert "config_not_found" not in result.output
 
 
-def test_validate_end_to_end(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_validate_end_to_end(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     project = tmp_path / "test.weevr"
     project.mkdir()
     (project / ".weevr").mkdir()
     thread = project / "staging" / "stg.thread"
     thread.parent.mkdir()
     thread.write_text(
-        'config_version: "1.0"\n'
-        "sources:\n"
-        "  raw:\n"
-        "    type: csv\n"
-        "target:\n"
-        "  path: Tables/raw\n"
+        'config_version: "1.0"\nsources:\n  raw:\n    type: csv\ntarget:\n  path: Tables/raw\n'
     )
     monkeypatch.chdir(project)
     result = runner.invoke(app, ["validate"])
     assert result.exit_code == 0
 
 
-def test_schema_version_end_to_end(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_schema_version_end_to_end(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     project = tmp_path / "test.weevr"
     project.mkdir()
     (project / ".weevr").mkdir()

@@ -19,9 +19,7 @@ schema_app = typer.Typer(
     no_args_is_help=True,
 )
 
-_GITHUB_BASE = (
-    "https://raw.githubusercontent.com/ardent-data/weevr"
-)
+_GITHUB_BASE = "https://raw.githubusercontent.com/ardent-data/weevr"
 
 
 def _get_project_root() -> Path | None:
@@ -52,18 +50,16 @@ def version(ctx: typer.Context) -> None:
         location = "weevr_cli/schemas/"
 
     if state.json_mode:
-        print_json({
-            "source": source,
-            "location": location,
-            "types": list(VALID_SCHEMA_TYPES),
-        })
+        print_json(
+            {
+                "source": source,
+                "location": location,
+                "types": list(VALID_SCHEMA_TYPES),
+            }
+        )
     else:
-        state.console.print(
-            f"Schema source: [bold]{source}[/bold] ({location})"
-        )
-        state.console.print(
-            f"Types: {', '.join(VALID_SCHEMA_TYPES)}"
-        )
+        state.console.print(f"Schema source: [bold]{source}[/bold] ({location})")
+        state.console.print(f"Types: {', '.join(VALID_SCHEMA_TYPES)}")
 
 
 @schema_app.command()
@@ -111,14 +107,13 @@ def update(
             raise typer.Exit(code=1) from exc
 
     if state.json_mode:
-        print_json({
-            "updated": True,
-            "schemas_updated": fetched,
-            "location": str(schemas_dir),
-        })
-    else:
-        state.console.print(
-            f"[green]Updated schemas:[/green] "
-            f"{', '.join(fetched)}"
+        print_json(
+            {
+                "updated": True,
+                "schemas_updated": fetched,
+                "location": str(schemas_dir),
+            }
         )
+    else:
+        state.console.print(f"[green]Updated schemas:[/green] {', '.join(fetched)}")
         state.console.print(f"Location: {schemas_dir}")

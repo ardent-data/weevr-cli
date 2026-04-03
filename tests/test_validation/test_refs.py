@@ -10,24 +10,9 @@ import yaml
 from weevr_cli.validation.refs import check_refs, find_orphans
 
 # Minimal valid YAML content for each file type.
-_THREAD = (
-    'config_version: "1.0"\n'
-    "sources:\n"
-    "  raw:\n"
-    "    type: csv\n"
-    "target:\n"
-    "  path: Tables/raw\n"
-)
-_WEAVE = (
-    'config_version: "1.0"\n'
-    "threads:\n"
-    "  - ref: staging/stg_customers.thread\n"
-)
-_LOOM = (
-    'config_version: "1.0"\n'
-    "weaves:\n"
-    "  - ref: staging.weave\n"
-)
+_THREAD = 'config_version: "1.0"\nsources:\n  raw:\n    type: csv\ntarget:\n  path: Tables/raw\n'
+_WEAVE = 'config_version: "1.0"\nthreads:\n  - ref: staging/stg_customers.thread\n'
+_LOOM = 'config_version: "1.0"\nweaves:\n  - ref: staging.weave\n'
 
 
 def _make_project(tmp_path: Path, files: dict[str, str]) -> Path:
@@ -55,11 +40,14 @@ def _parse_files(project: Path) -> dict[str, Any]:
 
 def test_valid_refs(tmp_path: Path) -> None:
     """All refs point to existing files — no errors."""
-    project = _make_project(tmp_path, {
-        "staging/stg_customers.thread": _THREAD,
-        "staging.weave": _WEAVE,
-        "daily.loom": _LOOM,
-    })
+    project = _make_project(
+        tmp_path,
+        {
+            "staging/stg_customers.thread": _THREAD,
+            "staging.weave": _WEAVE,
+            "daily.loom": _LOOM,
+        },
+    )
     files = _parse_files(project)
     issues = check_refs(files, project)
     errors = [i for i in issues if i.severity == "error"]
@@ -68,14 +56,13 @@ def test_valid_refs(tmp_path: Path) -> None:
 
 def test_broken_ref(tmp_path: Path) -> None:
     """Ref to non-existent file produces error."""
-    weave = (
-        'config_version: "1.0"\n'
-        "threads:\n"
-        "  - ref: staging/missing.thread\n"
+    weave = 'config_version: "1.0"\nthreads:\n  - ref: staging/missing.thread\n'
+    project = _make_project(
+        tmp_path,
+        {
+            "staging.weave": weave,
+        },
     )
-    project = _make_project(tmp_path, {
-        "staging.weave": weave,
-    })
     files = _parse_files(project)
     issues = check_refs(files, project)
     errors = [i for i in issues if i.severity == "error"]
@@ -85,11 +72,7 @@ def test_broken_ref(tmp_path: Path) -> None:
 
 def test_path_traversal_rejected(tmp_path: Path) -> None:
     """Ref containing ../ produces error."""
-    weave = (
-        'config_version: "1.0"\n'
-        "threads:\n"
-        "  - ref: ../outside.thread\n"
-    )
+    weave = 'config_version: "1.0"\nthreads:\n  - ref: ../outside.thread\n'
     project = _make_project(tmp_path, {"staging.weave": weave})
     files = _parse_files(project)
     issues = check_refs(files, project)
@@ -100,12 +83,15 @@ def test_path_traversal_rejected(tmp_path: Path) -> None:
 
 def test_orphaned_thread(tmp_path: Path) -> None:
     """Thread not referenced by any weave produces warning."""
-    project = _make_project(tmp_path, {
-        "staging/stg_customers.thread": _THREAD,
-        "staging/stg_orders.thread": _THREAD,
-        "staging.weave": _WEAVE,
-        "daily.loom": _LOOM,
-    })
+    project = _make_project(
+        tmp_path,
+        {
+            "staging/stg_customers.thread": _THREAD,
+            "staging/stg_orders.thread": _THREAD,
+            "staging.weave": _WEAVE,
+            "daily.loom": _LOOM,
+        },
+    )
     files = _parse_files(project)
     all_paths = list(files.keys())
     issues = find_orphans(files, all_paths)
@@ -116,10 +102,13 @@ def test_orphaned_thread(tmp_path: Path) -> None:
 
 def test_orphaned_weave(tmp_path: Path) -> None:
     """Weave not referenced by any loom produces warning."""
-    project = _make_project(tmp_path, {
-        "staging/stg_customers.thread": _THREAD,
-        "staging.weave": _WEAVE,
-    })
+    project = _make_project(
+        tmp_path,
+        {
+            "staging/stg_customers.thread": _THREAD,
+            "staging.weave": _WEAVE,
+        },
+    )
     files = _parse_files(project)
     all_paths = list(files.keys())
     issues = find_orphans(files, all_paths)
@@ -130,11 +119,14 @@ def test_orphaned_weave(tmp_path: Path) -> None:
 
 def test_loom_not_orphan(tmp_path: Path) -> None:
     """Loom files are top-level entry points — never reported as orphans."""
-    project = _make_project(tmp_path, {
-        "staging/stg_customers.thread": _THREAD,
-        "staging.weave": _WEAVE,
-        "daily.loom": _LOOM,
-    })
+    project = _make_project(
+        tmp_path,
+        {
+            "staging/stg_customers.thread": _THREAD,
+            "staging.weave": _WEAVE,
+            "daily.loom": _LOOM,
+        },
+    )
     files = _parse_files(project)
     all_paths = list(files.keys())
     issues = find_orphans(files, all_paths)
@@ -144,11 +136,14 @@ def test_loom_not_orphan(tmp_path: Path) -> None:
 
 def test_no_orphans(tmp_path: Path) -> None:
     """When all threads/weaves are referenced, no orphan warnings."""
-    project = _make_project(tmp_path, {
-        "staging/stg_customers.thread": _THREAD,
-        "staging.weave": _WEAVE,
-        "daily.loom": _LOOM,
-    })
+    project = _make_project(
+        tmp_path,
+        {
+            "staging/stg_customers.thread": _THREAD,
+            "staging.weave": _WEAVE,
+            "daily.loom": _LOOM,
+        },
+    )
     files = _parse_files(project)
     all_paths = list(files.keys())
     issues = find_orphans(files, all_paths)
