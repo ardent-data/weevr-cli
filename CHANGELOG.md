@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.6](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v0.1.5...weevr-cli-v0.1.6) (2026-04-03)
+
+
+### Features
+
+* **deploy:** add deploy command with OneLake sync ([#13](https://github.com/ardent-data/weevr-cli/issues/13)) ([601a63b](https://github.com/ardent-data/weevr-cli/commit/601a63bc52b4f07aaf965800e792921adcda595b))
+
 ## [0.1.5](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v0.1.4...weevr-cli-v0.1.5) (2026-04-03)
 
 
