@@ -51,16 +51,18 @@ def main(
     console = create_console(json_mode=json)
 
     config = None
+    config_error: ConfigError | None = None
     project_root = find_project_root()
     if project_root is not None:
         config_path = project_root / ".weevr" / "cli.yaml"
         try:
             config = load_config(config_path)
         except ConfigError as exc:
-            print_error(str(exc), exc.code, json_mode=json, console=console)
-            raise typer.Exit(code=1) from exc
+            config_error = exc
 
-    ctx.obj = AppState(console=console, config=config, json_mode=json)
+    ctx.obj = AppState(
+        console=console, config=config, json_mode=json, config_error=config_error
+    )
 
 
 def require_config(ctx: typer.Context) -> AppState:
@@ -76,6 +78,14 @@ def require_config(ctx: typer.Context) -> AppState:
         typer.Exit: If no config is available.
     """
     state: AppState = ctx.obj
+    if state.config_error is not None:
+        print_error(
+            str(state.config_error),
+            state.config_error.code,
+            json_mode=state.json_mode,
+            console=state.console,
+        )
+        raise typer.Exit(code=1)
     if state.config is None:
         print_error(
             "No weevr project found. Run 'weevr init' to create one, "
