@@ -29,9 +29,19 @@ class PluginRegistry:
         self._order: list[str] = []
 
     def add(self, record: PluginRecord) -> None:
-        """Register a plugin record, keyed by entry point name."""
+        """Register a plugin record, keyed by entry point name.
+
+        If a record with the same entry_point_name already exists, the
+        record is updated but insertion order is preserved (no duplicate).
+        """
+        if record.entry_point_name not in self._records:
+            self._order.append(record.entry_point_name)
         self._records[record.entry_point_name] = record
-        self._order.append(record.entry_point_name)
+
+    def clear(self) -> None:
+        """Remove all records. Primarily for test isolation."""
+        self._records.clear()
+        self._order.clear()
 
     def get(self, name: str) -> PluginRecord | None:
         """Look up a plugin by entry point name."""

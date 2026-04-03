@@ -43,43 +43,57 @@ def _extract_commands(app: typer.Typer) -> list[str]:
     return names
 
 
-def load_plugin(entry_point: EntryPoint) -> PluginRecord:
+def load_plugin(
+    entry_point: EntryPoint,
+) -> tuple[PluginRecord, typer.Typer | None, PluginMetadata | None]:
     """Load a single entry point and validate its module interface.
 
-    Returns a PluginRecord with status "loaded" on success, or "failed"
-    with an error message describing what went wrong.
+    Returns a tuple of (record, typer_app, plugin_meta). On failure,
+    typer_app and plugin_meta are None.
     """
     try:
         module = entry_point.load()
     except Exception as exc:
-        return PluginRecord(
-            entry_point_name=entry_point.name,
-            display_name=entry_point.name,
-            version=None,
-            description=None,
-            status="failed",
-            error_message=f"{type(exc).__name__}: {exc}",
+        return (
+            PluginRecord(
+                entry_point_name=entry_point.name,
+                display_name=entry_point.name,
+                version=None,
+                description=None,
+                status="failed",
+                error_message=f"{type(exc).__name__}: {exc}",
+            ),
+            None,
+            None,
         )
 
     app = getattr(module, "app", None)
     if app is None:
-        return PluginRecord(
-            entry_point_name=entry_point.name,
-            display_name=entry_point.name,
-            version=None,
-            description=None,
-            status="failed",
-            error_message="Plugin module has no 'app' attribute",
+        return (
+            PluginRecord(
+                entry_point_name=entry_point.name,
+                display_name=entry_point.name,
+                version=None,
+                description=None,
+                status="failed",
+                error_message="Plugin module has no 'app' attribute",
+            ),
+            None,
+            None,
         )
 
     if not isinstance(app, typer.Typer):
-        return PluginRecord(
-            entry_point_name=entry_point.name,
-            display_name=entry_point.name,
-            version=None,
-            description=None,
-            status="failed",
-            error_message=f"Plugin 'app' is {type(app).__name__}, expected Typer instance",
+        return (
+            PluginRecord(
+                entry_point_name=entry_point.name,
+                display_name=entry_point.name,
+                version=None,
+                description=None,
+                status="failed",
+                error_message=f"Plugin 'app' is {type(app).__name__}, expected Typer instance",
+            ),
+            None,
+            None,
         )
 
     plugin_meta: PluginMetadata | None = getattr(module, "plugin_meta", None)
@@ -111,7 +125,7 @@ def load_plugin(entry_point: EntryPoint) -> PluginRecord:
 
     commands = _extract_commands(app)
 
-    return PluginRecord(
+    record = PluginRecord(
         entry_point_name=entry_point.name,
         display_name=display_name,
         version=version,
@@ -120,6 +134,7 @@ def load_plugin(entry_point: EntryPoint) -> PluginRecord:
         source_package=source_package,
         commands=commands if commands else None,
     )
+    return record, app, plugin_meta
 
 
 def check_version_compatibility(
@@ -136,9 +151,7 @@ def check_version_compatibility(
         required = Version(plugin_meta.min_cli_version)
         current = Version(cli_version)
     except InvalidVersion:
-        return False, (
-            f"Invalid version string: min_cli_version={plugin_meta.min_cli_version!r}"
-        )
+        return False, (f"Invalid version string: min_cli_version={plugin_meta.min_cli_version!r}")
 
     if current < required:
         return False, (
@@ -164,39 +177,30 @@ def check_name_collision(
 
 def load_and_validate_plugin(
     entry_point: EntryPoint, reserved: frozenset[str], registered: set[str]
-) -> PluginRecord:
+) -> tuple[PluginRecord, typer.Typer | None]:
     """Load a plugin and apply version gating and collision checks.
 
-    Wraps ``load_plugin`` with additional validation. If the initial load
-    fails, the record is returned as-is (no further checks needed).
+    Returns (record, typer_app). On failure/skip, typer_app is None.
+    The module is loaded exactly once via ``load_plugin``.
     """
-    record = load_plugin(entry_point)
+    record, plugin_app, plugin_meta = load_plugin(entry_point)
     if record.status == "failed":
-        return record
+        return record, None
 
     # Name collision check (before version gate — cheap and deterministic)
     collision, collision_msg = check_name_collision(entry_point.name, reserved, registered)
     if collision:
-        return replace(record, status="skipped", error_message=collision_msg)
+        return replace(record, status="skipped", error_message=collision_msg), None
 
-    # Version gate check
-    plugin_meta: PluginMetadata | None = None
-    try:
-        module = entry_point.load()
-        plugin_meta = getattr(module, "plugin_meta", None)
-    except Exception:
-        pass
-
+    # Version gate check (uses plugin_meta already extracted by load_plugin)
     compatible, version_msg = check_version_compatibility(plugin_meta, __version__)
     if not compatible:
-        return replace(record, status="skipped", error_message=version_msg)
+        return replace(record, status="skipped", error_message=version_msg), None
 
-    return record
+    return record, plugin_app
 
 
-def discover_and_mount_plugins(
-    app: typer.Typer, console: Console | None = None
-) -> None:
+def discover_and_mount_plugins(app: typer.Typer, console: Console | None = None) -> None:
     """Discover, load, validate, and mount all plugins onto the CLI app.
 
     Scans ``weevr.plugins`` entry points, validates each plugin, mounts
@@ -211,21 +215,12 @@ def discover_and_mount_plugins(
     registered_names: set[str] = set()
 
     for entry_point in discover_entry_points():
-        record = load_and_validate_plugin(entry_point, RESERVED_NAMES, registered_names)
+        record, plugin_app = load_and_validate_plugin(entry_point, RESERVED_NAMES, registered_names)
         registry.add(record)
 
-        if record.status == "loaded":
-            # Mount the plugin's Typer app as a subcommand
-            try:
-                module = entry_point.load()
-                plugin_app = module.app
-                app.add_typer(plugin_app, name=entry_point.name)
-                registered_names.add(entry_point.name)
-            except Exception as exc:
-                console.print(
-                    f"[yellow]Warning:[/yellow] Plugin '{entry_point.name}' "
-                    f"failed to mount: {exc}",
-                )
+        if record.status == "loaded" and plugin_app is not None:
+            app.add_typer(plugin_app, name=entry_point.name)
+            registered_names.add(entry_point.name)
         elif record.status == "failed":
             console.print(
                 f"[yellow]Warning:[/yellow] Plugin '{entry_point.name}' "

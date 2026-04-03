@@ -11,9 +11,7 @@ runner = CliRunner()
 
 
 def _reset_registry() -> None:
-    reg = get_registry()
-    reg._records.clear()
-    reg._order.clear()
+    get_registry().clear()
 
 
 def _populated_registry() -> None:

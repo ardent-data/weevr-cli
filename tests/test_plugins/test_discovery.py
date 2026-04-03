@@ -74,45 +74,54 @@ class TestLoadPlugin:
         meta = PluginMetadata(name="Demo", version="2.0.0", description="A demo plugin")
         mod = _make_module_with_app(app=plugin_app, meta=meta, include_meta=True)
         ep = _mock_entry_point("demo", load_return=mod)
-        record = load_plugin(ep)
+        record, app, pmeta = load_plugin(ep)
         assert record.status == "loaded"
         assert record.display_name == "Demo"
         assert record.version == "2.0.0"
         assert record.description == "A demo plugin"
+        assert app is plugin_app
+        assert pmeta is meta
 
     def test_success_no_meta(self) -> None:
         mod = _make_module_with_app()
         ep = _mock_entry_point("demo", load_return=mod)
-        record = load_plugin(ep)
+        record, app, pmeta = load_plugin(ep)
         assert record.status == "loaded"
         assert record.display_name == "demo"
+        assert app is not None
+        assert pmeta is None
 
     def test_import_error(self) -> None:
         ep = _mock_entry_point("bad", load_side_effect=ImportError("no module"))
-        record = load_plugin(ep)
+        record, app, pmeta = load_plugin(ep)
         assert record.status == "failed"
         assert "no module" in (record.error_message or "")
+        assert app is None
+        assert pmeta is None
 
     def test_generic_exception(self) -> None:
         ep = _mock_entry_point("bad", load_side_effect=RuntimeError("boom"))
-        record = load_plugin(ep)
+        record, app, pmeta = load_plugin(ep)
         assert record.status == "failed"
         assert "boom" in (record.error_message or "")
+        assert app is None
 
     def test_no_app_attr(self) -> None:
         mod = _make_module_with_app(include_app=False)
         ep = _mock_entry_point("noapp", load_return=mod)
-        record = load_plugin(ep)
+        record, app, pmeta = load_plugin(ep)
         assert record.status == "failed"
         assert "app" in (record.error_message or "").lower()
+        assert app is None
 
     def test_app_not_typer(self) -> None:
         mod = ModuleType("fake")
         mod.app = "not a typer"  # type: ignore[attr-defined]
         ep = _mock_entry_point("badapp", load_return=mod)
-        record = load_plugin(ep)
+        record, app, pmeta = load_plugin(ep)
         assert record.status == "failed"
         assert "Typer" in (record.error_message or "")
+        assert app is None
 
     def test_extracts_commands(self) -> None:
         plugin_app = typer.Typer()
@@ -127,7 +136,7 @@ class TestLoadPlugin:
 
         mod = _make_module_with_app(app=plugin_app)
         ep = _mock_entry_point("cmds", load_return=mod)
-        record = load_plugin(ep)
+        record, app, pmeta = load_plugin(ep)
         assert record.status == "loaded"
         assert record.commands is not None
         assert "hello" in record.commands
@@ -188,41 +197,44 @@ class TestLoadAndValidatePlugin:
         meta = PluginMetadata(name="future", min_cli_version="99.0.0")
         mod = _make_module_with_app(meta=meta, include_meta=True)
         ep = _mock_entry_point("future", load_return=mod)
-        record = load_and_validate_plugin(ep, RESERVED_NAMES, set())
+        record, app = load_and_validate_plugin(ep, RESERVED_NAMES, set())
         assert record.status == "skipped"
         assert "99.0.0" in (record.error_message or "")
+        assert app is None
 
     def test_builtin_collision_skips(self) -> None:
         mod = _make_module_with_app()
         ep = _mock_entry_point("init", load_return=mod)
-        record = load_and_validate_plugin(ep, RESERVED_NAMES, set())
+        record, app = load_and_validate_plugin(ep, RESERVED_NAMES, set())
         assert record.status == "skipped"
         assert "built-in" in (record.error_message or "").lower()
+        assert app is None
 
     def test_plugin_collision_skips(self) -> None:
         mod = _make_module_with_app()
         ep = _mock_entry_point("demo", load_return=mod)
-        record = load_and_validate_plugin(ep, RESERVED_NAMES, {"demo"})
+        record, app = load_and_validate_plugin(ep, RESERVED_NAMES, {"demo"})
         assert record.status == "skipped"
+        assert app is None
 
     def test_failed_load_passes_through(self) -> None:
         ep = _mock_entry_point("bad", load_side_effect=ImportError("nope"))
-        record = load_and_validate_plugin(ep, RESERVED_NAMES, set())
+        record, app = load_and_validate_plugin(ep, RESERVED_NAMES, set())
         assert record.status == "failed"
+        assert app is None
 
     def test_success(self) -> None:
         mod = _make_module_with_app()
         ep = _mock_entry_point("demo", load_return=mod)
-        record = load_and_validate_plugin(ep, RESERVED_NAMES, set())
+        record, app = load_and_validate_plugin(ep, RESERVED_NAMES, set())
         assert record.status == "loaded"
+        assert app is not None
 
 
 class TestDiscoverAndMountPlugins:
     def _reset_registry(self) -> None:
         """Clear the global registry between tests."""
-        reg = get_registry()
-        reg._records.clear()
-        reg._order.clear()
+        get_registry().clear()
 
     def test_success(self) -> None:
         self._reset_registry()
