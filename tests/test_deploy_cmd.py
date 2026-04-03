@@ -203,6 +203,32 @@ class TestDeployTarget:
         assert result.exit_code == 1
 
 
+class TestDeploySelective:
+    def test_selective_deploys_single_file(self, mock_azure: MagicMock) -> None:
+        result = runner.invoke(
+            app,
+            ["deploy", "threads/orders.thread", "--skip-validation"],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0, result.output
+        mock_azure.upload_file.assert_called_once()
+        call_args = mock_azure.upload_file.call_args
+        assert "orders.thread" in str(call_args)
+
+    def test_selective_deploys_directory(self, mock_azure: MagicMock) -> None:
+        result = runner.invoke(
+            app, ["deploy", "threads", "--skip-validation"], catch_exceptions=False
+        )
+        assert result.exit_code == 0, result.output
+        assert mock_azure.upload_file.call_count == 1
+
+    def test_selective_nonexistent_path(self, mock_azure: MagicMock) -> None:
+        result = runner.invoke(
+            app, ["deploy", "nonexistent.yaml", "--skip-validation"], catch_exceptions=False
+        )
+        assert result.exit_code == 1
+
+
 class TestDeployIgnore:
     def test_deploy_ignore_excludes_files(self, mock_azure_with_ignore: MagicMock) -> None:
         result = runner.invoke(
@@ -211,9 +237,48 @@ class TestDeployIgnore:
         assert result.exit_code == 0, result.output
         assert "customer" not in result.output
 
+    def test_deploy_ignore_excludes_from_clean(self, mock_azure_with_ignore: MagicMock) -> None:
+        mock_azure_with_ignore.list_files.return_value = [
+            RemoteFile(path="weaves/keep.yaml", size=100, content_md5=None),
+            RemoteFile(path="threads/orphan.yaml", size=100, content_md5=None),
+        ]
+        result = runner.invoke(
+            app, ["deploy", "--clean", "--skip-validation"], catch_exceptions=False
+        )
+        assert result.exit_code == 0, result.output
+        # weaves/ is ignored — weaves/keep.yaml should NOT be deleted
+        # threads/orphan.yaml should be deleted
+        mock_azure_with_ignore.delete_file.assert_called_once_with("threads/orphan.yaml")
+
+
+class TestDeployPartialFailure:
+    def test_partial_failure_exits_with_code_1(self, mock_azure: MagicMock) -> None:
+        mock_azure.upload_file.side_effect = [None, Exception("403 Forbidden")]
+        result = runner.invoke(app, ["deploy", "--skip-validation"], catch_exceptions=False)
+        assert result.exit_code == 1
+
+    def test_partial_failure_json(self, mock_azure: MagicMock) -> None:
+        mock_azure.upload_file.side_effect = [None, Exception("403 Forbidden")]
+        result = runner.invoke(
+            app, ["--json", "deploy", "--skip-validation"], catch_exceptions=False
+        )
+        assert result.exit_code == 1
+        data = json.loads(result.output)
+        assert data["failed"] >= 1
+
+
+class TestDeployTargetHeader:
+    def test_target_header_displayed(self, mock_azure: MagicMock) -> None:
+        result = runner.invoke(
+            app, ["deploy", "--dry-run", "--skip-validation"], catch_exceptions=False
+        )
+        assert result.exit_code == 0, result.output
+        assert "Deploy target:" in result.output
+        assert "dev" in result.output
+
 
 class TestDeployJsonOutput:
-    def test_json_deploy_result(self, mock_azure: MagicMock) -> None:
+    def test_json_deploy_result_includes_target(self, mock_azure: MagicMock) -> None:
         result = runner.invoke(
             app, ["--json", "deploy", "--skip-validation"], catch_exceptions=False
         )
@@ -221,6 +286,9 @@ class TestDeployJsonOutput:
         data = json.loads(result.output)
         assert "uploaded" in data
         assert "failed" in data
+        assert "target" in data
+        assert data["target"]["workspace_id"] == VALID_UUID_1
+        assert data["target"]["lakehouse_id"] == VALID_UUID_2
 
 
 class TestDeployAuthError:

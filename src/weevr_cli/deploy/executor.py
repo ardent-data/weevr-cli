@@ -30,7 +30,8 @@ def execute_plan(client: OneLakeClient, plan: DeployPlan) -> DeployResult:
             continue
 
         if action.is_upload:
-            assert action.local_path is not None
+            if action.local_path is None:
+                raise ValueError(f"Upload action for {action.remote_path} has no local path")
             try:
                 client.upload_file(action.local_path, action.remote_path)
                 results.append(ActionResult(action=action, success=True))

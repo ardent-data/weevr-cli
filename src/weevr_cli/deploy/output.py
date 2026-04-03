@@ -65,10 +65,16 @@ def render_dry_run(plan: DeployPlan, *, json_mode: bool, console: Console) -> No
     )
 
 
-def render_result(result: DeployResult, *, json_mode: bool, console: Console) -> None:
+def render_result(
+    result: DeployResult,
+    target: DeployTarget,
+    *,
+    json_mode: bool,
+    console: Console,
+) -> None:
     """Display deploy execution results."""
     if json_mode:
-        print_json(_result_json(result))
+        print_json(_result_json(result, target))
         return
 
     if not result.results:
@@ -117,8 +123,9 @@ def _dry_run_json(plan: DeployPlan) -> dict[str, Any]:
     }
 
 
-def _result_json(result: DeployResult) -> dict[str, Any]:
+def _result_json(result: DeployResult, target: DeployTarget) -> dict[str, Any]:
     """Build JSON output for deploy results."""
+    target_info = _target_json(target)
     actions = []
     for r in result.results:
         label, _ = _ACTION_LABELS.get(r.action.action, ("unknown", ""))
@@ -137,6 +144,7 @@ def _result_json(result: DeployResult) -> dict[str, Any]:
     deleted = sum(1 for r in result.succeeded if r.action.action == ActionType.DELETE)
 
     return {
+        "target": target_info,
         "uploaded": uploaded,
         "skipped": skipped,
         "deleted": deleted,
@@ -147,7 +155,10 @@ def _result_json(result: DeployResult) -> dict[str, Any]:
 
 def _target_json(target: DeployTarget) -> dict[str, Any]:
     """Build JSON target info."""
-    info: dict[str, Any] = {"workspace_id": target.workspace_id}
+    info: dict[str, Any] = {
+        "workspace_id": target.workspace_id,
+        "lakehouse_id": target.lakehouse_id,
+    }
     if target.name:
         info["name"] = target.name
     if target.path_prefix:

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pathspec
+
 from weevr_cli.deploy.collector import LocalFile
 from weevr_cli.deploy.models import (
     ActionType,
@@ -22,6 +24,7 @@ def compute_diff(
     full: bool = False,
     clean: bool = False,
     clean_all: bool = False,
+    ignore_spec: pathspec.PathSpec | None = None,
 ) -> DeployPlan:
     """Compute a deploy plan by comparing local and remote files.
 
@@ -32,6 +35,8 @@ def compute_diff(
         full: If True, upload all files unconditionally (full overwrite).
         clean: If True, delete remote weevr files not present locally.
         clean_all: If True, delete all remote files not present locally.
+        ignore_spec: Deploy-ignore patterns. Remote files matching these
+            patterns are excluded from clean actions.
 
     Returns:
         DeployPlan with actions for each file.
@@ -85,6 +90,8 @@ def compute_diff(
     # Process remote-only files for clean mode
     if clean or clean_all:
         for remote in remote_files:
+            if ignore_spec is not None and ignore_spec.match_file(remote.path):
+                continue
             if remote.path not in local_paths and (clean_all or _is_weevr_file(remote.path)):
                 actions.append(
                     DeployAction(

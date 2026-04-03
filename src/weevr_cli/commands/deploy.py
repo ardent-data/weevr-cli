@@ -12,7 +12,7 @@ from weevr_cli.deploy.ignore import load_deploy_ignore
 from weevr_cli.deploy.onelake import OneLakeClient
 from weevr_cli.deploy.output import render_dry_run, render_result, render_target_header
 from weevr_cli.deploy.target import TargetError, resolve_target
-from weevr_cli.output import print_error
+from weevr_cli.output import print_error, print_json
 from weevr_cli.state import AppState, AuthError
 
 
@@ -52,12 +52,14 @@ def run_deploy(
     Raises:
         SystemExit: On errors.
     """
-    assert state.config is not None
+    config = state.config
+    if config is None:
+        raise SystemExit(1)
 
     # 1. Resolve target
     try:
         target = resolve_target(
-            state.config,
+            config,
             target_name=target_name,
             workspace_id=workspace_id,
             lakehouse_id=lakehouse_id,
@@ -158,6 +160,7 @@ def run_deploy(
         full=full,
         clean=clean and not clean_all,
         clean_all=clean_all,
+        ignore_spec=ignore_spec,
     )
 
     # 9. Dry run — show plan and exit
@@ -168,8 +171,6 @@ def run_deploy(
     # 10. Execute plan
     if not plan.uploads and not plan.deletes:
         if state.json_mode:
-            from weevr_cli.output import print_json
-
             print_json(
                 {
                     "uploaded": 0,
@@ -191,7 +192,7 @@ def run_deploy(
     result = execute_plan(client, plan)
 
     # 11. Output results
-    render_result(result, json_mode=state.json_mode, console=state.console)
+    render_result(result, target, json_mode=state.json_mode, console=state.console)
 
     if not result.is_success:
         raise SystemExit(1) from None

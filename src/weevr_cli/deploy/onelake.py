@@ -66,7 +66,7 @@ class OneLakeClient:
         """
         full_remote = f"{self._target.base_directory}/{remote_path}"
         file_client = self._fs_client.get_file_client(full_remote)
-        with open(local_path, "rb") as f:
+        with local_path.open("rb") as f:
             file_client.upload_data(f, overwrite=True)
 
     def delete_file(self, remote_path: str) -> None:

@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import pathspec
+
 from weevr_cli.deploy.collector import LocalFile
 from weevr_cli.deploy.diff import compute_diff
 from weevr_cli.deploy.models import ActionType, DeployTarget, RemoteFile
@@ -151,3 +153,41 @@ class TestPlanProperties:
         assert plan.uploads == []
         assert plan.deletes == []
         assert plan.skips == []
+
+
+class TestCleanWithIgnore:
+    def _ignore(self, *patterns: str) -> pathspec.PathSpec:
+        return pathspec.PathSpec.from_lines("gitignore", patterns)
+
+    def test_clean_respects_ignore(self) -> None:
+        plan = compute_diff(
+            _target(),
+            [],
+            [_remote("keep.yaml"), _remote("delete.yaml")],
+            clean=True,
+            ignore_spec=self._ignore("keep.yaml"),
+        )
+        deleted = [a for a in plan.actions if a.action == ActionType.DELETE]
+        assert len(deleted) == 1
+        assert deleted[0].remote_path == "delete.yaml"
+
+    def test_clean_all_respects_ignore(self) -> None:
+        plan = compute_diff(
+            _target(),
+            [],
+            [_remote("keep.txt"), _remote("delete.txt")],
+            clean_all=True,
+            ignore_spec=self._ignore("keep.txt"),
+        )
+        deleted = [a for a in plan.actions if a.action == ActionType.DELETE]
+        assert len(deleted) == 1
+        assert deleted[0].remote_path == "delete.txt"
+
+    def test_clean_without_ignore_deletes_all_weevr(self) -> None:
+        plan = compute_diff(
+            _target(),
+            [],
+            [_remote("a.yaml"), _remote("b.yaml")],
+            clean=True,
+        )
+        assert len(plan.deletes) == 2

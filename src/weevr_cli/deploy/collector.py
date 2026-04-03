@@ -29,7 +29,7 @@ def compute_md5(path: Path) -> bytes:
         16-byte MD5 digest.
     """
     hasher = hashlib.md5()  # noqa: S324
-    with open(path, "rb") as f:
+    with path.open("rb") as f:
         for chunk in iter(lambda: f.read(8192), b""):
             hasher.update(chunk)
     return hasher.digest()
