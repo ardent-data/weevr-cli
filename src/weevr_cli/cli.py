@@ -203,10 +203,18 @@ def status(
 
 
 @app.command(name="list")
-def list_cmd(ctx: typer.Context) -> None:
+def list_cmd(
+    ctx: typer.Context,
+    format: str = typer.Option("tree", "--format", "-f", help="Output format: tree or table."),
+) -> None:
     """Display project structure and dependency relationships."""
-    require_config(ctx)
-    typer.echo("Listing project structure...")
+    from weevr_cli.commands.list_cmd import run_list
+
+    state: AppState = ctx.obj
+    try:
+        run_list(format=format, state=state)
+    except SystemExit as exc:
+        raise typer.Exit(code=int(exc.code) if exc.code is not None else 1) from exc
 
 
 app.add_typer(schema_app, name="schema")
