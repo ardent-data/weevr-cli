@@ -158,14 +158,38 @@ def deploy(
     path_prefix: str | None = typer.Option(None, "--path-prefix", help="Override path prefix."),
     full: bool = typer.Option(False, "--full", help="Full overwrite instead of smart sync."),
     clean: bool = typer.Option(False, "--clean", help="Remove remote files not present locally."),
+    clean_all: bool = typer.Option(False, "--all", help="With --clean, remove all remote files."),
     dry_run: bool = typer.Option(False, "--dry-run", help="Show what would change."),
     skip_validation: bool = typer.Option(
         False, "--skip-validation", help="Skip pre-deploy validation."
     ),
+    strict_validation: bool = typer.Option(
+        False, "--strict-validation", help="Block deploy on validation warnings."
+    ),
+    force: bool = typer.Option(False, "--force", help="Skip confirmation prompts."),
 ) -> None:
     """Deploy project files to a Fabric Lakehouse."""
-    require_config(ctx)
-    typer.echo("Deploying...")
+    from weevr_cli.commands.deploy import run_deploy
+
+    state = require_config(ctx)
+    try:
+        run_deploy(
+            paths=paths,
+            target_name=target,
+            workspace_id=workspace_id,
+            lakehouse_id=lakehouse_id,
+            path_prefix=path_prefix,
+            full=full,
+            clean=clean,
+            clean_all=clean_all and clean,
+            dry_run=dry_run,
+            skip_validation=skip_validation,
+            strict_validation=strict_validation,
+            force=force,
+            state=state,
+        )
+    except SystemExit as exc:
+        raise typer.Exit(code=int(exc.code) if exc.code is not None else 1) from exc
 
 
 @app.command()
