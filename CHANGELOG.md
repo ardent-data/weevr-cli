@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.7](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v0.1.6...weevr-cli-v0.1.7) (2026-04-03)
+
+
+### Features
+
+* add status and list commands ([#15](https://github.com/ardent-data/weevr-cli/issues/15)) ([f03cba8](https://github.com/ardent-data/weevr-cli/commit/f03cba87d65f0163b3f632960bbe0325662415d2))
+
 ## [0.1.6](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v0.1.5...weevr-cli-v0.1.6) (2026-04-03)
 
 
