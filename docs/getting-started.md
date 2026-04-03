@@ -46,14 +46,14 @@ This creates a directory named `my-project.weevr/` with the following structure:
 ```
 my-project.weevr/
 ├── .weevr/
-│   └── cli.yaml          # CLI configuration
-├── threads/
-│   └── orders.thread.yaml
-├── weaves/
-│   └── customer_dim.weave.yaml
-└── looms/
-    └── daily_load.loom.yaml
+│   └── cli.yaml              # CLI configuration
+├── staging/
+│   └── stg_customers.thread  # Example thread
+├── staging.weave             # Example weave (references the thread)
+└── daily.loom                # Example loom (references the weave)
 ```
+
+The example files form a self-consistent pipeline: the loom references the weave, and the weave references the thread. File extensions (`.thread`, `.weave`, `.loom`) identify the file type — no `.yaml` suffix is used.
 
 !!! note
     The `.weevr` suffix on the project directory is required. The weevr engine uses it to detect project roots. The CLI adds it automatically if you omit it.
@@ -88,7 +88,7 @@ weevr new weave customer_dim
 weevr new loom daily_load
 ```
 
-Each command generates a YAML file with the standard schema fields pre-filled.
+Each command generates a file with the standard schema fields pre-filled. Files use type-specific extensions (`.thread`, `.weave`, `.loom`).
 
 ## Validate
 

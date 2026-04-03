@@ -95,9 +95,10 @@ app = typer.Typer()
 def info(ctx: typer.Context) -> None:
     """Show current config."""
     state = ctx.obj  # AppState instance
-    # state.console  — Rich console for output
-    # state.config   — WeevrConfig (or None if no project found)
-    # state.json_mode — True if --json was passed
+    # state.console      — Rich console for output
+    # state.config       — WeevrConfig (or None if no project found)
+    # state.config_error — ConfigError (or None if config loaded OK)
+    # state.json_mode    — True if --json was passed
 ```
 
 ## Testing Plugins

@@ -4,7 +4,7 @@ This guide covers the different deployment modes and how to integrate `weevr dep
 
 ## Smart Sync (Default)
 
-By default, `weevr deploy` compares local files against the remote state using MD5 checksums. Only changed files are uploaded:
+By default, `weevr deploy` compares local files against the remote state using MD5 checksums (falling back to file size when checksums are unavailable). Only changed files are uploaded:
 
 ```bash
 weevr deploy --target dev
@@ -31,10 +31,10 @@ Deploy specific files or directories by passing them as positional arguments:
 
 ```bash
 # Deploy a single file
-weevr deploy threads/orders.thread.yaml --target dev
+weevr deploy staging/stg_customers.thread --target dev
 
 # Deploy an entire directory
-weevr deploy threads/ --target dev
+weevr deploy staging/ --target dev
 ```
 
 Only the specified paths are included in the sync. Other remote files are untouched.
@@ -58,14 +58,16 @@ weevr deploy --target dev --full --clean --dry-run
 Remove remote files that no longer exist locally:
 
 ```bash
-# Remove orphaned weevr files only (.thread, .weave, .loom)
+# Remove orphaned weevr files only (.thread, .weave, .loom, .yaml, .yml)
 weevr deploy --target dev --clean
 
 # Remove all orphaned files, including non-weevr files
 weevr deploy --target dev --clean --all
 ```
 
-The tiered clean behavior protects non-weevr files by default. Use `--all` only when you're certain the remote path prefix is exclusively managed by this project.
+Without `--clean`, orphaned remote files are left untouched. The `--all` flag only takes effect when combined with `--clean` — on its own it is a no-op.
+
+The tiered clean behavior protects non-weevr files by default. Use `--clean --all` only when you're certain the remote path prefix is exclusively managed by this project.
 
 ## Validation Control
 
@@ -83,9 +85,10 @@ weevr deploy --target dev --strict-validation
 
 When you run `weevr deploy`, the target is resolved in this order:
 
-1. **CLI flags** (`--workspace-id`, `--lakehouse-id`, `--path-prefix`) — highest priority
-2. **Named target** (`--target <name>`) — looks up the target in `cli.yaml`
-3. **Default target** (`default_target` in `cli.yaml`) — used when no `--target` is given
+1. **CLI flags** (`--workspace-id` and `--lakehouse-id`, both required together) — highest priority
+2. **Named or default target** (`--target <name>`, or `default_target` from `cli.yaml` if `--target` is omitted)
+
+The `--path-prefix` flag can be combined with either approach — it overrides the target's `path_prefix` without changing how the target itself is resolved.
 
 See [Configuration](../configuration/index.md) for the full `cli.yaml` reference.
 

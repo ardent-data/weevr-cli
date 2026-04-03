@@ -74,9 +74,10 @@ schema:
 
 CLI flags override config file values. The resolution order (highest to lowest priority):
 
-1. **CLI flags** — `--workspace-id`, `--lakehouse-id`, `--path-prefix`
-2. **Named target** — `--target <name>` selects a target from config
-3. **Default target** — `default_target` in `cli.yaml`
+1. **CLI flags** — `--workspace-id` and `--lakehouse-id` (both must be provided together)
+2. **Named or default target** — `--target <name>` selects a target from config; if omitted, `default_target` is used
+
+The `--path-prefix` flag can be combined with either approach to override just the path prefix.
 
 This makes CI/CD pipelines straightforward — inject IDs from pipeline variables:
 
