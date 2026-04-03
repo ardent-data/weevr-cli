@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.8](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v0.1.7...weevr-cli-v0.1.8) (2026-04-03)
+
+
+### Features
+
+* **cli:** add plugin system with entry-point discovery and management commands ([#18](https://github.com/ardent-data/weevr-cli/issues/18)) ([b4d84ee](https://github.com/ardent-data/weevr-cli/commit/b4d84ee3f187248fa16b69f00cfb76b2194f5a78))
+
 ## [0.1.7](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v0.1.6...weevr-cli-v0.1.7) (2026-04-03)
 
 
