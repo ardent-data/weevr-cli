@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v0.1.3...weevr-cli-v0.1.4) (2026-04-03)
+
+
+### Bug Fixes
+
+* **init:** adopt .weevr project root model matching engine conventions ([#8](https://github.com/ardent-data/weevr-cli/issues/8)) ([5f089c5](https://github.com/ardent-data/weevr-cli/commit/5f089c5456cfc85e9401f3c20b803b732a7c0610))
+
 ## [0.1.3](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v0.1.2...weevr-cli-v0.1.3) (2026-04-02)
 
 
