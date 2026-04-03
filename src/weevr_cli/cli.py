@@ -5,6 +5,7 @@ from __future__ import annotations
 import typer
 
 from weevr_cli import __version__
+from weevr_cli.commands.schema_cmd import schema_app
 from weevr_cli.config import ConfigError, find_project_root, load_config
 from weevr_cli.output import create_console, print_error, print_json
 from weevr_cli.state import AppState
@@ -50,16 +51,16 @@ def main(
     console = create_console(json_mode=json)
 
     config = None
+    config_error: ConfigError | None = None
     project_root = find_project_root()
     if project_root is not None:
         config_path = project_root / ".weevr" / "cli.yaml"
         try:
             config = load_config(config_path)
         except ConfigError as exc:
-            print_error(str(exc), exc.code, json_mode=json, console=console)
-            raise typer.Exit(code=1) from exc
+            config_error = exc
 
-    ctx.obj = AppState(console=console, config=config, json_mode=json)
+    ctx.obj = AppState(console=console, config=config, json_mode=json, config_error=config_error)
 
 
 def require_config(ctx: typer.Context) -> AppState:
@@ -75,6 +76,14 @@ def require_config(ctx: typer.Context) -> AppState:
         typer.Exit: If no config is available.
     """
     state: AppState = ctx.obj
+    if state.config_error is not None:
+        print_error(
+            str(state.config_error),
+            state.config_error.code,
+            json_mode=state.json_mode,
+            console=state.console,
+        )
+        raise typer.Exit(code=1)
     if state.config is None:
         print_error(
             "No weevr project found. Run 'weevr init' to create one, "
@@ -128,9 +137,13 @@ def validate(
     strict: bool = typer.Option(False, "--strict", help="Treat warnings as errors."),
 ) -> None:
     """Validate project files against schemas and check reference integrity."""
-    require_config(ctx)
-    target = path or "entire project"
-    typer.echo(f"Validating: {target}")
+    from weevr_cli.commands.validate import run_validate
+
+    state: AppState = ctx.obj
+    try:
+        run_validate(path, strict=strict, state=state)
+    except SystemExit as exc:
+        raise typer.Exit(code=int(exc.code) if exc.code is not None else 1) from exc
 
 
 @app.command()
@@ -172,10 +185,4 @@ def list_cmd(ctx: typer.Context) -> None:
     typer.echo("Listing project structure...")
 
 
-@app.command()
-def schema(
-    action: str = typer.Argument("version", help="Action: version or update."),
-    version: str | None = typer.Option(None, "--version", help="Specific schema version."),
-) -> None:
-    """Manage validation schemas."""
-    typer.echo(f"Schema: {action}")
+app.add_typer(schema_app, name="schema")

@@ -56,19 +56,18 @@ def test_json_flag_available() -> None:
     assert result.exit_code == 0
 
 
-def test_config_not_found_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_validate_no_files_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(tmp_path)
     result = runner.invoke(app, ["validate"])
     assert result.exit_code == 1
-    assert "weevr init" in result.output or "config_not_found" in result.output
 
 
-def test_config_not_found_json(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_validate_no_files_json(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(tmp_path)
     result = runner.invoke(app, ["--json", "validate"])
     assert result.exit_code == 1
     combined = result.output + (result.stderr or "")
-    assert "config_not_found" in combined
+    assert "no_files_found" in combined
 
 
 def test_appstate_in_context(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -95,5 +94,30 @@ def test_config_loaded_when_present(tmp_path: Path, monkeypatch: pytest.MonkeyPa
         )
     )
     monkeypatch.chdir(project)
-    result = runner.invoke(app, ["validate"])
+    # deploy still requires config — verify it loads without config_not_found
+    result = runner.invoke(app, ["deploy"])
     assert "config_not_found" not in result.output
+
+
+def test_validate_end_to_end(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    project = tmp_path / "test.weevr"
+    project.mkdir()
+    (project / ".weevr").mkdir()
+    thread = project / "staging" / "stg.thread"
+    thread.parent.mkdir()
+    thread.write_text(
+        'config_version: "1.0"\nsources:\n  raw:\n    type: csv\ntarget:\n  path: Tables/raw\n'
+    )
+    monkeypatch.chdir(project)
+    result = runner.invoke(app, ["validate"])
+    assert result.exit_code == 0
+
+
+def test_schema_version_end_to_end(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    project = tmp_path / "test.weevr"
+    project.mkdir()
+    (project / ".weevr").mkdir()
+    monkeypatch.chdir(project)
+    result = runner.invoke(app, ["schema", "version"])
+    assert result.exit_code == 0
+    assert "bundled" in result.output.lower()
