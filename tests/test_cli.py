@@ -121,3 +121,20 @@ def test_schema_version_end_to_end(tmp_path: Path, monkeypatch: pytest.MonkeyPat
     result = runner.invoke(app, ["schema", "version"])
     assert result.exit_code == 0
     assert "bundled" in result.output.lower()
+
+
+def test_plugins_subcommand_exists() -> None:
+    result = runner.invoke(app, ["plugins", "--help"])
+    assert result.exit_code == 0
+    assert "list" in result.output.lower()
+    assert "info" in result.output.lower()
+
+
+def test_plugins_list_runs() -> None:
+    result = runner.invoke(app, ["plugins", "list"])
+    assert result.exit_code == 0
+
+
+def test_help_shows_plugins() -> None:
+    result = runner.invoke(app, ["--help"])
+    assert "plugins" in result.output.lower()
