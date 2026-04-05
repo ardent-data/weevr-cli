@@ -61,6 +61,21 @@ def test_valid_loom_passes(valid_loom: Path) -> None:
     assert errors == []
 
 
+@pytest.fixture()
+def valid_warp(tmp_path: Path) -> Path:
+    """Create a minimal valid warp file."""
+    f = tmp_path / "customers.warp"
+    f.write_text('config_version: "1.0"\ncolumns:\n  - name: id\n    type: bigint\n')
+    return f
+
+
+def test_valid_warp_passes(valid_warp: Path) -> None:
+    """A valid warp file produces no errors."""
+    issues = validate_file(valid_warp)
+    errors = [i for i in issues if i.severity == "error"]
+    assert errors == []
+
+
 def test_invalid_thread_missing_config_version(tmp_path: Path) -> None:
     """Missing config_version produces a schema error."""
     f = tmp_path / "bad.thread"

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import yaml
 
-VALID_TYPES = ("thread", "weave", "loom")
+VALID_TYPES = ("thread", "weave", "loom", "warp")
 
 _THREAD_TEMPLATE = """\
 # Thread: {name}
@@ -61,10 +61,33 @@ weaves:
   # - ref: staging.weave
 """
 
+_WARP_TEMPLATE = """\
+# Warp: {name}
+# A warp defines a target table schema contract.
+# See: https://ardent-data.github.io/weevr/latest/reference/warp/
+
+config_version: "1.0"
+
+columns:
+  - name: id
+    type: bigint
+    nullable: false
+  # - name: name
+  #   type: string
+  # - name: created_at
+  #   type: timestamp
+
+# keys:
+#   surrogate: id
+#   business:
+#     - name
+"""
+
 _TEMPLATES: dict[str, str] = {
     "thread": _THREAD_TEMPLATE,
     "weave": _WEAVE_TEMPLATE,
     "loom": _LOOM_TEMPLATE,
+    "warp": _WARP_TEMPLATE,
 }
 
 # Example files organized by medallion layer (staging → curated).
@@ -147,7 +170,7 @@ _CLI_YAML_TEMPLATE = """\
 
 # Schema settings
 schema:
-  version: "1.11"
+  version: "1.13"
 """
 
 
@@ -155,7 +178,7 @@ def get_template(file_type: str) -> str:
     """Return the YAML template string for a given file type.
 
     Args:
-        file_type: One of "thread", "weave", or "loom".
+        file_type: One of "thread", "weave", "loom", or "warp".
 
     Returns:
         YAML template string with placeholder name.
@@ -175,7 +198,7 @@ def get_example_files() -> dict[str, str]:
 
     Returns:
         Dict mapping relative paths to file content.
-        Paths use type-specific extensions (.thread, .weave, .loom).
+        Paths use type-specific extensions (.thread, .weave, .loom, .warp).
         Files are self-consistent: loom references weave, weave references thread.
     """
     return dict(_EXAMPLE_FILES)
@@ -208,7 +231,7 @@ def render_cli_yaml(
     }
     if default_target:
         config["default_target"] = default_target
-    config["schema"] = {"version": "1.11"}
+    config["schema"] = {"version": "1.13"}
 
     header = "# weevr CLI configuration\n# See: https://github.com/ardent-data/weevr-cli\n\n"
     return header + yaml.dump(config, default_flow_style=False, sort_keys=False)

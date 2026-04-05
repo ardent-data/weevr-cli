@@ -79,13 +79,15 @@ class TestActionsToStatusEntries:
             DeployAction(Path("t.thread"), "t.thread", ActionType.SKIP, ""),
             DeployAction(Path("w.weave"), "w.weave", ActionType.SKIP, ""),
             DeployAction(Path("l.loom"), "l.loom", ActionType.SKIP, ""),
+            DeployAction(Path("s.warp"), "s.warp", ActionType.SKIP, ""),
             DeployAction(Path("data.csv"), "data.csv", ActionType.SKIP, ""),
         ]
         entries = actions_to_status_entries(actions)
         assert entries[0].is_weevr is True  # .thread
         assert entries[1].is_weevr is True  # .weave
         assert entries[2].is_weevr is True  # .loom
-        assert entries[3].is_weevr is False  # .csv
+        assert entries[3].is_weevr is True  # .warp
+        assert entries[4].is_weevr is False  # .csv
 
 
 class TestPartitionEntries:

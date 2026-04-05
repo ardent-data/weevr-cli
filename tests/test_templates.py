@@ -12,6 +12,7 @@ def test_valid_types() -> None:
     assert "thread" in VALID_TYPES
     assert "weave" in VALID_TYPES
     assert "loom" in VALID_TYPES
+    assert "warp" in VALID_TYPES
 
 
 def test_get_template_thread() -> None:
@@ -34,6 +35,13 @@ def test_get_template_loom() -> None:
     assert isinstance(content, str)
     assert "config_version" in content
     assert "weaves:" in content
+
+
+def test_get_template_warp() -> None:
+    content = get_template("warp")
+    assert isinstance(content, str)
+    assert "config_version" in content
+    assert "columns:" in content
 
 
 def test_get_template_invalid() -> None:

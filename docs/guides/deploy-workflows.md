@@ -58,7 +58,7 @@ weevr deploy --target dev --full --clean --dry-run
 Remove remote files that no longer exist locally:
 
 ```bash
-# Remove orphaned weevr files only (.thread, .weave, .loom, .yaml, .yml)
+# Remove orphaned weevr files only (.thread, .weave, .loom, .warp, .yaml, .yml)
 weevr deploy --target dev --clean
 
 # Remove all orphaned files, including non-weevr files

@@ -11,7 +11,7 @@ class GraphNode:
     """A single file node in the dependency graph."""
 
     path: str
-    file_type: Literal["thread", "weave", "loom"]
+    file_type: Literal["thread", "weave", "loom", "warp"]
     refs_out: list[str] = field(default_factory=list)
     refs_in: list[str] = field(default_factory=list)
     is_orphan: bool = False

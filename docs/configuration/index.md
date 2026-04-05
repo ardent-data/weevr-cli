@@ -43,7 +43,7 @@ Pin the schema version used for validation:
 
 ```yaml
 schema:
-  version: "1.11"
+  version: "1.13"
 ```
 
 ### Complete Example
@@ -67,7 +67,7 @@ targets:
 default_target: dev
 
 schema:
-  version: "1.11"
+  version: "1.13"
 ```
 
 ## Flag Override Precedence

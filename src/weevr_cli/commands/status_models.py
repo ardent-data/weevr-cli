@@ -7,7 +7,7 @@ from typing import Literal
 
 from weevr_cli.deploy.models import ActionType, DeployAction
 
-WEEVR_EXTENSIONS = {".thread", ".weave", ".loom"}
+WEEVR_EXTENSIONS = {".thread", ".weave", ".loom", ".warp"}
 
 _ACTION_TO_STATUS: dict[ActionType, tuple[Literal["+", "~", "=", "-"], str]] = {
     ActionType.UPLOAD_NEW: ("+", "new, not deployed"),

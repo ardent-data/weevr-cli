@@ -110,8 +110,8 @@ def find_orphans(
 
     issues: list[ValidationIssue] = []
     for path in all_paths:
-        # Looms are top-level entry points — never orphans
-        if path.endswith(".loom"):
+        # Looms and warps are standalone — never orphans
+        if path.endswith(".loom") or path.endswith(".warp"):
             continue
 
         # Check if this file is referenced

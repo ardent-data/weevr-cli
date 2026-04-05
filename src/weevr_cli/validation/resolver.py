@@ -5,7 +5,7 @@ from __future__ import annotations
 from importlib import resources
 from pathlib import Path
 
-VALID_SCHEMA_TYPES = ("thread", "weave", "loom")
+VALID_SCHEMA_TYPES = ("thread", "weave", "loom", "warp")
 
 
 def _bundled_schema_path(schema_type: str) -> Path:
@@ -22,7 +22,7 @@ def resolve_schema(schema_type: str, *, project_root: Path | None = None) -> Pat
     2. Bundled src/weevr_cli/schemas/{type}.json
 
     Args:
-        schema_type: One of "thread", "weave", or "loom".
+        schema_type: One of "thread", "weave", "loom", or "warp".
         project_root: Optional project root directory for local overrides.
 
     Returns:

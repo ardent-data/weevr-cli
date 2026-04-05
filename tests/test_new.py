@@ -34,6 +34,16 @@ def test_new_loom(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     assert (tmp_path / "daily_load.loom").is_file()
 
 
+def test_new_warp(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    result = runner.invoke(app, ["new", "warp", "customers"])
+    assert result.exit_code == 0
+    assert (tmp_path / "customers.warp").is_file()
+    content = (tmp_path / "customers.warp").read_text()
+    assert "config_version" in content
+    assert "columns:" in content
+
+
 def test_new_invalid_type(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(tmp_path)
     result = runner.invoke(app, ["new", "widget", "test"])

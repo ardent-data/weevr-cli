@@ -19,7 +19,7 @@ def new_file(
     """Generate a new weevr file from a template in the current directory.
 
     Args:
-        file_type: One of "thread", "weave", or "loom".
+        file_type: One of "thread", "weave", "loom", or "warp".
         name: Name for the new file (without extension).
         force: Whether to overwrite an existing file.
         state: Application state with console and json_mode.
