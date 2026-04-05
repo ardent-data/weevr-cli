@@ -86,9 +86,10 @@ Create new files from templates:
 weevr new thread orders
 weevr new weave customer_dim
 weevr new loom daily_load
+weevr new warp customer_schema
 ```
 
-Each command generates a file with the standard schema fields pre-filled. Files use type-specific extensions (`.thread`, `.weave`, `.loom`).
+Each command generates a file with the standard schema fields pre-filled. Files use type-specific extensions (`.thread`, `.weave`, `.loom`, `.warp`).
 
 ## Validate
 

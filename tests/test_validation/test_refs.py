@@ -31,7 +31,7 @@ def _make_project(tmp_path: Path, files: dict[str, str]) -> Path:
 def _parse_files(project: Path) -> dict[str, Any]:
     """Parse all weevr files in the project into {rel_path: data}."""
     result: dict[str, Any] = {}
-    for ext in (".thread", ".weave", ".loom"):
+    for ext in (".thread", ".weave", ".loom", ".warp"):
         for f in project.rglob(f"*{ext}"):
             rel = str(f.relative_to(project))
             result[rel] = yaml.safe_load(f.read_text()) or {}

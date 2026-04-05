@@ -15,11 +15,11 @@ from weevr_cli.validation.refs import check_refs, find_orphans
 from weevr_cli.validation.results import ValidationIssue, ValidationResult
 from weevr_cli.validation.schema import validate_file
 
-_WEEVR_EXTENSIONS = (".thread", ".weave", ".loom")
+_WEEVR_EXTENSIONS = (".thread", ".weave", ".loom", ".warp")
 
 
 def _find_weevr_files(directory: Path) -> list[Path]:
-    """Recursively find all .thread, .weave, .loom files in a directory."""
+    """Recursively find all .thread, .weave, .loom, .warp files in a directory."""
     directory = directory.resolve()
     files: list[Path] = []
     for ext in _WEEVR_EXTENSIONS:

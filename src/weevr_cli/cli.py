@@ -118,11 +118,11 @@ def init(
 @app.command()
 def new(
     ctx: typer.Context,
-    file_type: str = typer.Argument(..., help="File type: thread, weave, or loom."),
+    file_type: str = typer.Argument(..., help="File type: thread, weave, loom, or warp."),
     name: str = typer.Argument(..., help="Name for the new file."),
     force: bool = typer.Option(False, "--force", help="Overwrite existing file."),
 ) -> None:
-    """Generate a new thread, weave, or loom file from a template."""
+    """Generate a new thread, weave, loom, or warp file from a template."""
     from weevr_cli.commands.new import new_file
 
     state: AppState = ctx.obj

@@ -79,6 +79,7 @@ def test_schema_update_success(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
     assert (schemas_dir / "thread.json").is_file()
     assert (schemas_dir / "weave.json").is_file()
     assert (schemas_dir / "loom.json").is_file()
+    assert (schemas_dir / "warp.json").is_file()
 
 
 def test_schema_update_network_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

@@ -13,7 +13,7 @@ from weevr_cli.listing.models import DependencyGraph, GraphNode
 def render_tree(graph: DependencyGraph, console: Console) -> None:
     """Render a dependency graph as a Rich Tree.
 
-    Shows loom → weave → thread dependency chains with an
+    Shows loom → weave/warp → thread dependency chains with an
     "Unreferenced" section for orphaned files.
 
     Args:
@@ -42,7 +42,13 @@ def _add_children(graph: DependencyGraph, node: GraphNode, branch: Tree) -> None
         if child_node is None:
             branch.add(f"[dim]{ref_path} (not found)[/dim]")
         else:
-            style = "green" if child_node.file_type == "thread" else "blue"
+            style = (
+                "green"
+                if child_node.file_type == "thread"
+                else "magenta"
+                if child_node.file_type == "warp"
+                else "blue"
+            )
             child_branch = branch.add(f"[{style}]{child_node.path}[/{style}]")
             _add_children(graph, child_node, child_branch)
 

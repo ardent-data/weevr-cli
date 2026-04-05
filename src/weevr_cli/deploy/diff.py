@@ -13,7 +13,7 @@ from weevr_cli.deploy.models import (
     RemoteFile,
 )
 
-WEEVR_EXTENSIONS = {".thread", ".weave", ".loom", ".yaml", ".yml"}
+WEEVR_EXTENSIONS = {".thread", ".weave", ".loom", ".warp", ".yaml", ".yml"}
 
 
 def compute_diff(

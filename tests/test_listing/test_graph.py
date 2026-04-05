@@ -83,6 +83,18 @@ class TestBuildDependencyGraph:
         assert graph.orphans == []
         assert graph.nodes["looms/empty.loom"].is_orphan is False
 
+    def test_warp_with_no_refs_not_orphan(self, tmp_path: Path) -> None:
+        """Warp with no references is never an orphan."""
+        root = tmp_path / "project.weevr"
+        _write_yaml(
+            root / "schemas" / "customers.warp",
+            {"config_version": "1.0", "columns": [{"name": "id", "type": "bigint"}]},
+        )
+
+        graph = build_dependency_graph(root)
+        assert graph.orphans == []
+        assert graph.nodes["schemas/customers.warp"].is_orphan is False
+
     def test_broken_ref_no_crash(self, tmp_path: Path) -> None:
         """Weave references non-existent thread → ref recorded, no crash."""
         root = tmp_path / "project.weevr"

@@ -28,7 +28,7 @@ def validate_file(
     """Validate a single file against its JSON schema.
 
     Args:
-        path: Path to the .thread, .weave, or .loom file.
+        path: Path to the .thread, .weave, .loom, or .warp file.
         project_root: Optional project root for local schema overrides.
 
     Returns:

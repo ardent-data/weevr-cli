@@ -61,6 +61,13 @@ def test_resolve_local_missing_falls_back(tmp_path: Path) -> None:
     assert "weevr_cli" in str(path)  # bundled path
 
 
+def test_resolve_bundled_warp() -> None:
+    """Bundled warp schema is returned when no local override."""
+    path = resolve_schema("warp")
+    assert path.exists()
+    assert path.name == "warp.json"
+
+
 def test_resolve_unknown_type() -> None:
     """Unknown file type raises ValueError."""
     with pytest.raises(ValueError, match="Unknown schema type"):

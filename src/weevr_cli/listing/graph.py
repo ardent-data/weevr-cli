@@ -13,17 +13,18 @@ from weevr_cli.validation.refs import extract_refs
 
 logger = logging.getLogger(__name__)
 
-WEEVR_EXTENSIONS: dict[str, Literal["thread", "weave", "loom"]] = {
+WEEVR_EXTENSIONS: dict[str, Literal["thread", "weave", "loom", "warp"]] = {
     ".thread": "thread",
     ".weave": "weave",
     ".loom": "loom",
+    ".warp": "warp",
 }
 
 
 def build_dependency_graph(project_root: Path) -> DependencyGraph:
     """Build a dependency graph from weevr project files.
 
-    Scans the project root recursively for .thread, .weave, and .loom files,
+    Scans the project root recursively for .thread, .weave, .loom, and .warp files,
     parses their YAML content, extracts references, and builds a directed graph.
 
     Args:
@@ -33,7 +34,7 @@ def build_dependency_graph(project_root: Path) -> DependencyGraph:
         A DependencyGraph with all discovered nodes and edges.
     """
     # Scan for weevr files
-    file_data: dict[str, tuple[Literal["thread", "weave", "loom"], dict[str, Any]]] = {}
+    file_data: dict[str, tuple[Literal["thread", "weave", "loom", "warp"], dict[str, Any]]] = {}
 
     for ext, file_type in WEEVR_EXTENSIONS.items():
         for path in sorted(project_root.rglob(f"*{ext}")):
@@ -71,9 +72,9 @@ def build_dependency_graph(project_root: Path) -> DependencyGraph:
             if target_node is not None:
                 target_node.refs_in.append(node.path)
 
-    # Compute orphan status
+    # Compute orphan status (looms and warps are standalone — never orphans)
     for node in nodes.values():
-        if node.file_type != "loom" and len(node.refs_in) == 0:
+        if node.file_type not in ("loom", "warp") and len(node.refs_in) == 0:
             node.is_orphan = True
 
     return DependencyGraph(nodes=nodes)
