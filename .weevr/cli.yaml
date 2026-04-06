@@ -6,11 +6,11 @@ targets:
   dev:
     workspace_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
     lakehouse_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-    path_prefix: "weevr/my-project"
+    path_prefix: "weevr"
   prod:
     workspace_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
     lakehouse_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-    path_prefix: "weevr/my-project"
+    path_prefix: "weevr"
 
 # Default target for deploy commands
 default_target: dev

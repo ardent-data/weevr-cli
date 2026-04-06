@@ -1,9 +1,16 @@
 """Tests for deploy target resolution."""
 
+from pathlib import Path
+
 import pytest
 
 from weevr_cli.config import TargetConfig, WeevrConfig
-from weevr_cli.deploy.target import TargetError, resolve_target, validate_uuid
+from weevr_cli.deploy.target import (
+    TargetError,
+    resolve_deploy_context,
+    resolve_target,
+    validate_uuid,
+)
 
 VALID_UUID = "12345678-1234-1234-1234-123456789abc"
 VALID_UUID_2 = "abcdef01-2345-6789-abcd-ef0123456789"
@@ -102,3 +109,31 @@ class TestResolveTarget:
         config = _config()
         target = resolve_target(config, target_name="prod")
         assert target.path_prefix is None
+
+
+class TestResolveDeployContext:
+    def test_sets_project_folder_from_root(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        proj = tmp_path / "datalake.weevr"
+        proj.mkdir()
+        weevr_dir = proj / ".weevr"
+        weevr_dir.mkdir()
+        (weevr_dir / "cli.yaml").write_text(
+            f"targets:\n  dev:\n    workspace_id: '{VALID_UUID}'\n"
+            f"    lakehouse_id: '{VALID_UUID_2}'\n"
+        )
+        monkeypatch.chdir(proj)
+        config = _config()
+        ctx = resolve_deploy_context(config)
+        assert ctx.target.project_folder == "datalake.weevr"
+        assert ctx.project_root == proj
+        assert "datalake.weevr" in ctx.target.base_directory
+
+    def test_raises_when_no_project_root(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.chdir(tmp_path)
+        config = _config()
+        with pytest.raises(TargetError, match="No weevr project found"):
+            resolve_deploy_context(config)

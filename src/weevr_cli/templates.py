@@ -160,11 +160,11 @@ _CLI_YAML_TEMPLATE = """\
 #   dev:
 #     workspace_id: "<your-workspace-id>"
 #     lakehouse_id: "<your-lakehouse-id>"
-#     path_prefix: "weevr/<project-name>"
+#     path_prefix: "weevr"
 #   prod:
 #     workspace_id: "<your-workspace-id>"
 #     lakehouse_id: "<your-lakehouse-id>"
-#     path_prefix: "weevr/<project-name>"
+#     path_prefix: "weevr"
 #
 # default_target: dev
 

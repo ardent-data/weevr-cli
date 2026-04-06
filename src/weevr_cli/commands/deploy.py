@@ -4,14 +4,13 @@ from __future__ import annotations
 
 import sys
 
-from weevr_cli.config import find_project_root
 from weevr_cli.deploy.collector import collect_local_files
 from weevr_cli.deploy.diff import compute_diff
 from weevr_cli.deploy.executor import execute_plan
 from weevr_cli.deploy.ignore import load_deploy_ignore
 from weevr_cli.deploy.onelake import OneLakeClient
 from weevr_cli.deploy.output import render_dry_run, render_result, render_target_header
-from weevr_cli.deploy.target import TargetError, resolve_target
+from weevr_cli.deploy.target import TargetError, resolve_deploy_context
 from weevr_cli.output import print_error, print_json
 from weevr_cli.state import AppState, AuthError
 
@@ -56,9 +55,9 @@ def run_deploy(
     if config is None:
         raise SystemExit(1)
 
-    # 1. Resolve target
+    # 1. Resolve target and project root
     try:
-        target = resolve_target(
+        ctx = resolve_deploy_context(
             config,
             target_name=target_name,
             workspace_id=workspace_id,
@@ -69,20 +68,12 @@ def run_deploy(
         print_error(str(exc), exc.code, json_mode=state.json_mode, console=state.console)
         raise SystemExit(1) from exc
 
+    target = ctx.target
+    project_root = ctx.project_root
+
     # 2. Display target header
     if not state.json_mode:
         render_target_header(target, state.console)
-
-    # 3. Find project root
-    project_root = find_project_root()
-    if project_root is None:
-        print_error(
-            "No weevr project found.",
-            "config_not_found",
-            json_mode=state.json_mode,
-            console=state.console,
-        )
-        raise SystemExit(1) from None
 
     # 4. Pre-deploy validation (unless skipped)
     if not skip_validation:

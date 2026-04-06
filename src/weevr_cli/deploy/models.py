@@ -25,6 +25,14 @@ class DeployTarget:
     lakehouse_id: str
     path_prefix: str | None = None
     name: str | None = None
+    project_folder: str | None = None
+
+    def __post_init__(self) -> None:
+        """Validate that project_folder is a single path component."""
+        if self.project_folder and ("/" in self.project_folder or "\\" in self.project_folder):
+            raise ValueError(
+                f"project_folder must be a single path component, got: {self.project_folder}"
+            )
 
     @property
     def onelake_account_url(self) -> str:
@@ -42,6 +50,8 @@ class DeployTarget:
         base = f"{self.lakehouse_id}.Lakehouse/Files"
         if self.path_prefix:
             base = f"{base}/{self.path_prefix}"
+        if self.project_folder:
+            base = f"{base}/{self.project_folder}"
         return base
 
 

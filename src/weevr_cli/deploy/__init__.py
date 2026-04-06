@@ -14,12 +14,18 @@ from weevr_cli.deploy.models import (
     RemoteFile,
 )
 from weevr_cli.deploy.onelake import OneLakeClient
-from weevr_cli.deploy.target import TargetError, resolve_target
+from weevr_cli.deploy.target import (
+    DeployContext,
+    TargetError,
+    resolve_deploy_context,
+    resolve_target,
+)
 
 __all__ = [
     "ActionResult",
     "ActionType",
     "DeployAction",
+    "DeployContext",
     "DeployPlan",
     "DeployResult",
     "DeployTarget",
@@ -33,5 +39,6 @@ __all__ = [
     "execute_plan",
     "is_ignored",
     "load_deploy_ignore",
+    "resolve_deploy_context",
     "resolve_target",
 ]
