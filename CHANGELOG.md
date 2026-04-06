@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.1.0...weevr-cli-v1.1.1) (2026-04-06)
+
+
+### Bug Fixes
+
+* **deploy:** preserve project root folder in remote paths ([#27](https://github.com/ardent-data/weevr-cli/issues/27)) ([68a65a3](https://github.com/ardent-data/weevr-cli/commit/68a65a381000370219f7cb0efa4adec6eeb6854e))
+
 ## [1.1.0](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.0.0...weevr-cli-v1.1.0) (2026-04-06)
 
 This release aligns the CLI with the weevr engine v1.13 release. The headline
