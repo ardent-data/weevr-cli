@@ -106,6 +106,111 @@ def test_unknown_extension(tmp_path: Path) -> None:
     assert any("extension" in e.message.lower() or "type" in e.message.lower() for e in errors)
 
 
+def test_var_ref_in_non_string_field_skipped(tmp_path: Path) -> None:
+    """Bare ${...} reference in a non-string field does not produce errors."""
+    f = tmp_path / "param.thread"
+    f.write_text(
+        'config_version: "1.0"\n'
+        "sources:\n"
+        "  raw:\n"
+        "    type: csv\n"
+        "write:\n"
+        "  mode: merge\n"
+        "  match_keys: ${param.pk_columns}\n"
+        "  on_match: update\n"
+        "  on_no_match_target: insert\n"
+        "  on_no_match_source: soft_delete\n"
+        "  soft_delete_column: _is_deleted\n"
+        "  soft_delete_value: true\n"
+        "target:\n"
+        "  path: Tables/test\n"
+    )
+    issues = validate_file(f)
+    errors = [i for i in issues if i.severity == "error"]
+    assert errors == []
+
+
+def test_var_ref_does_not_mask_real_errors(tmp_path: Path) -> None:
+    """A var ref on one field does not suppress errors on sibling fields."""
+    f = tmp_path / "mixed.thread"
+    f.write_text(
+        'config_version: "1.0"\n'
+        "sources:\n"
+        "  raw:\n"
+        "    type: csv\n"
+        "write:\n"
+        "  mode: merge\n"
+        "  match_keys: ${param.pk_columns}\n"
+        "  on_match: invalid_value\n"
+        "target:\n"
+        "  path: Tables/test\n"
+    )
+    issues = validate_file(f)
+    errors = [i for i in issues if i.severity == "error"]
+    assert len(errors) >= 1
+    assert any("invalid_value" in e.message for e in errors)
+
+
+def test_var_ref_in_list_item_stripped(tmp_path: Path) -> None:
+    """A ${...} item inside a list is stripped; remaining items validate."""
+    f = tmp_path / "listref.thread"
+    f.write_text(
+        'config_version: "1.0"\n'
+        "sources:\n"
+        "  raw:\n"
+        "    type: csv\n"
+        "write:\n"
+        "  mode: merge\n"
+        "  match_keys:\n"
+        "    - customer_id\n"
+        "    - ${param.extra_key}\n"
+        "  on_match: update\n"
+        "target:\n"
+        "  path: Tables/test\n"
+    )
+    issues = validate_file(f)
+    errors = [i for i in issues if i.severity == "error"]
+    assert errors == []
+
+
+def test_var_ref_in_enum_field_accepted(tmp_path: Path) -> None:
+    """A ${...} ref in an enum field (e.g. write.mode) passes validation."""
+    f = tmp_path / "enumref.thread"
+    f.write_text(
+        'config_version: "1.0"\n'
+        "sources:\n"
+        "  raw:\n"
+        "    type: csv\n"
+        "write:\n"
+        "  mode: ${param.write_mode}\n"
+        "  match_keys: ${param.pk_columns}\n"
+        "target:\n"
+        "  path: Tables/test\n"
+    )
+    issues = validate_file(f)
+    errors = [i for i in issues if i.severity == "error"]
+    assert errors == []
+
+
+def test_string_interpolation_not_skipped(tmp_path: Path) -> None:
+    """A value with embedded ${...} (not a bare ref) is still validated."""
+    f = tmp_path / "interp.thread"
+    f.write_text(
+        'config_version: "1.0"\n'
+        "sources:\n"
+        "  raw:\n"
+        "    type: csv\n"
+        "write:\n"
+        "  mode: merge\n"
+        '  match_keys: "prefix_${param.pk_columns}"\n'
+        "target:\n"
+        "  path: Tables/test\n"
+    )
+    issues = validate_file(f)
+    errors = [i for i in issues if i.severity == "error"]
+    assert len(errors) >= 1
+
+
 def test_corrupted_local_schema(tmp_path: Path) -> None:
     """Malformed local schema JSON produces an error, not a crash."""
     project = tmp_path / "test.weevr"
