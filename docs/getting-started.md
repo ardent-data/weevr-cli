@@ -105,6 +105,9 @@ Use `--strict` to treat warnings as errors:
 weevr validate --strict
 ```
 
+!!! tip "Parameterized templates"
+    Files that use variable references like `${param.pk_columns}` or `${env.DB_NAME}` pass validation even when the referenced field expects a non-string type (e.g. an array). The validator skips static type checks on bare `${...}` values since they are resolved at runtime by the weevr engine.
+
 ## Configure a Deploy Target
 
 Edit `.weevr/cli.yaml` with your Fabric workspace and lakehouse IDs:
