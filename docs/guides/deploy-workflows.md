@@ -88,7 +88,7 @@ When you run `weevr deploy`, the target is resolved in this order:
 1. **CLI flags** (`--workspace-id` and `--lakehouse-id`, both required together) — highest priority
 2. **Named or default target** (`--target <name>`, or `default_target` from `cli.yaml` if `--target` is omitted)
 
-The `--path-prefix` flag can be combined with either approach — it overrides the target's `path_prefix` without changing how the target itself is resolved.
+The `--path-prefix` flag can be combined with either approach — it overrides the target's `path_prefix` without changing how the target itself is resolved. The project folder name (e.g., `my-project.weevr`) is always appended after the prefix, so the effective remote base is `Files/{path_prefix}/{project_folder}/`.
 
 See [Configuration](../configuration/index.md) for the full `cli.yaml` reference.
 

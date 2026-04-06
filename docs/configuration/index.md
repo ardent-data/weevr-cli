@@ -15,7 +15,7 @@ targets:
   dev:
     workspace_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
     lakehouse_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-    path_prefix: "weevr/my-project"
+    path_prefix: "weevr"
   prod:
     workspace_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
     lakehouse_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
@@ -25,7 +25,29 @@ targets:
 |---|---|---|
 | `workspace_id` | Yes | Fabric workspace GUID |
 | `lakehouse_id` | Yes | Fabric Lakehouse GUID |
-| `path_prefix` | No | Prefix prepended to all remote paths (e.g., `weevr/my-project`) |
+| `path_prefix` | No | Optional namespace prepended before the project folder in remote paths (e.g., `weevr`) |
+
+### Remote Path Structure
+
+The CLI automatically includes the project folder name (e.g., `my-project.weevr`) in all remote paths. The full remote base path is:
+
+```
+Files/{path_prefix}/{project_folder}/
+```
+
+For example, with `path_prefix: "weevr"` and a project directory named `my-project.weevr`, the file `staging/stg_customers.thread` deploys to:
+
+```
+Files/weevr/my-project.weevr/staging/stg_customers.thread
+```
+
+If `path_prefix` is omitted, the project folder sits directly under `Files/`:
+
+```
+Files/my-project.weevr/staging/stg_customers.thread
+```
+
+The project folder name is always included because the weevr engine uses it to detect project roots on the Lakehouse.
 
 ### Default Target
 
@@ -55,11 +77,11 @@ targets:
   dev:
     workspace_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
     lakehouse_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-    path_prefix: "weevr/my-project"
+    path_prefix: "weevr"
   staging:
     workspace_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
     lakehouse_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-    path_prefix: "weevr/my-project"
+    path_prefix: "weevr"
   prod:
     workspace_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
     lakehouse_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
@@ -77,7 +99,7 @@ CLI flags override config file values. The resolution order (highest to lowest p
 1. **CLI flags** — `--workspace-id` and `--lakehouse-id` (both must be provided together)
 2. **Named or default target** — `--target <name>` selects a target from config; if omitted, `default_target` is used
 
-The `--path-prefix` flag can be combined with either approach to override just the path prefix.
+The `--path-prefix` flag can be combined with either approach to override just the path prefix. The project folder name is always appended after the prefix automatically.
 
 This makes CI/CD pipelines straightforward — inject IDs from pipeline variables:
 

@@ -117,10 +117,12 @@ targets:
   dev:
     workspace_id: "your-workspace-id"
     lakehouse_id: "your-lakehouse-id"
-    path_prefix: "weevr/my-project"
+    path_prefix: "weevr"
 
 default_target: dev
 ```
+
+The `path_prefix` is optional — it adds a namespace before the project folder on the Lakehouse. With this config, files deploy to `Files/weevr/my-project.weevr/...`. The project folder name is always included automatically.
 
 You can define multiple targets (e.g., `dev`, `staging`, `prod`) and switch between them with `--target`.
 
