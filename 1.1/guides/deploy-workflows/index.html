@@ -1044,7 +1044,7 @@
 <li><strong>CLI flags</strong> (<code>--workspace-id</code> and <code>--lakehouse-id</code>, both required together) — highest priority</li>
 <li><strong>Named or default target</strong> (<code>--target &lt;name&gt;</code>, or <code>default_target</code> from <code>cli.yaml</code> if <code>--target</code> is omitted)</li>
 </ol>
-<p>The <code>--path-prefix</code> flag can be combined with either approach — it overrides the target's <code>path_prefix</code> without changing how the target itself is resolved.</p>
+<p>The <code>--path-prefix</code> flag can be combined with either approach — it overrides the target's <code>path_prefix</code> without changing how the target itself is resolved. The project folder name (e.g., <code>my-project.weevr</code>) is always appended after the prefix, so the effective remote base is <code>Files/{path_prefix}/{project_folder}/</code>.</p>
 <p>See <a href="../../configuration/">Configuration</a> for the full <code>cli.yaml</code> reference.</p>
 <h2 id="cicd-patterns">CI/CD Patterns<a class="headerlink" href="#cicd-patterns" title="Permanent link">&para;</a></h2>
 <h3 id="github-actions">GitHub Actions<a class="headerlink" href="#github-actions" title="Permanent link">&para;</a></h3>
