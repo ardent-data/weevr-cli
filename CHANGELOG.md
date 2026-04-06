@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.0.0...weevr-cli-v1.1.0) (2026-04-06)
+
+
+### Features
+
+* **schema:** add warp artifact type and update schemas to v1.13 ([#23](https://github.com/ardent-data/weevr-cli/issues/23)) ([909b076](https://github.com/ardent-data/weevr-cli/commit/909b0762cdc5da3137fdcdc86c6f25737652b28d))
+
+
+### Bug Fixes
+
+* **validate:** skip schema type checks for bare variable references ([#25](https://github.com/ardent-data/weevr-cli/issues/25)) ([ecbb4a5](https://github.com/ardent-data/weevr-cli/commit/ecbb4a52417a672056c7708371cc3ed649b84610))
+
 ## [1.0.0](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v0.1.8...weevr-cli-v1.0.0) (2026-04-03)
 
 
