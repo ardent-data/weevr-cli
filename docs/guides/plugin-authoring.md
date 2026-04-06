@@ -3,7 +3,7 @@
 Plugins extend the weevr CLI with custom subcommand groups. This guide covers creating, registering, and testing a plugin.
 
 !!! warning "Stability Notice"
-    The plugin API may evolve in future releases. The v1.0 stability contract covers CLI commands, flags, exit codes, and the configuration format — but not the plugin protocol.
+    The plugin API may evolve in future releases. The stability contract covers CLI commands, flags, exit codes, and the configuration format — but not the plugin protocol.
 
 ## How Plugins Work
 

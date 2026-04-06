@@ -2,6 +2,24 @@
 
 ## [1.1.0](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.0.0...weevr-cli-v1.1.0) (2026-04-06)
 
+This release aligns the CLI with the weevr engine v1.13 release. The headline
+addition is **warp** — a new artifact type for declaring target table schema
+contracts. Warp files (`.warp`) define the intended shape of a target table:
+columns, types, nullability, and key metadata. They're now a first-class citizen
+across the CLI: `weevr new warp` scaffolds from a template, `weevr validate`
+checks them against the bundled schema, and `weevr deploy`, `weevr status`, and
+`weevr list` all recognize them.
+
+The bundled thread and weave schemas have been updated to v1.13, picking up
+support for **thread parameterization** (`params` on weave thread entries) and
+**instance aliasing** (`as` for reusing the same thread ref multiple times in a
+weave). The default schema version in new projects is now `1.13`.
+
+This release also fixes a validation issue where parameterized thread files
+using `${param.*}` or `${env.*}` variable references in non-string fields (like
+`match_keys`) were incorrectly rejected. The validator now recognizes bare
+`${...}` references and skips static type checks on them, since those values are
+resolved at runtime by the engine.
 
 ### Features
 

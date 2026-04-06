@@ -14,7 +14,7 @@ CLI for managing [weevr](https://github.com/ardent-data/weevr) projects — scaf
 The weevr engine runs inside Fabric notebooks; the CLI runs on your workstation and in CI/CD pipelines.
 
 - **`weevr init`** — scaffold a new project
-- **`weevr new`** — generate thread, weave, or loom files from templates
+- **`weevr new`** — generate thread, weave, loom, and warp files from templates
 - **`weevr validate`** — check YAML schema conformance and reference integrity
 - **`weevr deploy`** — sync files to a Fabric Lakehouse via the OneLake API
 - **`weevr status`** — diff local files against deployed state
