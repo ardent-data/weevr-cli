@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import re
+from dataclasses import replace
+from pathlib import Path
 
-from weevr_cli.config import WeevrConfig
+from weevr_cli.config import WeevrConfig, find_project_root
 from weevr_cli.deploy.models import DeployTarget
 
 UUID_PATTERN = re.compile(
@@ -109,3 +111,57 @@ def resolve_target(
         path_prefix=path_prefix if path_prefix is not None else target_config.path_prefix,
         name=name,
     )
+
+
+class DeployContext:
+    """Resolved deploy target paired with the local project root."""
+
+    def __init__(self, target: DeployTarget, project_root: Path) -> None:
+        """Initialize with a resolved target and its project root path."""
+        self.target = target
+        self.project_root = project_root
+
+
+def resolve_deploy_context(
+    config: WeevrConfig,
+    *,
+    target_name: str = "",
+    workspace_id: str | None = None,
+    lakehouse_id: str | None = None,
+    path_prefix: str | None = None,
+) -> DeployContext:
+    """Resolve a deploy target and project root together.
+
+    Combines target resolution with project root discovery, wiring
+    the project folder name into the target so remote paths preserve
+    the .weevr project root directory.
+
+    Args:
+        config: Parsed weevr configuration.
+        target_name: Named target from --target flag.
+        workspace_id: Override workspace ID from CLI flag.
+        lakehouse_id: Override lakehouse ID from CLI flag.
+        path_prefix: Override path prefix from CLI flag.
+
+    Returns:
+        DeployContext with the resolved target and project root.
+
+    Raises:
+        TargetError: If target cannot be resolved or IDs are invalid.
+            Also raised if no weevr project root is found.
+    """
+    target = resolve_target(
+        config,
+        target_name=target_name,
+        workspace_id=workspace_id,
+        lakehouse_id=lakehouse_id,
+        path_prefix=path_prefix,
+    )
+
+    project_root = find_project_root()
+    if project_root is None:
+        raise TargetError("No weevr project found.", code="config_not_found")
+
+    target = replace(target, project_folder=project_root.name)
+
+    return DeployContext(target=target, project_root=project_root)

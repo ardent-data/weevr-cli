@@ -64,6 +64,30 @@ def mock_azure(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Generator[Mag
         yield mock_client
 
 
+class TestStatusProjectFolder:
+    def test_project_folder_in_target(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """OneLakeClient receives a target with project_folder set."""
+        proj = _setup_project(tmp_path)
+        monkeypatch.chdir(proj)
+        with (
+            patch(
+                "weevr_cli.state.AppState.credential",
+                new_callable=lambda: property(lambda self: MagicMock()),
+            ),
+            patch("weevr_cli.commands.status.OneLakeClient") as mock_cls,
+        ):
+            mock_client = MagicMock()
+            mock_client.list_files.return_value = []
+            mock_cls.return_value = mock_client
+            result = runner.invoke(app, ["status"], catch_exceptions=False)
+            assert result.exit_code == 0, result.output
+            target_arg = mock_cls.call_args[0][0]
+            assert target_arg.project_folder == "test-project.weevr"
+            assert "test-project.weevr" in target_arg.base_directory
+
+
 class TestStatusDiffSymbols:
     """EC-001: Colored diff symbols for each status."""
 

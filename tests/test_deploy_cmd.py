@@ -93,6 +93,31 @@ def mock_azure_with_ignore(
         yield mock_client
 
 
+class TestDeployProjectFolder:
+    def test_project_folder_in_upload_path(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Remote paths must include the project folder name."""
+        proj = _setup_project(tmp_path)
+        monkeypatch.chdir(proj)
+        with (
+            patch(
+                "weevr_cli.state.AppState.credential",
+                new_callable=lambda: property(lambda self: MagicMock()),
+            ),
+            patch("weevr_cli.commands.deploy.OneLakeClient") as mock_cls,
+        ):
+            mock_client = MagicMock()
+            mock_client.list_files.return_value = []
+            mock_cls.return_value = mock_client
+            result = runner.invoke(app, ["deploy", "--skip-validation"], catch_exceptions=False)
+            assert result.exit_code == 0, result.output
+            # The target passed to OneLakeClient must have project_folder set
+            target_arg = mock_cls.call_args[0][0]
+            assert target_arg.project_folder == "test-project.weevr"
+            assert "test-project.weevr" in target_arg.base_directory
+
+
 class TestDeploySmartSync:
     def test_smart_sync_uploads_new_files(self, mock_azure: MagicMock) -> None:
         result = runner.invoke(app, ["deploy", "--skip-validation"], catch_exceptions=False)

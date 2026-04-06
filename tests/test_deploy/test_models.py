@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import pytest
+
 from weevr_cli.deploy.models import (
     ActionResult,
     ActionType,
@@ -31,6 +33,27 @@ class TestDeployTarget:
             workspace_id="ws-id", lakehouse_id="lh-id", path_prefix="weevr/project"
         )
         assert target.base_directory == "lh-id.Lakehouse/Files/weevr/project"
+
+    def test_base_directory_with_project_folder(self) -> None:
+        target = DeployTarget(
+            workspace_id="ws-id", lakehouse_id="lh-id", project_folder="datalake.weevr"
+        )
+        assert target.base_directory == "lh-id.Lakehouse/Files/datalake.weevr"
+
+    def test_base_directory_with_prefix_and_project_folder(self) -> None:
+        target = DeployTarget(
+            workspace_id="ws-id",
+            lakehouse_id="lh-id",
+            path_prefix="custom/path",
+            project_folder="datalake.weevr",
+        )
+        assert target.base_directory == "lh-id.Lakehouse/Files/custom/path/datalake.weevr"
+
+    def test_project_folder_rejects_path_separators(self) -> None:
+        with pytest.raises(ValueError, match="single path component"):
+            DeployTarget(workspace_id="ws-id", lakehouse_id="lh-id", project_folder="bad/path")
+        with pytest.raises(ValueError, match="single path component"):
+            DeployTarget(workspace_id="ws-id", lakehouse_id="lh-id", project_folder="bad\\path")
 
     def test_name_optional(self) -> None:
         target = DeployTarget(workspace_id="ws-id", lakehouse_id="lh-id", name="dev")
