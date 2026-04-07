@@ -123,6 +123,37 @@ class TestBuildDependencyGraph:
         assert "threads/good.thread" in graph.nodes
         assert "threads/bad.thread" not in graph.nodes
 
+    def test_leading_slash_ref_resolves(self, tmp_path: Path) -> None:
+        """A '/'-prefixed ref must resolve to its target node, not appear broken."""
+        root = tmp_path / "project.weevr"
+        _write_yaml(root / "threads" / "raw.thread", {"name": "raw"})
+        _write_yaml(
+            root / "weaves" / "customer.weave",
+            {"name": "customer", "threads": [{"ref": "/threads/raw.thread"}]},
+        )
+
+        graph = build_dependency_graph(root)
+        weave_node = graph.nodes["weaves/customer.weave"]
+        assert weave_node.refs_out == ["threads/raw.thread"]
+        # Target thread must register the inbound edge and not be flagged orphan.
+        thread_node = graph.nodes["threads/raw.thread"]
+        assert "weaves/customer.weave" in thread_node.refs_in
+        assert thread_node.is_orphan is False
+
+    def test_backslash_ref_resolves(self, tmp_path: Path) -> None:
+        """A ref written with backslashes (Windows authoring) still resolves."""
+        root = tmp_path / "project.weevr"
+        _write_yaml(root / "threads" / "raw.thread", {"name": "raw"})
+        _write_yaml(
+            root / "weaves" / "customer.weave",
+            {"name": "customer", "threads": [{"ref": "threads\\raw.thread"}]},
+        )
+
+        graph = build_dependency_graph(root)
+        thread_node = graph.nodes["threads/raw.thread"]
+        assert "weaves/customer.weave" in thread_node.refs_in
+        assert thread_node.is_orphan is False
+
     def test_empty_project(self, tmp_path: Path) -> None:
         """Project with no weevr files → empty graph."""
         root = tmp_path / "project.weevr"

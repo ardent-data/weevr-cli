@@ -153,7 +153,9 @@ def run_validate(
         parsed: dict[str, Any] = {}
         for file_path in files_to_check:
             try:
-                rel = str(file_path.relative_to(project_root))
+                # Use POSIX form so orphan detection compares consistently
+                # against YAML refs regardless of host OS.
+                rel = file_path.relative_to(project_root).as_posix()
             except ValueError:
                 continue
             data = _parse_file(file_path)
