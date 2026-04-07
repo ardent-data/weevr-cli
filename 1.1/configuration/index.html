@@ -616,15 +616,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#weevrdeploy-ignore" class="md-nav__link">
+  <a href="#ignore-files" class="md-nav__link">
     <span class="md-ellipsis">
       
-        .weevr/deploy-ignore
+        Ignore files
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=".weevr/deploy-ignore">
+    <nav class="md-nav" aria-label="Ignore files">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -643,6 +643,28 @@
     <span class="md-ellipsis">
       
         Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explicit-path-bypass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explicit-path bypass
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weevrdeploy-ignore-deprecated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .weevr/deploy-ignore (deprecated)
       
     </span>
   </a>
@@ -914,15 +936,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#weevrdeploy-ignore" class="md-nav__link">
+  <a href="#ignore-files" class="md-nav__link">
     <span class="md-ellipsis">
       
-        .weevr/deploy-ignore
+        Ignore files
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=".weevr/deploy-ignore">
+    <nav class="md-nav" aria-label="Ignore files">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -941,6 +963,28 @@
     <span class="md-ellipsis">
       
         Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explicit-path-bypass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explicit-path bypass
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weevrdeploy-ignore-deprecated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .weevr/deploy-ignore (deprecated)
       
     </span>
   </a>
@@ -1065,27 +1109,52 @@
 <p>This makes CI/CD pipelines straightforward — inject IDs from pipeline variables:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>--workspace-id<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$WORKSPACE_ID</span><span class="s2">&quot;</span><span class="w"> </span>--lakehouse-id<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$LAKEHOUSE_ID</span><span class="s2">&quot;</span>
 </code></pre></div>
-<h2 id="weevrdeploy-ignore"><code>.weevr/deploy-ignore</code><a class="headerlink" href="#weevrdeploy-ignore" title="Permanent link">&para;</a></h2>
-<p>Controls which files are excluded from deployment. Uses gitignore-style pattern syntax.</p>
+<h2 id="ignore-files">Ignore files<a class="headerlink" href="#ignore-files" title="Permanent link">&para;</a></h2>
+<p>Project-wide ignore patterns control which files weevr considers part of the project. Ignored files are skipped by <code>weevr validate</code>, <code>weevr list</code>, <code>weevr status</code>, and <code>weevr deploy</code> alike — useful for scratch folders, drafts, and editor backups that should never be validated or deployed.</p>
+<p>Two locations are supported. Both are optional, both use gitignore-style pattern syntax, and patterns from both are unioned:</p>
+<table>
+<thead>
+<tr>
+<th>Location</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.weevr/ignore</code></td>
+<td>Lives alongside other weevr config (<code>cli.yaml</code>). Recommended primary location.</td>
+</tr>
+<tr>
+<td><code>.weevrignore</code> (project root)</td>
+<td>Familiar gitignore-style location. Use whichever you prefer — or both.</td>
+</tr>
+</tbody>
+</table>
 <h3 id="format">Format<a class="headerlink" href="#format" title="Permanent link">&para;</a></h3>
 <ul>
 <li>One pattern per line</li>
 <li>Lines starting with <code>#</code> are comments</li>
 <li>Blank lines are ignored</li>
-<li>Patterns follow gitignore glob syntax</li>
+<li>Patterns follow gitignore glob syntax (directory suffix <code>/</code>, wildcards, <code>!</code> for re-include, etc.)</li>
 </ul>
 <h3 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a># Ignore test fixtures
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>tests/
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a># Scratch folder for in-progress work
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>scratch/
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a># Ignore drafts
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>*.draft.yaml
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a># Ignore docs
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>docs/
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>README.md
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a># Drafts
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>*.draft.thread
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>*.draft.weave
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a># Editor backups
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>*~
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>.DS_Store
 </code></pre></div>
-<p>If the file does not exist, no files are excluded (everything is eligible for deployment).</p>
+<p>If neither file exists, nothing is excluded.</p>
+<h3 id="explicit-path-bypass">Explicit-path bypass<a class="headerlink" href="#explicit-path-bypass" title="Permanent link">&para;</a></h3>
+<p>When you pass a specific file or directory to <code>weevr validate &lt;path&gt;</code>, the ignore filter is bypassed for that target. The reasoning: if you asked for a file by name, you meant it. The full-project scan (no path argument) honors the ignore filter.</p>
+<h3 id="weevrdeploy-ignore-deprecated"><code>.weevr/deploy-ignore</code> (deprecated)<a class="headerlink" href="#weevrdeploy-ignore-deprecated" title="Permanent link">&para;</a></h3>
+<p><code>.weevr/deploy-ignore</code> is the legacy deploy-only ignore file. It is still honored by <code>weevr deploy</code> and <code>weevr status</code>, but <strong>will be removed in v1.3.0</strong>. Move its patterns into <code>.weevr/ignore</code> (or <code>.weevrignore</code>) and delete the old file.</p>
+<p>When <code>.weevr/deploy-ignore</code> is present, weevr commands will print a one-line deprecation warning to stderr.</p>
 
 
 
