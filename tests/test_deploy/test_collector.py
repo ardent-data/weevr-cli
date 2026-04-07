@@ -53,9 +53,16 @@ class TestCollectLocalFiles:
 
     def test_excludes_config_files(self, tmp_path: Path) -> None:
         root = _setup_project(tmp_path)
+        # Create every config/ignore file that must never be deployed.
+        (root / ".weevr" / "ignore").write_text("# project-wide\n")
+        (root / ".weevr" / "deploy-ignore").write_text("# deploy-only\n")
+        (root / ".weevrignore").write_text("# root convention\n")
         files = collect_local_files(root, _empty_spec())
         paths = [f.relative_path for f in files]
         assert ".weevr/cli.yaml" not in paths
+        assert ".weevr/ignore" not in paths
+        assert ".weevr/deploy-ignore" not in paths
+        assert ".weevrignore" not in paths
 
     def test_respects_ignore_patterns(self, tmp_path: Path) -> None:
         root = _setup_project(tmp_path)

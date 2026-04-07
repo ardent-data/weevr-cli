@@ -5,10 +5,16 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+import pathspec
 import yaml
 from rich.table import Table
 
 from weevr_cli.config import WEEVR_PROJECT_EXT, find_project_root
+from weevr_cli.ignore import (
+    deploy_ignore_deprecation_message,
+    has_deploy_ignore,
+    load_combined_ignore,
+)
 from weevr_cli.output import print_error, print_json
 from weevr_cli.state import AppState
 from weevr_cli.validation.refs import check_refs, find_orphans
@@ -18,12 +24,38 @@ from weevr_cli.validation.schema import validate_file
 _WEEVR_EXTENSIONS = (".thread", ".weave", ".loom", ".warp")
 
 
-def _find_weevr_files(directory: Path) -> list[Path]:
-    """Recursively find all .thread, .weave, .loom, .warp files in a directory."""
+def _find_weevr_files(
+    directory: Path,
+    *,
+    ignore_spec: pathspec.PathSpec | None = None,
+    ignore_root: Path | None = None,
+) -> list[Path]:
+    """Recursively find all .thread, .weave, .loom, .warp files in a directory.
+
+    When ``ignore_spec`` is provided, files whose path (relative to
+    ``ignore_root``) matches any ignore pattern are excluded. ``ignore_root``
+    should be the project root — ignore patterns are always interpreted
+    relative to it, not the scan ``directory``.
+    """
     directory = directory.resolve()
     files: list[Path] = []
     for ext in _WEEVR_EXTENSIONS:
         files.extend(directory.rglob(f"*{ext}"))
+
+    if ignore_spec is not None and ignore_root is not None:
+        filtered: list[Path] = []
+        for f in files:
+            try:
+                rel = f.relative_to(ignore_root).as_posix()
+            except ValueError:
+                # File is outside the ignore root — cannot be matched by
+                # project-relative patterns, so keep it.
+                filtered.append(f)
+                continue
+            if not ignore_spec.match_file(rel):
+                filtered.append(f)
+        files = filtered
+
     return sorted(files)
 
 
@@ -119,16 +151,30 @@ def run_validate(
         )
         raise SystemExit(1)
 
+    # Load project-wide ignore patterns (validate does NOT honor deploy-ignore).
+    # The ignore filter applies only to the full-project scan. An explicit
+    # target_path — whether a file or a directory — bypasses the filter
+    # entirely: if the user named it on the command line, they meant it.
+    ignore_spec: pathspec.PathSpec | None = None
+    if project_root is not None and target_path is None:
+        ignore_spec = load_combined_ignore(project_root, include_deploy=False)
+        if has_deploy_ignore(project_root) and not state.json_mode:
+            state.console.print(f"[yellow]{deploy_ignore_deprecation_message()}[/yellow]")
+
     # Determine what to validate
     if target_path is not None and target_path.is_file():
         # Single file: schema + immediate refs
         files_to_check = [target_path]
     elif target_path is not None and target_path.is_dir():
-        # Directory: recursive scan
+        # Directory: recursive scan. Explicit path — ignore filter bypassed
+        # intentionally. If the user ran `weevr validate scratch/`, they
+        # want scratch/ validated even if it is otherwise ignored.
         files_to_check = _find_weevr_files(target_path)
     elif project_root is not None:
-        # Full project scan
-        files_to_check = _find_weevr_files(project_root)
+        # Full project scan — apply ignore filter
+        files_to_check = _find_weevr_files(
+            project_root, ignore_spec=ignore_spec, ignore_root=project_root
+        )
     else:
         # Scan cwd as fallback
         files_to_check = _find_weevr_files(Path.cwd())

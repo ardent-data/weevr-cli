@@ -6,6 +6,7 @@ import logging
 from pathlib import Path
 from typing import Any, Literal
 
+import pathspec
 import yaml
 
 from weevr_cli.listing.models import DependencyGraph, GraphNode
@@ -21,7 +22,11 @@ WEEVR_EXTENSIONS: dict[str, Literal["thread", "weave", "loom", "warp"]] = {
 }
 
 
-def build_dependency_graph(project_root: Path) -> DependencyGraph:
+def build_dependency_graph(
+    project_root: Path,
+    *,
+    ignore_spec: pathspec.PathSpec | None = None,
+) -> DependencyGraph:
     """Build a dependency graph from weevr project files.
 
     Scans the project root recursively for .thread, .weave, .loom, and .warp files,
@@ -29,6 +34,8 @@ def build_dependency_graph(project_root: Path) -> DependencyGraph:
 
     Args:
         project_root: Root directory of the weevr project.
+        ignore_spec: Optional compiled ignore patterns. Files whose
+            project-relative path matches any pattern are skipped.
 
     Returns:
         A DependencyGraph with all discovered nodes and edges.
@@ -41,6 +48,8 @@ def build_dependency_graph(project_root: Path) -> DependencyGraph:
             if not path.is_file():
                 continue
             relative = path.relative_to(project_root).as_posix()
+            if ignore_spec is not None and ignore_spec.match_file(relative):
+                continue
             try:
                 text = path.read_text(encoding="utf-8")
                 data = yaml.safe_load(text)
