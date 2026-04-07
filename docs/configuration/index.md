@@ -148,6 +148,8 @@ When you pass a specific file or directory to `weevr validate <path>`, the ignor
 
 ### `.weevr/deploy-ignore` (deprecated)
 
-`.weevr/deploy-ignore` is the legacy deploy-only ignore file. It is still honored by `weevr deploy` and `weevr status`, but **will be removed in v1.3.0**. Move its patterns into `.weevr/ignore` (or `.weevrignore`) and delete the old file.
+`.weevr/deploy-ignore` is the legacy deploy-only ignore file. It is still honored for its original purpose — its patterns continue to filter files for `weevr deploy` and `weevr status` during the deprecation window — but **it will be removed in v1.3.0**. Move its patterns into `.weevr/ignore` (or `.weevrignore`) and delete the old file.
 
-When `.weevr/deploy-ignore` is present, weevr commands will print a one-line deprecation warning to stderr.
+When `.weevr/deploy-ignore` is present, every command that encounters a project root — `weevr validate`, `weevr list`, `weevr deploy`, and `weevr status` — prints a one-line deprecation warning to stderr directing you to migrate. `weevr validate` and `weevr list` emit the warning even though they do not apply the patterns themselves, so the notice surfaces regardless of which command you run first.
+
+The warning is suppressed in `--json` mode so machine-readable output remains clean for automation.
