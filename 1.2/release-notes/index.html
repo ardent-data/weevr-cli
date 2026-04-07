@@ -1,0 +1,1977 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="CLI for managing weevr projects — scaffolding, validation, and deployment to Microsoft Fabric.">
+      
+      
+      
+        <link rel="canonical" href="https://ardent-data.github.io/weevr-cli/1.2/release-notes/">
+      
+      
+        <link rel="prev" href="../guides/plugin-authoring/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Release Notes - weevr-cli</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#release-notes" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="weevr-cli" class="md-header__button md-logo" aria-label="weevr-cli" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            weevr-cli
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Release Notes
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/ardent-data/weevr-cli" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ardent-data/weevr-cli
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../cli/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  CLI Reference
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../configuration/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Configuration
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../guides/reference-syntax/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Release Notes
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="weevr-cli" class="md-nav__button md-logo" aria-label="weevr-cli" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    weevr-cli
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/ardent-data/weevr-cli" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ardent-data/weevr-cli
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/reference-syntax/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference Syntax
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/warp-files/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Warp Files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/deploy-workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deploy Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/plugin-authoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugin Authoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release Notes
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release Notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#120-2026-04-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2.0 (2026-04-07)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.2.0 (2026-04-07)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#114-2026-04-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.4 (2026-04-07)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.1.4 (2026-04-07)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bug-fixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#113-2026-04-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.3 (2026-04-07)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.1.3 (2026-04-07)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bug-fixes_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#112-2026-04-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.2 (2026-04-07)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.1.2 (2026-04-07)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bug-fixes_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#111-2026-04-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.1 (2026-04-06)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.1.1 (2026-04-06)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bug-fixes_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#110-2026-04-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.0 (2026-04-06)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.1.0 (2026-04-06)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#features_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bug-fixes_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#100-2026-04-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0.0 (2026-04-03)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.0.0 (2026-04-03)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠ BREAKING CHANGES
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#features_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#018-2026-04-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1.8 (2026-04-03)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.1.8 (2026-04-03)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#features_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#017-2026-04-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1.7 (2026-04-03)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.1.7 (2026-04-03)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#features_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#016-2026-04-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1.6 (2026-04-03)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.1.6 (2026-04-03)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#features_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#015-2026-04-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1.5 (2026-04-03)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.1.5 (2026-04-03)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#features_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bug-fixes_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#014-2026-04-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1.4 (2026-04-03)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.1.4 (2026-04-03)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bug-fixes_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#013-2026-04-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1.3 (2026-04-02)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.1.3 (2026-04-02)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bug-fixes_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#012-2026-04-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1.2 (2026-04-02)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.1.2 (2026-04-02)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#features_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#011-2026-04-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1.1 (2026-04-02)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.1.1 (2026-04-02)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#features_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bug-fixes_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#120-2026-04-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2.0 (2026-04-07)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.2.0 (2026-04-07)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#114-2026-04-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.4 (2026-04-07)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.1.4 (2026-04-07)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bug-fixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#113-2026-04-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.3 (2026-04-07)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.1.3 (2026-04-07)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bug-fixes_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#112-2026-04-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.2 (2026-04-07)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.1.2 (2026-04-07)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bug-fixes_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#111-2026-04-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.1 (2026-04-06)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.1.1 (2026-04-06)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bug-fixes_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#110-2026-04-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.0 (2026-04-06)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.1.0 (2026-04-06)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#features_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bug-fixes_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#100-2026-04-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0.0 (2026-04-03)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.0.0 (2026-04-03)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠ BREAKING CHANGES
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#features_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#018-2026-04-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1.8 (2026-04-03)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.1.8 (2026-04-03)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#features_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#017-2026-04-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1.7 (2026-04-03)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.1.7 (2026-04-03)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#features_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#016-2026-04-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1.6 (2026-04-03)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.1.6 (2026-04-03)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#features_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#015-2026-04-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1.5 (2026-04-03)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.1.5 (2026-04-03)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#features_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bug-fixes_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#014-2026-04-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1.4 (2026-04-03)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.1.4 (2026-04-03)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bug-fixes_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#013-2026-04-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1.3 (2026-04-02)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.1.3 (2026-04-02)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bug-fixes_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#012-2026-04-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1.2 (2026-04-02)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.1.2 (2026-04-02)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#features_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#011-2026-04-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1.1 (2026-04-02)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.1.1 (2026-04-02)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#features_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bug-fixes_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="release-notes">Release Notes<a class="headerlink" href="#release-notes" title="Permanent link">&para;</a></h1>
+<h2 id="120-2026-04-07"><a href="https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.1.4...weevr-cli-v1.2.0">1.2.0</a> (2026-04-07)<a class="headerlink" href="#120-2026-04-07" title="Permanent link">&para;</a></h2>
+<p>This release introduces <strong>project-wide ignore files</strong>. A new <code>.weevr/ignore</code>
+file — or equivalently a <code>.weevrignore</code> at the project root — lets you exclude
+scratch folders, drafts, editor backups, and anything else you don't want the
+CLI to treat as part of your project. The patterns apply to every command that
+walks the project tree: <code>weevr validate</code>, <code>weevr list</code>, <code>weevr deploy</code>, and
+<code>weevr status</code>. Both files use gitignore-style syntax and are optional; when
+both exist, their patterns are unioned with no precedence ordering.</p>
+<p>The problem this solves is small but sharp. Until now, the only ignore
+mechanism was <code>.weevr/deploy-ignore</code>, which only affected <code>deploy</code> and
+<code>status</code>. A <code>scratch/</code> folder with half-finished drafts or deliberately broken
+YAML would be picked up by <code>weevr validate</code>, flagged as orphans by
+<code>weevr list</code>, and could even fail validation outright — and there was no way
+to say "this folder is not part of the project" without literally deleting
+the files. Now you can:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a># .weevr/ignore
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a># Scratch folder for in-progress work
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>scratch/
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a># Drafts and experiments
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>*.draft.thread
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>*.draft.weave
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a># Editor backups
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>*~
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>.DS_Store
+</code></pre></div>
+<p>Or, if you prefer the convention familiar from <code>.gitignore</code> and
+<code>.dockerignore</code>, the same file can live at the project root as
+<code>.weevrignore</code>. Use whichever location you prefer — or both, if you want to
+keep personal patterns separate from shared ones.</p>
+<p><strong>Explicit target paths bypass the ignore filter.</strong> If you pass a specific
+file or directory to <code>weevr validate</code> on the command line, it is validated
+regardless of ignore patterns:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Full-project scan — scratch/ is excluded by the ignore file</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>weevr<span class="w"> </span>validate
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Explicit path — bypasses the ignore filter, validates scratch/draft.thread</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>weevr<span class="w"> </span>validate<span class="w"> </span>scratch/draft.thread
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># Same rule applies to directory targets</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>weevr<span class="w"> </span>validate<span class="w"> </span>scratch/
+</code></pre></div>
+<p>The rule is simple: if you named it on the command line, you meant it. The
+ignore filter applies only to the implicit full-project scan.</p>
+<p><strong><code>.weevr/deploy-ignore</code> is deprecated</strong> and scheduled for removal in <strong>v1.3.0</strong>.
+It is still honored by <code>weevr deploy</code> and <code>weevr status</code> during the deprecation
+window, but every command that encounters it (<code>validate</code>, <code>list</code>, <code>deploy</code>,
+<code>status</code>) prints a one-line deprecation warning on stderr directing you to
+migrate. The warning is suppressed in <code>--json</code> mode so automation remains
+clean. To migrate, move the patterns from <code>.weevr/deploy-ignore</code> into
+<code>.weevr/ignore</code> (or <code>.weevrignore</code>) and delete the old file — the contents
+are identical, only the filename and scope differ.</p>
+<p>See <a href="https://ardent-data.github.io/weevr-cli/latest/configuration/#ignore-files">Configuration › Ignore files</a>
+for the full reference.</p>
+<h3 id="features">Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>cli:</strong> add project-wide ignore files (<a href="https://github.com/ardent-data/weevr-cli/issues/37">#37</a>) (<a href="https://github.com/ardent-data/weevr-cli/commit/f69ba294124b5fd70473f73ba74be2d2a206953c">f69ba29</a>)</li>
+</ul>
+<h2 id="114-2026-04-07"><a href="https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.1.3...weevr-cli-v1.1.4">1.1.4</a> (2026-04-07)<a class="headerlink" href="#114-2026-04-07" title="Permanent link">&para;</a></h2>
+<h3 id="bug-fixes">Bug Fixes<a class="headerlink" href="#bug-fixes" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>validate:</strong> normalize ref paths for cross-platform compatibility (<a href="https://github.com/ardent-data/weevr-cli/issues/35">#35</a>) (<a href="https://github.com/ardent-data/weevr-cli/commit/7b650dc129068ce4fc83dae2d131fba1ba326052">7b650dc</a>)</li>
+</ul>
+<h2 id="113-2026-04-07"><a href="https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.1.2...weevr-cli-v1.1.3">1.1.3</a> (2026-04-07)<a class="headerlink" href="#113-2026-04-07" title="Permanent link">&para;</a></h2>
+<h3 id="bug-fixes_1">Bug Fixes<a class="headerlink" href="#bug-fixes_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>schema:</strong> update bundled schemas to weevr engine v1.15 (<a href="https://github.com/ardent-data/weevr-cli/issues/31">#31</a>) (<a href="https://github.com/ardent-data/weevr-cli/commit/0a0aa42f43bbd0682a54c55fa8ce92a6c7d34b58">0a0aa42</a>)</li>
+</ul>
+<h2 id="112-2026-04-07"><a href="https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.1.1...weevr-cli-v1.1.2">1.1.2</a> (2026-04-07)<a class="headerlink" href="#112-2026-04-07" title="Permanent link">&para;</a></h2>
+<h3 id="bug-fixes_2">Bug Fixes<a class="headerlink" href="#bug-fixes_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>schema:</strong> update bundled schemas to weevr engine v1.14 (<a href="https://github.com/ardent-data/weevr-cli/issues/29">#29</a>) (<a href="https://github.com/ardent-data/weevr-cli/commit/2aefb30900d631c9bcc833b9cb9589e8d35107cf">2aefb30</a>)</li>
+</ul>
+<h2 id="111-2026-04-06"><a href="https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.1.0...weevr-cli-v1.1.1">1.1.1</a> (2026-04-06)<a class="headerlink" href="#111-2026-04-06" title="Permanent link">&para;</a></h2>
+<h3 id="bug-fixes_3">Bug Fixes<a class="headerlink" href="#bug-fixes_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>deploy:</strong> preserve project root folder in remote paths (<a href="https://github.com/ardent-data/weevr-cli/issues/27">#27</a>) (<a href="https://github.com/ardent-data/weevr-cli/commit/68a65a381000370219f7cb0efa4adec6eeb6854e">68a65a3</a>)</li>
+</ul>
+<h2 id="110-2026-04-06"><a href="https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.0.0...weevr-cli-v1.1.0">1.1.0</a> (2026-04-06)<a class="headerlink" href="#110-2026-04-06" title="Permanent link">&para;</a></h2>
+<p>This release aligns the CLI with the weevr engine v1.13 release. The headline
+addition is <strong>warp</strong> — a new artifact type for declaring target table schema
+contracts. Warp files (<code>.warp</code>) define the intended shape of a target table:
+columns, types, nullability, and key metadata. They're now a first-class citizen
+across the CLI: <code>weevr new warp</code> scaffolds from a template, <code>weevr validate</code>
+checks them against the bundled schema, and <code>weevr deploy</code>, <code>weevr status</code>, and
+<code>weevr list</code> all recognize them.</p>
+<p>The bundled thread and weave schemas have been updated to v1.13, picking up
+support for <strong>thread parameterization</strong> (<code>params</code> on weave thread entries) and
+<strong>instance aliasing</strong> (<code>as</code> for reusing the same thread ref multiple times in a
+weave). The default schema version in new projects is now <code>1.13</code>.</p>
+<p>This release also fixes a validation issue where parameterized thread files
+using <code>${param.*}</code> or <code>${env.*}</code> variable references in non-string fields (like
+<code>match_keys</code>) were incorrectly rejected. The validator now recognizes bare
+<code>${...}</code> references and skips static type checks on them, since those values are
+resolved at runtime by the engine.</p>
+<h3 id="features_1">Features<a class="headerlink" href="#features_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>schema:</strong> add warp artifact type and update schemas to v1.13 (<a href="https://github.com/ardent-data/weevr-cli/issues/23">#23</a>) (<a href="https://github.com/ardent-data/weevr-cli/commit/909b0762cdc5da3137fdcdc86c6f25737652b28d">909b076</a>)</li>
+</ul>
+<h3 id="bug-fixes_4">Bug Fixes<a class="headerlink" href="#bug-fixes_4" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>validate:</strong> skip schema type checks for bare variable references (<a href="https://github.com/ardent-data/weevr-cli/issues/25">#25</a>) (<a href="https://github.com/ardent-data/weevr-cli/commit/ecbb4a52417a672056c7708371cc3ed649b84610">ecbb4a5</a>)</li>
+</ul>
+<h2 id="100-2026-04-03"><a href="https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v0.1.8...weevr-cli-v1.0.0">1.0.0</a> (2026-04-03)<a class="headerlink" href="#100-2026-04-03" title="Permanent link">&para;</a></h2>
+<h3 id="breaking-changes">⚠ BREAKING CHANGES<a class="headerlink" href="#breaking-changes" title="Permanent link">&para;</a></h3>
+<ul>
+<li>add documentation site and prepare v1.0 release (<a href="https://github.com/ardent-data/weevr-cli/issues/19">#19</a>)</li>
+</ul>
+<h3 id="features_2">Features<a class="headerlink" href="#features_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>add documentation site and prepare v1.0 release (<a href="https://github.com/ardent-data/weevr-cli/issues/19">#19</a>) (<a href="https://github.com/ardent-data/weevr-cli/commit/651ba796ff945de5ba08d902ee50638656f24f71">651ba79</a>)</li>
+</ul>
+<h2 id="018-2026-04-03"><a href="https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v0.1.7...weevr-cli-v0.1.8">0.1.8</a> (2026-04-03)<a class="headerlink" href="#018-2026-04-03" title="Permanent link">&para;</a></h2>
+<h3 id="features_3">Features<a class="headerlink" href="#features_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>cli:</strong> add plugin system with entry-point discovery and management commands (<a href="https://github.com/ardent-data/weevr-cli/issues/18">#18</a>) (<a href="https://github.com/ardent-data/weevr-cli/commit/b4d84ee3f187248fa16b69f00cfb76b2194f5a78">b4d84ee</a>)</li>
+</ul>
+<h2 id="017-2026-04-03"><a href="https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v0.1.6...weevr-cli-v0.1.7">0.1.7</a> (2026-04-03)<a class="headerlink" href="#017-2026-04-03" title="Permanent link">&para;</a></h2>
+<h3 id="features_4">Features<a class="headerlink" href="#features_4" title="Permanent link">&para;</a></h3>
+<ul>
+<li>add status and list commands (<a href="https://github.com/ardent-data/weevr-cli/issues/15">#15</a>) (<a href="https://github.com/ardent-data/weevr-cli/commit/f03cba87d65f0163b3f632960bbe0325662415d2">f03cba8</a>)</li>
+</ul>
+<h2 id="016-2026-04-03"><a href="https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v0.1.5...weevr-cli-v0.1.6">0.1.6</a> (2026-04-03)<a class="headerlink" href="#016-2026-04-03" title="Permanent link">&para;</a></h2>
+<h3 id="features_5">Features<a class="headerlink" href="#features_5" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>deploy:</strong> add deploy command with OneLake sync (<a href="https://github.com/ardent-data/weevr-cli/issues/13">#13</a>) (<a href="https://github.com/ardent-data/weevr-cli/commit/601a63bc52b4f07aaf965800e792921adcda595b">601a63b</a>)</li>
+</ul>
+<h2 id="015-2026-04-03"><a href="https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v0.1.4...weevr-cli-v0.1.5">0.1.5</a> (2026-04-03)<a class="headerlink" href="#015-2026-04-03" title="Permanent link">&para;</a></h2>
+<h3 id="features_6">Features<a class="headerlink" href="#features_6" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>cli:</strong> add validate and schema commands with JSON schema validation and ref checking (<a href="https://github.com/ardent-data/weevr-cli/issues/12">#12</a>) (<a href="https://github.com/ardent-data/weevr-cli/commit/8a9c94ab41d9a9d1b47668bb1355c02de0cf0254">8a9c94a</a>)</li>
+</ul>
+<h3 id="bug-fixes_5">Bug Fixes<a class="headerlink" href="#bug-fixes_5" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>ci:</strong> use frozen lockfile to tolerate Release Please version bumps (<a href="https://github.com/ardent-data/weevr-cli/issues/10">#10</a>) (<a href="https://github.com/ardent-data/weevr-cli/commit/d2efed529560d0aca4b23b1e32a21e32368dcab4">d2efed5</a>)</li>
+</ul>
+<h2 id="014-2026-04-03"><a href="https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v0.1.3...weevr-cli-v0.1.4">0.1.4</a> (2026-04-03)<a class="headerlink" href="#014-2026-04-03" title="Permanent link">&para;</a></h2>
+<h3 id="bug-fixes_6">Bug Fixes<a class="headerlink" href="#bug-fixes_6" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>init:</strong> adopt .weevr project root model matching engine conventions (<a href="https://github.com/ardent-data/weevr-cli/issues/8">#8</a>) (<a href="https://github.com/ardent-data/weevr-cli/commit/5f089c5456cfc85e9401f3c20b803b732a7c0610">5f089c5</a>)</li>
+</ul>
+<h2 id="013-2026-04-02"><a href="https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v0.1.2...weevr-cli-v0.1.3">0.1.3</a> (2026-04-02)<a class="headerlink" href="#013-2026-04-02" title="Permanent link">&para;</a></h2>
+<h3 id="bug-fixes_7">Bug Fixes<a class="headerlink" href="#bug-fixes_7" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>templates:</strong> align YAML with engine format and remove opinionated init structure (<a href="https://github.com/ardent-data/weevr-cli/issues/6">#6</a>) (<a href="https://github.com/ardent-data/weevr-cli/commit/8b651b099b3679b6120445e0d04f2205fb86c832">8b651b0</a>)</li>
+</ul>
+<h2 id="012-2026-04-02"><a href="https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v0.1.1...weevr-cli-v0.1.2">0.1.2</a> (2026-04-02)<a class="headerlink" href="#012-2026-04-02" title="Permanent link">&para;</a></h2>
+<h3 id="features_7">Features<a class="headerlink" href="#features_7" title="Permanent link">&para;</a></h3>
+<ul>
+<li>add embedded YAML templates for thread, weave, and loom files (<a href="https://github.com/ardent-data/weevr-cli/commit/c6803d6792ece7f7d6b06e8c0e146c096f8ca502">c6803d6</a>)</li>
+<li>add interactive wizard to init command (<a href="https://github.com/ardent-data/weevr-cli/commit/9db6cc99fbd611ee71924e56c9e668cf84de87a7">9db6cc9</a>)</li>
+<li><strong>cli:</strong> implement init and new commands with templates and interactive wizard (<a href="https://github.com/ardent-data/weevr-cli/commit/b71b16b13eeaa96467c3e210f6288b5d10ff7bcb">b71b16b</a>)</li>
+<li>implement init command with project scaffolding (<a href="https://github.com/ardent-data/weevr-cli/commit/43c2ca48dfa23d4e2c6dd4ef400672f4ad4d2a75">43c2ca4</a>)</li>
+<li>implement new command for generating weevr files (<a href="https://github.com/ardent-data/weevr-cli/commit/83308644c985a649508fc1920ac11d27f646f126">8330864</a>)</li>
+</ul>
+<h2 id="011-2026-04-02"><a href="https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v0.1.0...weevr-cli-v0.1.1">0.1.1</a> (2026-04-02)<a class="headerlink" href="#011-2026-04-02" title="Permanent link">&para;</a></h2>
+<h3 id="features_8">Features<a class="headerlink" href="#features_8" title="Permanent link">&para;</a></h3>
+<ul>
+<li>add AppState dataclass for Typer context (<a href="https://github.com/ardent-data/weevr-cli/commit/c533363fcbf38b132802f10fb0b47cc704f8ace7">c533363</a>)</li>
+<li>add config dataclasses and YAML loading (<a href="https://github.com/ardent-data/weevr-cli/commit/dfd95a37b9f9917bdf818e44201bc6b66b153423">dfd95a3</a>)</li>
+<li>add global --json flag, config loading, and AppState to root callback (<a href="https://github.com/ardent-data/weevr-cli/commit/2273bd03bbcba15818952220d6b7150be902cc28">2273bd0</a>)</li>
+<li>add output helpers for Rich and JSON modes (<a href="https://github.com/ardent-data/weevr-cli/commit/921ee1126638b9e73b17d72fb32dcac22dce3b99">921ee11</a>)</li>
+<li><strong>cli:</strong> add CLI foundation with config loading, JSON output, and Rich diagnostics (<a href="https://github.com/ardent-data/weevr-cli/commit/1c3373f3c63e1030b7c864e59999dfbec7e514cd">1c3373f</a>)</li>
+<li><strong>project:</strong> scaffold weevr-cli repository (<a href="https://github.com/ardent-data/weevr-cli/commit/35d4fcda4580454e54407a55462319015dc9eb9f">35d4fcd</a>)</li>
+<li>read version from package metadata instead of hardcoded string (<a href="https://github.com/ardent-data/weevr-cli/commit/831f9f4e0d9b67960f70aea782d831da805f29e9">831f9f4</a>)</li>
+</ul>
+<h3 id="bug-fixes_8">Bug Fixes<a class="headerlink" href="#bug-fixes_8" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>ci:</strong> add contents read permission to CodeQL workflow (<a href="https://github.com/ardent-data/weevr-cli/commit/a9a8707d0c4458bcc28456a8d820f4b1fa904bca">a9a8707</a>)</li>
+<li><strong>ci:</strong> commit uv.lock for reproducible CI builds (<a href="https://github.com/ardent-data/weevr-cli/commit/edef632b4ccdd2e52b19db535f3d9e7e388004d9">edef632</a>)</li>
+</ul>
+<h3 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h3>
+<ul>
+<li>recommend uv over pipx for installation (<a href="https://github.com/ardent-data/weevr-cli/commit/bac8b411d06fa75836ac7e586da224863f5fad44">bac8b41</a>)</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
