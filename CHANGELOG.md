@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.4](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.1.3...weevr-cli-v1.1.4) (2026-04-07)
+
+
+### Bug Fixes
+
+* **validate:** normalize ref paths for cross-platform compatibility ([#35](https://github.com/ardent-data/weevr-cli/issues/35)) ([7b650dc](https://github.com/ardent-data/weevr-cli/commit/7b650dc129068ce4fc83dae2d131fba1ba326052))
+
 ## [1.1.3](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.1.2...weevr-cli-v1.1.3) (2026-04-07)
 
 
