@@ -53,6 +53,8 @@ nav:
   - CLI Reference: cli/index.md
   - Configuration: configuration/index.md
   - Guides:
+      - Reference Syntax: guides/reference-syntax.md
+      - Warp Files: guides/warp-files.md
       - Deploy Workflows: guides/deploy-workflows.md
       - Plugin Authoring: guides/plugin-authoring.md
   - Release Notes: release-notes.md

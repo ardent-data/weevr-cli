@@ -102,7 +102,7 @@ See [Configuration](../configuration/index.md) for the full `cli.yaml` reference
     weevr deploy \
       --workspace-id "${{ secrets.FABRIC_WORKSPACE_ID }}" \
       --lakehouse-id "${{ secrets.FABRIC_LAKEHOUSE_ID }}" \
-      --force
+      --strict-validation
 ```
 
 ### Azure DevOps
@@ -112,12 +112,12 @@ See [Configuration](../configuration/index.md) for the full `cli.yaml` reference
     weevr deploy \
       --workspace-id "$(FABRIC_WORKSPACE_ID)" \
       --lakehouse-id "$(FABRIC_LAKEHOUSE_ID)" \
-      --force
+      --strict-validation
   displayName: Deploy to Fabric Lakehouse
 ```
 
 !!! tip
-    Use `--force` in CI/CD to skip interactive confirmation prompts. Combine with `--strict-validation` to fail the pipeline on validation warnings.
+    Use `--strict-validation` in CI/CD to fail the pipeline on validation warnings, not just errors. `--force` is only needed when combining `--clean --all` in a non-interactive environment — it suppresses the confirmation prompt that would otherwise block the pipeline. Plain `weevr deploy` (without `--clean --all`) has no interactive prompts and does not need `--force`.
 
 ### Environment Authentication
 

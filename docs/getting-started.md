@@ -108,6 +108,31 @@ weevr validate --strict
 !!! tip "Parameterized templates"
     Files that use variable references like `${param.pk_columns}` or `${env.DB_NAME}` pass validation even when the referenced field expects a non-string type (e.g. an array). The validator skips static type checks on bare `${...}` values since they are resolved at runtime by the weevr engine.
 
+## Exclude Files From the Project
+
+If you have scratch folders, drafts, or experiments you don't want the CLI to
+treat as part of the project, create a `.weevr/ignore` file with gitignore-style
+patterns:
+
+```gitignore
+# .weevr/ignore
+
+# Scratch folder for in-progress work
+scratch/
+
+# Drafts
+*.draft.thread
+*.draft.weave
+```
+
+The patterns apply to every command that walks the project tree — `validate`,
+`list`, `deploy`, and `status` — so ignored files never show up as orphans,
+never fail validation, and never upload to Fabric. You can use either
+`.weevr/ignore` or a `.weevrignore` at the project root (the familiar
+gitignore-style location), or both. See
+[Configuration › Ignore files](configuration/index.md#ignore-files) for the
+full reference, including how explicit target paths bypass the filter.
+
 ## Configure a Deploy Target
 
 Edit `.weevr/cli.yaml` with your Fabric workspace and lakehouse IDs:
@@ -161,6 +186,8 @@ weevr status
 ## Next Steps
 
 - [CLI Reference](cli/index.md) — every command and flag in detail
-- [Configuration](configuration/index.md) — full reference for `.weevr/cli.yaml` and deploy-ignore
+- [Configuration](configuration/index.md) — full reference for `.weevr/cli.yaml` and ignore files
+- [Reference Syntax](guides/reference-syntax.md) — how refs in weaves and looms resolve
+- [Warp Files](guides/warp-files.md) — declare target table schema contracts
 - [Deploy Workflows](guides/deploy-workflows.md) — smart sync, full overwrite, clean, and CI/CD patterns
 - [Plugin Authoring](guides/plugin-authoring.md) — extend the CLI with custom commands

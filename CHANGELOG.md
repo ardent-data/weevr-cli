@@ -2,6 +2,71 @@
 
 ## [1.2.0](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.1.4...weevr-cli-v1.2.0) (2026-04-07)
 
+This release introduces **project-wide ignore files**. A new `.weevr/ignore`
+file — or equivalently a `.weevrignore` at the project root — lets you exclude
+scratch folders, drafts, editor backups, and anything else you don't want the
+CLI to treat as part of your project. The patterns apply to every command that
+walks the project tree: `weevr validate`, `weevr list`, `weevr deploy`, and
+`weevr status`. Both files use gitignore-style syntax and are optional; when
+both exist, their patterns are unioned with no precedence ordering.
+
+The problem this solves is small but sharp. Until now, the only ignore
+mechanism was `.weevr/deploy-ignore`, which only affected `deploy` and
+`status`. A `scratch/` folder with half-finished drafts or deliberately broken
+YAML would be picked up by `weevr validate`, flagged as orphans by
+`weevr list`, and could even fail validation outright — and there was no way
+to say "this folder is not part of the project" without literally deleting
+the files. Now you can:
+
+```gitignore
+# .weevr/ignore
+
+# Scratch folder for in-progress work
+scratch/
+
+# Drafts and experiments
+*.draft.thread
+*.draft.weave
+
+# Editor backups
+*~
+.DS_Store
+```
+
+Or, if you prefer the convention familiar from `.gitignore` and
+`.dockerignore`, the same file can live at the project root as
+`.weevrignore`. Use whichever location you prefer — or both, if you want to
+keep personal patterns separate from shared ones.
+
+**Explicit target paths bypass the ignore filter.** If you pass a specific
+file or directory to `weevr validate` on the command line, it is validated
+regardless of ignore patterns:
+
+```bash
+# Full-project scan — scratch/ is excluded by the ignore file
+weevr validate
+
+# Explicit path — bypasses the ignore filter, validates scratch/draft.thread
+weevr validate scratch/draft.thread
+
+# Same rule applies to directory targets
+weevr validate scratch/
+```
+
+The rule is simple: if you named it on the command line, you meant it. The
+ignore filter applies only to the implicit full-project scan.
+
+**`.weevr/deploy-ignore` is deprecated** and scheduled for removal in **v1.3.0**.
+It is still honored by `weevr deploy` and `weevr status` during the deprecation
+window, but every command that encounters it (`validate`, `list`, `deploy`,
+`status`) prints a one-line deprecation warning on stderr directing you to
+migrate. The warning is suppressed in `--json` mode so automation remains
+clean. To migrate, move the patterns from `.weevr/deploy-ignore` into
+`.weevr/ignore` (or `.weevrignore`) and delete the old file — the contents
+are identical, only the filename and scope differ.
+
+See [Configuration › Ignore files](https://ardent-data.github.io/weevr-cli/latest/configuration/#ignore-files)
+for the full reference.
 
 ### Features
 
