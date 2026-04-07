@@ -26,8 +26,8 @@ jobs:
         with:
           enable-cache: true
 
-      - name: Sync (frozen)
-        run: uv sync --frozen --dev --group docs
+      - name: Sync (locked)
+        run: uv sync --locked --dev --group docs
 
       - name: Lint
         run: uv run ruff check .
