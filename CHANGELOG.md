@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.2.0...weevr-cli-v1.2.1) (2026-04-07)
+
+
+### Bug Fixes
+
+* **schema:** update bundled schemas to weevr engine v1.16 ([#40](https://github.com/ardent-data/weevr-cli/issues/40)) ([1415ffe](https://github.com/ardent-data/weevr-cli/commit/1415ffe8e59462db00240b0d820835c73b02841c))
+
 ## [1.2.0](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.1.4...weevr-cli-v1.2.0) (2026-04-07)
 
 This release introduces **project-wide ignore files**. A new `.weevr/ignore`
