@@ -17,4 +17,4 @@ default_target: dev
 
 # Schema settings
 schema:
-  version: "1.14"
+  version: "1.15"
