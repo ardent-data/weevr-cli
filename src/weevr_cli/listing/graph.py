@@ -9,7 +9,7 @@ from typing import Any, Literal
 import yaml
 
 from weevr_cli.listing.models import DependencyGraph, GraphNode
-from weevr_cli.validation.refs import extract_refs
+from weevr_cli.validation.refs import extract_refs, normalize_ref
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +56,10 @@ def build_dependency_graph(project_root: Path) -> DependencyGraph:
     nodes: dict[str, GraphNode] = {}
     for relative, (file_type, data) in file_data.items():
         refs = extract_refs(data, relative)
-        refs_out = [ref_value for ref_value, _, _ in refs]
+        # Normalize refs to project-root-relative POSIX form so lookups
+        # against `nodes` (keyed by .as_posix()) succeed regardless of
+        # whether the YAML uses a leading '/' or backslash separators.
+        refs_out = [normalize_ref(ref_value) for ref_value, _, _ in refs]
         nodes[relative] = GraphNode(
             path=relative,
             file_type=file_type,

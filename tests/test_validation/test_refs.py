@@ -33,7 +33,7 @@ def _parse_files(project: Path) -> dict[str, Any]:
     result: dict[str, Any] = {}
     for ext in (".thread", ".weave", ".loom", ".warp"):
         for f in project.rglob(f"*{ext}"):
-            rel = str(f.relative_to(project))
+            rel = f.relative_to(project).as_posix()
             result[rel] = yaml.safe_load(f.read_text()) or {}
     return result
 
@@ -81,15 +81,42 @@ def test_path_traversal_rejected(tmp_path: Path) -> None:
     assert ".." in errors[0].message
 
 
-def test_absolute_path_rejected(tmp_path: Path) -> None:
-    """Ref with absolute path produces error."""
+def test_leading_slash_ref_resolved_from_project_root(tmp_path: Path) -> None:
+    """Leading '/' is the project-root marker and must resolve, not be rejected."""
+    weave = 'config_version: "1.0"\nthreads:\n  - ref: /staging/stg_customers.thread\n'
+    project = _make_project(
+        tmp_path,
+        {
+            "staging/stg_customers.thread": _THREAD,
+            "staging.weave": weave,
+        },
+    )
+    files = _parse_files(project)
+    issues = check_refs(files, project)
+    errors = [i for i in issues if i.severity == "error"]
+    assert errors == []
+
+
+def test_leading_slash_ref_missing_target(tmp_path: Path) -> None:
+    """A '/'-prefixed ref to a file that does not exist is a broken reference."""
     weave = 'config_version: "1.0"\nthreads:\n  - ref: /etc/passwd\n'
     project = _make_project(tmp_path, {"staging.weave": weave})
     files = _parse_files(project)
     issues = check_refs(files, project)
     errors = [i for i in issues if i.severity == "error"]
     assert len(errors) == 1
-    assert "traversal" in errors[0].message.lower() or "relative" in errors[0].message.lower()
+    assert "broken reference" in errors[0].message.lower()
+
+
+def test_empty_ref_rejected(tmp_path: Path) -> None:
+    """A ref that normalizes to empty (e.g. '/', '////') is a user error."""
+    weave = 'config_version: "1.0"\nthreads:\n  - ref: "/"\n'
+    project = _make_project(tmp_path, {"staging.weave": weave})
+    files = _parse_files(project)
+    issues = check_refs(files, project)
+    errors = [i for i in issues if i.severity == "error"]
+    assert len(errors) == 1
+    assert "empty" in errors[0].message.lower()
 
 
 def test_orphaned_thread(tmp_path: Path) -> None:
@@ -143,6 +170,44 @@ def test_loom_not_orphan(tmp_path: Path) -> None:
     issues = find_orphans(files, all_paths)
     orphan_files = [i.file for i in issues]
     assert not any("loom" in f for f in orphan_files)
+
+
+def test_orphans_with_windows_separators_in_paths(tmp_path: Path) -> None:
+    """On Windows, discovered paths use '\\' but refs use '/' — must still match."""
+    project = _make_project(
+        tmp_path,
+        {
+            "staging/stg_customers.thread": _THREAD,
+            "staging.weave": _WEAVE,
+            "daily.loom": _LOOM,
+        },
+    )
+    files = _parse_files(project)
+    # Simulate how paths look when collected on Windows (backslash separators).
+    all_paths = [
+        "staging\\stg_customers.thread",
+        "staging.weave",
+        "daily.loom",
+    ]
+    issues = find_orphans(files, all_paths)
+    assert issues == []
+
+
+def test_orphans_ignore_leading_slash_in_refs(tmp_path: Path) -> None:
+    """Leading '/' on a ref must not cause its target to appear orphaned."""
+    weave = 'config_version: "1.0"\nthreads:\n  - ref: /staging/stg_customers.thread\n'
+    project = _make_project(
+        tmp_path,
+        {
+            "staging/stg_customers.thread": _THREAD,
+            "staging.weave": weave,
+            "daily.loom": _LOOM,
+        },
+    )
+    files = _parse_files(project)
+    all_paths = list(files.keys())
+    issues = find_orphans(files, all_paths)
+    assert issues == []
 
 
 def test_no_orphans(tmp_path: Path) -> None:

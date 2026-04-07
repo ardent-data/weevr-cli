@@ -8,6 +8,16 @@ from typing import Any
 from weevr_cli.validation.results import ValidationIssue
 
 
+def normalize_ref(ref_value: str) -> str:
+    """Normalize a ref to a project-root-relative POSIX path.
+
+    Accepts the documented leading-'/' project-root marker and strips it.
+    Backslashes are converted to forward slashes so refs authored on
+    Windows still compare correctly against POSIX file paths.
+    """
+    return ref_value.replace("\\", "/").lstrip("/")
+
+
 def extract_refs(data: dict[str, Any], file_path: str) -> list[tuple[str, str, str]]:
     """Extract ref entries from a parsed weave or loom file.
 
@@ -53,9 +63,22 @@ def check_refs(
             continue
 
         for ref_value, source_file, location in extract_refs(data, file_path):
-            # Reject absolute paths and path traversal
-            ref_path = PurePosixPath(ref_value)
-            if ref_path.is_absolute() or ".." in ref_path.parts:
+            normalized = normalize_ref(ref_value)
+            # Empty ref (e.g. "", "/", "////") is always a user error.
+            if not normalized:
+                issues.append(
+                    ValidationIssue(
+                        severity="error",
+                        message=f"Empty reference: '{ref_value}' does not name a file",
+                        file=source_file,
+                        location=location,
+                    )
+                )
+                continue
+            # A leading '/' is the documented project-root marker and is
+            # stripped by normalize_ref; only '..' segments are traversal.
+            ref_path = PurePosixPath(normalized)
+            if ".." in ref_path.parts:
                 issues.append(
                     ValidationIssue(
                         severity="error",
@@ -70,7 +93,7 @@ def check_refs(
                 continue
 
             # Check target exists
-            target = project_root / ref_value
+            target = project_root / normalized
             if not target.is_file():
                 issues.append(
                     ValidationIssue(
@@ -100,23 +123,27 @@ def find_orphans(
     Returns:
         List of warning issues for orphaned files.
     """
-    # Collect all referenced paths
+    # Collect all referenced paths, normalized to project-root-relative POSIX form.
     referenced: set[str] = set()
     for data in files.values():
         if not isinstance(data, dict):
             continue
         for ref_value, _, _ in extract_refs(data, ""):
-            referenced.add(ref_value)
+            referenced.add(normalize_ref(ref_value))
 
     issues: list[ValidationIssue] = []
     for path in all_paths:
+        # Normalize Windows-style separators so discovered paths compare
+        # correctly against refs (which are always POSIX-style in YAML).
+        normalized_path = path.replace("\\", "/")
+
         # Looms and warps are standalone — never orphans
-        if path.endswith(".loom") or path.endswith(".warp"):
+        if normalized_path.endswith(".loom") or normalized_path.endswith(".warp"):
             continue
 
         # Check if this file is referenced
-        if path not in referenced:
-            file_type = "weave" if path.endswith(".weave") else "thread"
+        if normalized_path not in referenced:
+            file_type = "weave" if normalized_path.endswith(".weave") else "thread"
             issues.append(
                 ValidationIssue(
                     severity="warning",
@@ -124,7 +151,7 @@ def find_orphans(
                         f"Orphaned file: not referenced by any "
                         f"{'loom' if file_type == 'weave' else 'weave or loom'}"
                     ),
-                    file=path,
+                    file=normalized_path,
                 )
             )
 
