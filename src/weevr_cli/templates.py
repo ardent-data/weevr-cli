@@ -170,7 +170,7 @@ _CLI_YAML_TEMPLATE = """\
 
 # Schema settings
 schema:
-  version: "1.14"
+  version: "1.15"
 """
 
 
@@ -231,7 +231,7 @@ def render_cli_yaml(
     }
     if default_target:
         config["default_target"] = default_target
-    config["schema"] = {"version": "1.14"}
+    config["schema"] = {"version": "1.15"}
 
     header = "# weevr CLI configuration\n# See: https://github.com/ardent-data/weevr-cli\n\n"
     return header + yaml.dump(config, default_flow_style=False, sort_keys=False)

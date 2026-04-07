@@ -31,7 +31,7 @@ def test_parse_valid_config(tmp_path: Path) -> None:
                     },
                 },
                 "default_target": "dev",
-                "schema": {"version": "1.14"},
+                "schema": {"version": "1.15"},
             }
         )
     )
@@ -45,7 +45,7 @@ def test_parse_valid_config(tmp_path: Path) -> None:
     )
     assert config.targets["prod"].path_prefix is None
     assert config.default_target == "dev"
-    assert config.schema_version == "1.14"
+    assert config.schema_version == "1.15"
 
 
 def test_parse_minimal_config(tmp_path: Path) -> None:
