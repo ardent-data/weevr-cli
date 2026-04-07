@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.1.1...weevr-cli-v1.1.2) (2026-04-07)
+
+
+### Bug Fixes
+
+* **schema:** update bundled schemas to weevr engine v1.14 ([#29](https://github.com/ardent-data/weevr-cli/issues/29)) ([2aefb30](https://github.com/ardent-data/weevr-cli/commit/2aefb30900d631c9bcc833b9cb9589e8d35107cf))
+
 ## [1.1.1](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.1.0...weevr-cli-v1.1.1) (2026-04-06)
 
 
