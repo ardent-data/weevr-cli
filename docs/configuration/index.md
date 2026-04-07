@@ -107,29 +107,47 @@ This makes CI/CD pipelines straightforward — inject IDs from pipeline variable
 weevr deploy --workspace-id "$WORKSPACE_ID" --lakehouse-id "$LAKEHOUSE_ID"
 ```
 
-## `.weevr/deploy-ignore`
+## Ignore files
 
-Controls which files are excluded from deployment. Uses gitignore-style pattern syntax.
+Project-wide ignore patterns control which files weevr considers part of the project. Ignored files are skipped by `weevr validate`, `weevr list`, `weevr status`, and `weevr deploy` alike — useful for scratch folders, drafts, and editor backups that should never be validated or deployed.
+
+Two locations are supported. Both are optional, both use gitignore-style pattern syntax, and patterns from both are unioned:
+
+| Location | Notes |
+|---|---|
+| `.weevr/ignore` | Lives alongside other weevr config (`cli.yaml`). Recommended primary location. |
+| `.weevrignore` (project root) | Familiar gitignore-style location. Use whichever you prefer — or both. |
 
 ### Format
 
 - One pattern per line
 - Lines starting with `#` are comments
 - Blank lines are ignored
-- Patterns follow gitignore glob syntax
+- Patterns follow gitignore glob syntax (directory suffix `/`, wildcards, `!` for re-include, etc.)
 
 ### Example
 
 ```gitignore
-# Ignore test fixtures
-tests/
+# Scratch folder for in-progress work
+scratch/
 
-# Ignore drafts
-*.draft.yaml
+# Drafts
+*.draft.thread
+*.draft.weave
 
-# Ignore docs
-docs/
-README.md
+# Editor backups
+*~
+.DS_Store
 ```
 
-If the file does not exist, no files are excluded (everything is eligible for deployment).
+If neither file exists, nothing is excluded.
+
+### Explicit-path bypass
+
+When you pass a specific file or directory to `weevr validate <path>`, the ignore filter is bypassed for that target. The reasoning: if you asked for a file by name, you meant it. The full-project scan (no path argument) honors the ignore filter.
+
+### `.weevr/deploy-ignore` (deprecated)
+
+`.weevr/deploy-ignore` is the legacy deploy-only ignore file. It is still honored by `weevr deploy` and `weevr status`, but **will be removed in v1.3.0**. Move its patterns into `.weevr/ignore` (or `.weevrignore`) and delete the old file.
+
+When `.weevr/deploy-ignore` is present, weevr commands will print a one-line deprecation warning to stderr.

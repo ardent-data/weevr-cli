@@ -207,3 +207,46 @@ class TestListEdgeCases:
         assert result.exit_code == 0
         # Good file still shows up
         assert "good.thread" in result.output
+
+    def test_ignored_files_excluded_from_graph(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Files matching .weevr/ignore are not shown in list output."""
+        project = _make_project(tmp_path)
+        _write_yaml(project / "threads" / "keep.thread", {"name": "keep"})
+        _write_yaml(project / "scratch" / "wip.thread", {"name": "wip"})
+        (project / ".weevr" / "ignore").write_text("scratch/\n")
+        monkeypatch.chdir(project)
+
+        result = runner.invoke(app, ["list"])
+        assert result.exit_code == 0
+        assert "keep.thread" in result.output
+        assert "wip.thread" not in result.output
+
+    def test_root_weevrignore_honored_by_list(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A .weevrignore at the project root is honored by list."""
+        project = _make_project(tmp_path)
+        _write_yaml(project / "threads" / "keep.thread", {"name": "keep"})
+        _write_yaml(project / "scratch" / "wip.thread", {"name": "wip"})
+        (project / ".weevrignore").write_text("scratch/\n")
+        monkeypatch.chdir(project)
+
+        result = runner.invoke(app, ["list"])
+        assert result.exit_code == 0
+        assert "wip.thread" not in result.output
+
+    def test_list_does_not_honor_deploy_ignore(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """list must NOT filter by .weevr/deploy-ignore (deploy-only scope)."""
+        project = _make_project(tmp_path)
+        _write_yaml(project / "threads" / "keep.thread", {"name": "keep"})
+        _write_yaml(project / "scratch" / "wip.thread", {"name": "wip"})
+        (project / ".weevr" / "deploy-ignore").write_text("scratch/\n")
+        monkeypatch.chdir(project)
+
+        result = runner.invoke(app, ["list"])
+        assert result.exit_code == 0
+        assert "wip.thread" in result.output

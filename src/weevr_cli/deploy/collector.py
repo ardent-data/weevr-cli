@@ -1,4 +1,4 @@
-"""Local file collection with deploy-ignore support."""
+"""Local file collection with ignore-file support."""
 
 from __future__ import annotations
 
@@ -43,12 +43,13 @@ def collect_local_files(
 ) -> list[LocalFile]:
     """Collect local files eligible for deployment.
 
-    Walks the project root, excludes the .weevr directory's cli.yaml and
-    deploy-ignore (config files), and applies deploy-ignore patterns.
+    Walks the project root, excludes weevr config/ignore files (never
+    deployed), and applies the provided ignore pattern set.
 
     Args:
         project_root: Root directory of the weevr project.
-        ignore_spec: Compiled deploy-ignore patterns.
+        ignore_spec: Compiled ignore patterns (typically from
+            ``weevr_cli.ignore.load_combined_ignore(include_deploy=True)``).
         selective_paths: If provided, only include files matching these
             relative paths or directories. Paths are relative to project root.
 
@@ -135,7 +136,12 @@ def _collect_selective(
     return sorted(files, key=lambda f: f.relative_path)
 
 
-_CONFIG_FILES = {".weevr/cli.yaml", ".weevr/deploy-ignore"}
+_CONFIG_FILES = {
+    ".weevr/cli.yaml",
+    ".weevr/ignore",
+    ".weevr/deploy-ignore",
+    ".weevrignore",
+}
 
 
 def _is_config_file(relative_path: str) -> bool:

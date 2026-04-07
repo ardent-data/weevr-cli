@@ -16,9 +16,13 @@ from weevr_cli.commands.status_output import (
 )
 from weevr_cli.deploy.collector import collect_local_files
 from weevr_cli.deploy.diff import compute_diff
-from weevr_cli.deploy.ignore import load_deploy_ignore
 from weevr_cli.deploy.onelake import OneLakeClient
 from weevr_cli.deploy.target import TargetError, resolve_deploy_context
+from weevr_cli.ignore import (
+    deploy_ignore_deprecation_message,
+    has_deploy_ignore,
+    load_combined_ignore,
+)
 from weevr_cli.output import print_error, print_json
 from weevr_cli.state import AppState, AuthError
 
@@ -78,7 +82,9 @@ def run_status(
         print_status_header(target, state.console)
 
     # 3. Collect local files
-    ignore_spec = load_deploy_ignore(project_root)
+    if has_deploy_ignore(project_root) and not state.json_mode:
+        state.console.print(f"[yellow]{deploy_ignore_deprecation_message()}[/yellow]")
+    ignore_spec = load_combined_ignore(project_root, include_deploy=True)
     local_files = collect_local_files(project_root, ignore_spec)
 
     # 4. Authenticate and list remote files

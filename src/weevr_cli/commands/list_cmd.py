@@ -3,6 +3,11 @@
 from __future__ import annotations
 
 from weevr_cli.config import find_project_root
+from weevr_cli.ignore import (
+    deploy_ignore_deprecation_message,
+    has_deploy_ignore,
+    load_combined_ignore,
+)
 from weevr_cli.listing.graph import build_dependency_graph
 from weevr_cli.listing.table import render_table, render_table_json
 from weevr_cli.listing.tree import render_tree, render_tree_json
@@ -30,7 +35,10 @@ def run_list(*, format: str, state: AppState) -> None:
         )
         raise SystemExit(1)
 
-    graph = build_dependency_graph(project_root)
+    if has_deploy_ignore(project_root) and not state.json_mode:
+        state.console.print(f"[yellow]{deploy_ignore_deprecation_message()}[/yellow]")
+    ignore_spec = load_combined_ignore(project_root, include_deploy=False)
+    graph = build_dependency_graph(project_root, ignore_spec=ignore_spec)
 
     if len(graph.nodes) == 0:
         if state.json_mode:

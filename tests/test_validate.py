@@ -266,3 +266,155 @@ def test_validate_no_files(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> N
     monkeypatch.chdir(project)
     result = runner.invoke(app, ["validate"])
     assert result.exit_code == 1
+
+
+def test_validate_skips_files_in_weevr_ignore(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Files matching .weevr/ignore are not validated and not flagged as orphans."""
+    project = _make_project(
+        tmp_path,
+        {
+            "staging/stg_customers.thread": _THREAD,
+            "staging.weave": _WEAVE,
+            "daily.loom": _LOOM,
+            # Scratch file would otherwise be flagged as orphan and (if broken)
+            # would also fail schema validation.
+            "scratch/wip.thread": "this is not valid yaml for a thread\n",
+        },
+    )
+    (project / ".weevr" / "ignore").write_text("scratch/\n")
+    monkeypatch.chdir(project)
+    result = runner.invoke(app, ["validate"])
+    assert result.exit_code == 0
+    assert "scratch/wip.thread" not in result.output
+
+
+def test_validate_skips_files_in_root_weevrignore(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A .weevrignore at the project root is honored the same as .weevr/ignore."""
+    project = _make_project(
+        tmp_path,
+        {
+            "staging/stg_customers.thread": _THREAD,
+            "staging.weave": _WEAVE,
+            "daily.loom": _LOOM,
+            "scratch/wip.thread": "broken\n",
+        },
+    )
+    (project / ".weevrignore").write_text("scratch/\n")
+    monkeypatch.chdir(project)
+    result = runner.invoke(app, ["validate"])
+    assert result.exit_code == 0
+    assert "scratch/wip.thread" not in result.output
+
+
+def test_validate_explicit_path_bypasses_ignore(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An explicit path to an ignored file is still validated."""
+    project = _make_project(
+        tmp_path,
+        {
+            "scratch/wip.thread": "not valid\n",
+        },
+    )
+    (project / ".weevr" / "ignore").write_text("scratch/\n")
+    monkeypatch.chdir(project)
+    result = runner.invoke(app, ["validate", "scratch/wip.thread"])
+    # File is explicitly requested, so it must be checked. Schema is invalid,
+    # so the command fails — but the important thing is the file was NOT skipped.
+    assert result.exit_code == 1
+
+
+def test_validate_explicit_directory_bypasses_ignore(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Passing a directory that is itself ignored still validates its files.
+
+    Rationale: if the user ran `weevr validate scratch/`, they intentionally
+    named the directory. The ignore filter applies only to the full-project
+    scan; explicit targets — file or directory — always bypass it.
+    """
+    project = _make_project(
+        tmp_path,
+        {
+            "scratch/wip.thread": "not valid\n",
+        },
+    )
+    (project / ".weevr" / "ignore").write_text("scratch/\n")
+    monkeypatch.chdir(project)
+    result = runner.invoke(app, ["validate", "scratch"])
+    # Directory explicitly targeted → scratch/wip.thread must be checked.
+    # Its schema is invalid, so the command fails with exit 1.
+    assert result.exit_code == 1
+
+
+def test_validate_ignores_deploy_ignore_patterns(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """validate must NOT honor .weevr/deploy-ignore (deploy-only scope)."""
+    project = _make_project(
+        tmp_path,
+        {
+            "staging/stg_customers.thread": _THREAD,
+            "staging.weave": _WEAVE,
+            "daily.loom": _LOOM,
+            "scratch/orphan.thread": _THREAD,
+        },
+    )
+    # deploy-ignore should NOT exclude scratch/ from validation.
+    (project / ".weevr" / "deploy-ignore").write_text("scratch/\n")
+    monkeypatch.chdir(project)
+    result = runner.invoke(app, ["validate"])
+    # scratch/orphan.thread is not referenced anywhere → orphan warning fires.
+    assert "orphan.thread" in result.output.lower()
+
+
+def test_validate_warns_on_deprecated_deploy_ignore(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Presence of .weevr/deploy-ignore prints a deprecation warning."""
+    project = _make_project(
+        tmp_path,
+        {
+            "staging/stg_customers.thread": _THREAD,
+            "staging.weave": _WEAVE,
+            "daily.loom": _LOOM,
+        },
+    )
+    (project / ".weevr" / "deploy-ignore").write_text("# noop\n")
+    monkeypatch.chdir(project)
+    result = runner.invoke(app, ["validate"])
+    assert result.exit_code == 0
+    assert "deprecated" in result.output.lower()
+    assert "v1.3.0" in result.output
+
+
+def test_validate_json_mode_suppresses_deprecation_warning(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """In --json mode, the deprecation warning must not appear anywhere in output.
+
+    The warning goes to a stderr-routed Rich Console that is ``quiet=True`` in
+    JSON mode, so it should never reach the user. This pins that guarantee.
+    """
+    project = _make_project(
+        tmp_path,
+        {
+            "staging/stg_customers.thread": _THREAD,
+            "staging.weave": _WEAVE,
+            "daily.loom": _LOOM,
+        },
+    )
+    (project / ".weevr" / "deploy-ignore").write_text("# noop\n")
+    monkeypatch.chdir(project)
+    result = runner.invoke(app, ["--json", "validate"])
+    assert result.exit_code == 0
+    # Merged stdout/stderr output must contain no warning text.
+    assert "deprecated" not in result.output.lower()
+    assert "v1.3.0" not in result.output
+    # And the JSON payload itself must parse cleanly.
+    payload = json.loads(result.output)
+    assert isinstance(payload, dict)
