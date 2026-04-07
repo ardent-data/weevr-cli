@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.1.4...weevr-cli-v1.2.0) (2026-04-07)
+
+
+### Features
+
+* **cli:** add project-wide ignore files ([#37](https://github.com/ardent-data/weevr-cli/issues/37)) ([f69ba29](https://github.com/ardent-data/weevr-cli/commit/f69ba294124b5fd70473f73ba74be2d2a206953c))
+
 ## [1.1.4](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.1.3...weevr-cli-v1.1.4) (2026-04-07)
 
 
