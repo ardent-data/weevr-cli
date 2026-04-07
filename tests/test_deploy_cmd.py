@@ -37,7 +37,7 @@ def _setup_project(
         f"    path_prefix: weevr/test\n"
         f"default_target: dev\n"
         f"schema:\n"
-        f"  version: '1.15'\n"
+        f"  version: '1.16'\n"
     )
     if deploy_ignore:
         (weevr_dir / "deploy-ignore").write_text(deploy_ignore)
