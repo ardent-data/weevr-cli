@@ -681,6 +681,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Smart Sync (Default)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#first-deploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        First Deploy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reading-the-deploy-banner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading the Deploy Banner
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -905,6 +933,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Smart Sync (Default)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#first-deploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        First Deploy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reading-the-deploy-banner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading the Deploy Banner
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1055,44 +1111,51 @@
 <li><strong>Unchanged files</strong> — skipped</li>
 <li><strong>Deleted local files</strong> — remain on remote (use <code>--clean</code> to remove them)</li>
 </ul>
+<h3 id="first-deploy">First Deploy<a class="headerlink" href="#first-deploy" title="Permanent link">&para;</a></h3>
+<p><code>weevr deploy</code> bootstraps a fresh Lakehouse automatically. You do not need to pre-create the project folder under <code>Files/</code>, run an init step, or perform any setup on the OneLake side — when the destination folder does not yet exist, smart sync treats the remote as empty and uploads everything on the first run.</p>
+<h3 id="reading-the-deploy-banner">Reading the Deploy Banner<a class="headerlink" href="#reading-the-deploy-banner" title="Permanent link">&para;</a></h3>
+<p>Before deploying, the CLI prints a one-line banner showing the resolved target:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Deploy target: dev  workspace=&lt;guid&gt;  lakehouse=&lt;guid&gt;  path=weevr/my-project.weevr
+</code></pre></div>
+<p>The <code>path=</code> field shows the effective remote location under <code>Files/</code> — that is, <code>&lt;path_prefix&gt;/&lt;project_folder&gt;</code> joined together (or <code>(root)</code> when neither is set). This is the directory weevr will list against the lakehouse and upload into. If something looks wrong about where your files are landing, this is the field to check first.</p>
 <h2 id="full-overwrite">Full Overwrite<a class="headerlink" href="#full-overwrite" title="Permanent link">&para;</a></h2>
 <p>Upload all files regardless of remote state:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>--target<span class="w"> </span>dev<span class="w"> </span>--full
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>--target<span class="w"> </span>dev<span class="w"> </span>--full
 </code></pre></div>
 <p>Use this when you suspect the remote state is inconsistent or when you want to ensure a complete refresh.</p>
 <h2 id="selective-deploy">Selective Deploy<a class="headerlink" href="#selective-deploy" title="Permanent link">&para;</a></h2>
 <p>Deploy specific files or directories by passing them as positional arguments:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Deploy a single file</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>staging/stg_customers.thread<span class="w"> </span>--target<span class="w"> </span>dev
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Deploy an entire directory</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>staging/<span class="w"> </span>--target<span class="w"> </span>dev
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Deploy a single file</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>staging/stg_customers.thread<span class="w"> </span>--target<span class="w"> </span>dev
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Deploy an entire directory</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>staging/<span class="w"> </span>--target<span class="w"> </span>dev
 </code></pre></div>
 <p>Only the specified paths are included in the sync. Other remote files are untouched.</p>
 <h2 id="dry-run">Dry Run<a class="headerlink" href="#dry-run" title="Permanent link">&para;</a></h2>
 <p>Preview what would happen without making changes:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>--target<span class="w"> </span>dev<span class="w"> </span>--dry-run
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>--target<span class="w"> </span>dev<span class="w"> </span>--dry-run
 </code></pre></div>
 <p>The output shows which files would be uploaded, skipped, or deleted, without actually performing any operations. Combine with any other flags:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>--target<span class="w"> </span>dev<span class="w"> </span>--full<span class="w"> </span>--clean<span class="w"> </span>--dry-run
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>--target<span class="w"> </span>dev<span class="w"> </span>--full<span class="w"> </span>--clean<span class="w"> </span>--dry-run
 </code></pre></div>
 <h2 id="cleaning-orphaned-files">Cleaning Orphaned Files<a class="headerlink" href="#cleaning-orphaned-files" title="Permanent link">&para;</a></h2>
 <p>Remove remote files that no longer exist locally:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Remove orphaned weevr files only (.thread, .weave, .loom, .warp, .yaml, .yml)</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>--target<span class="w"> </span>dev<span class="w"> </span>--clean
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Remove all orphaned files, including non-weevr files</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>--target<span class="w"> </span>dev<span class="w"> </span>--clean<span class="w"> </span>--all
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Remove orphaned weevr files only (.thread, .weave, .loom, .warp, .yaml, .yml)</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>--target<span class="w"> </span>dev<span class="w"> </span>--clean
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Remove all orphaned files, including non-weevr files</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>--target<span class="w"> </span>dev<span class="w"> </span>--clean<span class="w"> </span>--all
 </code></pre></div>
 <p>Without <code>--clean</code>, orphaned remote files are left untouched. The <code>--all</code> flag only takes effect when combined with <code>--clean</code> — on its own it is a no-op.</p>
-<p>The tiered clean behavior protects non-weevr files by default. Use <code>--clean --all</code> only when you're certain the remote path prefix is exclusively managed by this project.</p>
+<p>The tiered clean behavior protects non-weevr files by default. Use <code>--clean --all</code> only when you're certain the remote path is exclusively managed by this project.</p>
 <h2 id="validation-control">Validation Control<a class="headerlink" href="#validation-control" title="Permanent link">&para;</a></h2>
 <p>By default, <code>weevr deploy</code> runs validation before deploying. You can adjust this:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Skip pre-deploy validation entirely</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>--target<span class="w"> </span>dev<span class="w"> </span>--skip-validation
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Block deploy if validation produces any warnings</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>--target<span class="w"> </span>dev<span class="w"> </span>--strict-validation
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Skip pre-deploy validation entirely</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>--target<span class="w"> </span>dev<span class="w"> </span>--skip-validation
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Block deploy if validation produces any warnings</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>--target<span class="w"> </span>dev<span class="w"> </span>--strict-validation
 </code></pre></div>
 <h2 id="deploy-target-resolution">Deploy Target Resolution<a class="headerlink" href="#deploy-target-resolution" title="Permanent link">&para;</a></h2>
 <p>When you run <code>weevr deploy</code>, the target is resolved in this order:</p>
@@ -1104,28 +1167,28 @@
 <p>See <a href="../../configuration/">Configuration</a> for the full <code>cli.yaml</code> reference.</p>
 <h2 id="cicd-patterns">CI/CD Patterns<a class="headerlink" href="#cicd-patterns" title="Permanent link">&para;</a></h2>
 <h3 id="github-actions">GitHub Actions<a class="headerlink" href="#github-actions" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deploy to dev</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="no">weevr deploy \</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">      </span><span class="no">--workspace-id &quot;${{ secrets.FABRIC_WORKSPACE_ID }}&quot; \</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">      </span><span class="no">--lakehouse-id &quot;${{ secrets.FABRIC_LAKEHOUSE_ID }}&quot; \</span>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">      </span><span class="no">--strict-validation</span>
-</code></pre></div>
-<p>If your tenant supports friendly-name lookup and you prefer to inject a display name instead of a GUID, swap <code>--lakehouse-id</code> for <code>--lakehouse-name</code> (the two flags are mutually exclusive):</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deploy to dev</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="no">weevr deploy \</span>
 <a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">      </span><span class="no">--workspace-id &quot;${{ secrets.FABRIC_WORKSPACE_ID }}&quot; \</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">      </span><span class="no">--lakehouse-name &quot;${{ secrets.FABRIC_LAKEHOUSE_NAME }}&quot; \</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">      </span><span class="no">--lakehouse-id &quot;${{ secrets.FABRIC_LAKEHOUSE_ID }}&quot; \</span>
 <a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">      </span><span class="no">--strict-validation</span>
 </code></pre></div>
+<p>If your tenant supports friendly-name lookup and you prefer to inject a display name instead of a GUID, swap <code>--lakehouse-id</code> for <code>--lakehouse-name</code> (the two flags are mutually exclusive):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deploy to dev</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="no">weevr deploy \</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">      </span><span class="no">--workspace-id &quot;${{ secrets.FABRIC_WORKSPACE_ID }}&quot; \</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">      </span><span class="no">--lakehouse-name &quot;${{ secrets.FABRIC_LAKEHOUSE_NAME }}&quot; \</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">      </span><span class="no">--strict-validation</span>
+</code></pre></div>
 <h3 id="azure-devops">Azure DevOps<a class="headerlink" href="#azure-devops" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">script</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="no">weevr deploy \</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">      </span><span class="no">--workspace-id &quot;$(FABRIC_WORKSPACE_ID)&quot; \</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">      </span><span class="no">--lakehouse-id &quot;$(FABRIC_LAKEHOUSE_ID)&quot; \</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">      </span><span class="no">--strict-validation</span>
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span><span class="nt">displayName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deploy to Fabric Lakehouse</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">script</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="no">weevr deploy \</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">      </span><span class="no">--workspace-id &quot;$(FABRIC_WORKSPACE_ID)&quot; \</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">      </span><span class="no">--lakehouse-id &quot;$(FABRIC_LAKEHOUSE_ID)&quot; \</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">      </span><span class="no">--strict-validation</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="nt">displayName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deploy to Fabric Lakehouse</span>
 </code></pre></div>
 <p>As with GitHub Actions, substitute <code>--lakehouse-name "$(FABRIC_LAKEHOUSE_NAME)"</code> if you are passing a friendly display name instead of a GUID.</p>
 <div class="admonition tip">

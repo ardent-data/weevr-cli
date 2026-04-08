@@ -1167,6 +1167,10 @@ full reference, including how explicit target paths bypass the filter.</p>
 <p>Preview what would change without deploying:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>--target<span class="w"> </span>dev<span class="w"> </span>--dry-run
 </code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Your first deploy works against an empty Lakehouse — you don't need to pre-create the project folder under <code>Files/</code> or run any setup on the OneLake side. The CLI prints a <code>path=...</code> banner showing exactly where your files will land under <code>Files/</code>.</p>
+</div>
 <h2 id="check-status">Check Status<a class="headerlink" href="#check-status" title="Permanent link">&para;</a></h2>
 <p>See what differs between local files and the deployed state:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>weevr<span class="w"> </span>status
