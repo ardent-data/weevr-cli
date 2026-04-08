@@ -156,7 +156,14 @@ def deploy(
     ),
     target: str = typer.Option("", "--target", "-t", help="Named deploy target."),
     workspace_id: str | None = typer.Option(None, "--workspace-id", help="Override workspace."),
-    lakehouse_id: str | None = typer.Option(None, "--lakehouse-id", help="Override lakehouse."),
+    lakehouse_id: str | None = typer.Option(
+        None, "--lakehouse-id", help="Override lakehouse GUID."
+    ),
+    lakehouse_name: str | None = typer.Option(
+        None,
+        "--lakehouse-name",
+        help="Override lakehouse friendly name (mutually exclusive with --lakehouse-id).",
+    ),
     path_prefix: str | None = typer.Option(None, "--path-prefix", help="Override path prefix."),
     full: bool = typer.Option(False, "--full", help="Full overwrite instead of smart sync."),
     clean: bool = typer.Option(False, "--clean", help="Remove remote files not present locally."),
@@ -180,6 +187,7 @@ def deploy(
             target_name=target,
             workspace_id=workspace_id,
             lakehouse_id=lakehouse_id,
+            lakehouse_name=lakehouse_name,
             path_prefix=path_prefix,
             full=full,
             clean=clean,
@@ -199,7 +207,14 @@ def status(
     ctx: typer.Context,
     target: str = typer.Option("", "--target", "-t", help="Named deploy target."),
     workspace_id: str | None = typer.Option(None, "--workspace-id", help="Override workspace."),
-    lakehouse_id: str | None = typer.Option(None, "--lakehouse-id", help="Override lakehouse."),
+    lakehouse_id: str | None = typer.Option(
+        None, "--lakehouse-id", help="Override lakehouse GUID."
+    ),
+    lakehouse_name: str | None = typer.Option(
+        None,
+        "--lakehouse-name",
+        help="Override lakehouse friendly name (mutually exclusive with --lakehouse-id).",
+    ),
     path_prefix: str | None = typer.Option(None, "--path-prefix", help="Override path prefix."),
     exit_code: bool = typer.Option(False, "--exit-code", help="Exit 1 if differences exist."),
     verbose: bool = typer.Option(False, "--verbose", help="Show all files including non-weevr."),
@@ -213,6 +228,7 @@ def status(
             target_name=target,
             workspace_id=workspace_id,
             lakehouse_id=lakehouse_id,
+            lakehouse_name=lakehouse_name,
             path_prefix=path_prefix,
             exit_code=exit_code,
             verbose=verbose,

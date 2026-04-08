@@ -32,6 +32,7 @@ def run_status(
     target_name: str,
     workspace_id: str | None,
     lakehouse_id: str | None,
+    lakehouse_name: str | None,
     path_prefix: str | None,
     exit_code: bool,
     verbose: bool,
@@ -42,7 +43,8 @@ def run_status(
     Args:
         target_name: Named target from --target flag.
         workspace_id: Override workspace ID.
-        lakehouse_id: Override lakehouse ID.
+        lakehouse_id: Override lakehouse GUID.
+        lakehouse_name: Override lakehouse friendly name.
         path_prefix: Override path prefix.
         exit_code: If True, exit 1 when differences exist.
         verbose: If True, show all files including non-weevr.
@@ -68,6 +70,7 @@ def run_status(
             target_name=target_name,
             workspace_id=workspace_id,
             lakehouse_id=lakehouse_id,
+            lakehouse_name=lakehouse_name,
             path_prefix=path_prefix,
         )
     except TargetError as exc:

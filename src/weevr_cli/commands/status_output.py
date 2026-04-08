@@ -27,7 +27,7 @@ def print_status_header(target: DeployTarget, console: Console) -> None:
     name = target.name or "unnamed"
     console.print(f"\n[bold]Target:[/bold] {name}")
     console.print(f"  Workspace: {target.workspace_id}")
-    console.print(f"  Lakehouse: {target.lakehouse_id}")
+    console.print(f"  Lakehouse: {target.lakehouse_id or target.lakehouse_name}")
     if target.path_prefix:
         console.print(f"  Path prefix: {target.path_prefix}")
     console.print()
@@ -127,10 +127,11 @@ def format_status_json(
             summary["remote_only"] += 1
     summary["total"] = len(entries)
 
-    target_info: dict[str, str] = {
-        "workspace_id": target.workspace_id,
-        "lakehouse_id": target.lakehouse_id,
-    }
+    target_info: dict[str, str] = {"workspace_id": target.workspace_id}
+    if target.lakehouse_id:
+        target_info["lakehouse_id"] = target.lakehouse_id
+    if target.lakehouse_name:
+        target_info["lakehouse_name"] = target.lakehouse_name
     if target.name:
         target_info["name"] = target.name
     if target.path_prefix:

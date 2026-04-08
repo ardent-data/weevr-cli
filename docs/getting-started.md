@@ -135,19 +135,21 @@ full reference, including how explicit target paths bypass the filter.
 
 ## Configure a Deploy Target
 
-Edit `.weevr/cli.yaml` with your Fabric workspace and lakehouse IDs:
+Edit `.weevr/cli.yaml` with your Fabric workspace GUID and lakehouse identifier. Use `lakehouse_id` (a GUID) by default; use `lakehouse_name` only if your tenant supports friendly-name lookup. The two are mutually exclusive — provide exactly one per target.
 
 ```yaml
 targets:
   dev:
-    workspace_id: "your-workspace-id"
-    lakehouse_id: "your-lakehouse-id"
+    workspace_id: "your-workspace-guid"
+    lakehouse_id: "your-lakehouse-guid"
     path_prefix: "weevr"
 
 default_target: dev
 ```
 
 The `path_prefix` is optional — it adds a namespace before the project folder on the Lakehouse. With this config, files deploy to `Files/weevr/my-project.weevr/...`. The project folder name is always included automatically.
+
+See [Configuration › Targets](configuration/index.md#targets) for the `lakehouse_name` alternative and the full field reference.
 
 You can define multiple targets (e.g., `dev`, `staging`, `prod`) and switch between them with `--target`.
 

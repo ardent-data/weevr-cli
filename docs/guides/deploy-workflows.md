@@ -85,10 +85,10 @@ weevr deploy --target dev --strict-validation
 
 When you run `weevr deploy`, the target is resolved in this order:
 
-1. **CLI flags** (`--workspace-id` and `--lakehouse-id`, both required together) — highest priority
+1. **CLI flags** (`--workspace-id` together with **either** `--lakehouse-id` or `--lakehouse-name`, both required together) — highest priority. The two lakehouse flags are mutually exclusive.
 2. **Named or default target** (`--target <name>`, or `default_target` from `cli.yaml` if `--target` is omitted)
 
-The `--path-prefix` flag can be combined with either approach — it overrides the target's `path_prefix` without changing how the target itself is resolved. The project folder name (e.g., `my-project.weevr`) is always appended after the prefix, so the effective remote base is `Files/{path_prefix}/{project_folder}/`.
+The `--path-prefix` flag can be combined with either approach — it overrides the target's `path_prefix` without changing how the target itself is resolved. The project folder name (e.g., `my-project.weevr`) is always appended after the prefix, so the effective remote base under the lakehouse Files folder is `{lakehouse}/Files/{path_prefix}/{project_folder}/`, where `{lakehouse}` is the bare GUID when you use `lakehouse_id` or `{name}.Lakehouse` when you use `lakehouse_name`.
 
 See [Configuration](../configuration/index.md) for the full `cli.yaml` reference.
 
@@ -105,6 +105,17 @@ See [Configuration](../configuration/index.md) for the full `cli.yaml` reference
       --strict-validation
 ```
 
+If your tenant supports friendly-name lookup and you prefer to inject a display name instead of a GUID, swap `--lakehouse-id` for `--lakehouse-name` (the two flags are mutually exclusive):
+
+```yaml
+- name: Deploy to dev
+  run: |
+    weevr deploy \
+      --workspace-id "${{ secrets.FABRIC_WORKSPACE_ID }}" \
+      --lakehouse-name "${{ secrets.FABRIC_LAKEHOUSE_NAME }}" \
+      --strict-validation
+```
+
 ### Azure DevOps
 
 ```yaml
@@ -115,6 +126,8 @@ See [Configuration](../configuration/index.md) for the full `cli.yaml` reference
       --strict-validation
   displayName: Deploy to Fabric Lakehouse
 ```
+
+As with GitHub Actions, substitute `--lakehouse-name "$(FABRIC_LAKEHOUSE_NAME)"` if you are passing a friendly display name instead of a GUID.
 
 !!! tip
     Use `--strict-validation` in CI/CD to fail the pipeline on validation warnings, not just errors. `--force` is only needed when combining `--clean --all` in a non-interactive environment — it suppresses the confirmation prompt that would otherwise block the pipeline. Plain `weevr deploy` (without `--clean --all`) has no interactive prompts and does not need `--force`.
