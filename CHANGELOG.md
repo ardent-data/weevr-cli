@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.2](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.2.1...weevr-cli-v1.2.2) (2026-04-08)
+
+
+### Bug Fixes
+
+* **deploy:** handle GUID lakehouses without friendly-name lookup ([#42](https://github.com/ardent-data/weevr-cli/issues/42)) ([cb9388b](https://github.com/ardent-data/weevr-cli/commit/cb9388bb40b6970ab29c4f1c0aadba43d03db0d1))
+
 ## [1.2.1](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.2.0...weevr-cli-v1.2.1) (2026-04-07)
 
 
