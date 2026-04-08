@@ -110,6 +110,44 @@ class TestResolveTarget:
         target = resolve_target(config, target_name="prod")
         assert target.path_prefix is None
 
+    def test_cli_flag_lakehouse_name(self) -> None:
+        config = _config()
+        target = resolve_target(
+            config,
+            workspace_id=VALID_UUID,
+            lakehouse_name="MyLake",
+        )
+        assert target.workspace_id == VALID_UUID
+        assert target.lakehouse_id is None
+        assert target.lakehouse_name == "MyLake"
+
+    def test_cli_flag_lakehouse_name_skips_uuid_validation(self) -> None:
+        config = _config()
+        # Lakehouse name need not be a UUID — must not raise.
+        resolve_target(config, workspace_id=VALID_UUID, lakehouse_name="not-a-uuid")
+
+    def test_cli_flags_reject_both_lakehouse_id_and_name(self) -> None:
+        config = _config()
+        with pytest.raises(TargetError, match="lakehouse"):
+            resolve_target(
+                config,
+                workspace_id=VALID_UUID,
+                lakehouse_id=VALID_UUID_2,
+                lakehouse_name="MyLake",
+            )
+
+    def test_named_target_with_lakehouse_name(self) -> None:
+        targets = {
+            "dev": TargetConfig(
+                workspace_id=VALID_UUID,
+                lakehouse_name="MyLake",
+            ),
+        }
+        config = _config(targets=targets)
+        target = resolve_target(config, target_name="dev")
+        assert target.lakehouse_name == "MyLake"
+        assert target.lakehouse_id is None
+
 
 class TestResolveDeployContext:
     def test_sets_project_folder_from_root(

@@ -19,16 +19,29 @@ class ActionType(Enum):
 
 @dataclass
 class DeployTarget:
-    """Resolved deploy target — one workspace + lakehouse + optional path prefix."""
+    """Resolved deploy target — one workspace + lakehouse + optional path prefix.
+
+    Exactly one of ``lakehouse_id`` (a GUID) or ``lakehouse_name`` (a friendly
+    display name) must be provided. GUIDs are used as-is in OneLake URLs;
+    friendly names get a ``.Lakehouse`` suffix appended (case-insensitive
+    detection prevents double-suffixing).
+    """
 
     workspace_id: str
-    lakehouse_id: str
+    lakehouse_id: str | None = None
+    lakehouse_name: str | None = None
     path_prefix: str | None = None
     name: str | None = None
     project_folder: str | None = None
 
     def __post_init__(self) -> None:
-        """Validate that project_folder is a single path component."""
+        """Validate lakehouse identifier and project_folder shape."""
+        if self.lakehouse_id and self.lakehouse_name:
+            raise ValueError(
+                "DeployTarget cannot specify both lakehouse_id and lakehouse_name; choose one."
+            )
+        if not self.lakehouse_id and not self.lakehouse_name:
+            raise ValueError("DeployTarget requires either lakehouse_id (GUID) or lakehouse_name.")
         if self.project_folder and ("/" in self.project_folder or "\\" in self.project_folder):
             raise ValueError(
                 f"project_folder must be a single path component, got: {self.project_folder}"
@@ -45,9 +58,26 @@ class DeployTarget:
         return self.workspace_id
 
     @property
+    def lakehouse_segment(self) -> str:
+        """The lakehouse path segment used in OneLake URLs.
+
+        For GUID lakehouse IDs, returns the bare GUID — appending the
+        ``.Lakehouse`` suffix triggers ``FriendlyNameSupportDisabled`` from
+        OneLake. For friendly names, ensures the segment ends in
+        ``.Lakehouse`` (matching case-insensitively to avoid duplicates).
+        """
+        if self.lakehouse_id:
+            return self.lakehouse_id
+        name = self.lakehouse_name
+        assert name is not None  # guaranteed by __post_init__
+        if name.lower().endswith(".lakehouse"):
+            return name
+        return f"{name}.Lakehouse"
+
+    @property
     def base_directory(self) -> str:
         """Base directory path within the lakehouse Files folder."""
-        base = f"{self.lakehouse_id}.Lakehouse/Files"
+        base = f"{self.lakehouse_segment}/Files"
         if self.path_prefix:
             base = f"{base}/{self.path_prefix}"
         if self.project_folder:

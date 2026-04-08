@@ -72,6 +72,75 @@ def test_parse_minimal_config(tmp_path: Path) -> None:
     assert config.targets["dev"].path_prefix is None
 
 
+def test_parse_target_with_lakehouse_name(tmp_path: Path) -> None:
+    config_dir = tmp_path / ".weevr"
+    config_dir.mkdir()
+    config_file = config_dir / "cli.yaml"
+    config_file.write_text(
+        yaml.dump(
+            {
+                "targets": {
+                    "dev": {
+                        "workspace_id": "ws-111",
+                        "lakehouse_name": "MyLake",
+                    },
+                },
+            }
+        )
+    )
+
+    config = load_config(config_file)
+    assert config.targets["dev"].lakehouse_name == "MyLake"
+    assert config.targets["dev"].lakehouse_id is None
+
+
+def test_parse_target_with_both_lakehouse_id_and_name(tmp_path: Path) -> None:
+    config_dir = tmp_path / ".weevr"
+    config_dir.mkdir()
+    config_file = config_dir / "cli.yaml"
+    config_file.write_text(
+        yaml.dump(
+            {
+                "targets": {
+                    "dev": {
+                        "workspace_id": "ws-111",
+                        "lakehouse_id": "lh-222",
+                        "lakehouse_name": "MyLake",
+                    },
+                },
+            }
+        )
+    )
+
+    with pytest.raises(ConfigError) as exc_info:
+        load_config(config_file)
+    assert exc_info.value.code == "config_invalid"
+    assert "lakehouse_id" in str(exc_info.value)
+    assert "lakehouse_name" in str(exc_info.value)
+
+
+def test_parse_target_missing_lakehouse(tmp_path: Path) -> None:
+    config_dir = tmp_path / ".weevr"
+    config_dir.mkdir()
+    config_file = config_dir / "cli.yaml"
+    config_file.write_text(
+        yaml.dump(
+            {
+                "targets": {
+                    "dev": {
+                        "workspace_id": "ws-111",
+                    },
+                },
+            }
+        )
+    )
+
+    with pytest.raises(ConfigError) as exc_info:
+        load_config(config_file)
+    assert exc_info.value.code == "config_invalid"
+    assert "lakehouse_id" in str(exc_info.value) or "lakehouse_name" in str(exc_info.value)
+
+
 def test_parse_missing_targets(tmp_path: Path) -> None:
     config_dir = tmp_path / ".weevr"
     config_dir.mkdir()

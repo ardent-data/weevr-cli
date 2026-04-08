@@ -25,6 +25,7 @@ def run_deploy(
     target_name: str,
     workspace_id: str | None,
     lakehouse_id: str | None,
+    lakehouse_name: str | None,
     path_prefix: str | None,
     full: bool,
     clean: bool,
@@ -41,7 +42,8 @@ def run_deploy(
         paths: Specific files/directories to deploy (selective mode).
         target_name: Named target from --target flag.
         workspace_id: Override workspace ID.
-        lakehouse_id: Override lakehouse ID.
+        lakehouse_id: Override lakehouse GUID.
+        lakehouse_name: Override lakehouse friendly name.
         path_prefix: Override path prefix.
         full: Full overwrite mode.
         clean: Remove orphaned weevr files from remote.
@@ -66,6 +68,7 @@ def run_deploy(
             target_name=target_name,
             workspace_id=workspace_id,
             lakehouse_id=lakehouse_id,
+            lakehouse_name=lakehouse_name,
             path_prefix=path_prefix,
         )
     except TargetError as exc:

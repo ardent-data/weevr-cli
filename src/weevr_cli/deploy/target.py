@@ -47,12 +47,13 @@ def resolve_target(
     target_name: str = "",
     workspace_id: str | None = None,
     lakehouse_id: str | None = None,
+    lakehouse_name: str | None = None,
     path_prefix: str | None = None,
 ) -> DeployTarget:
     """Resolve a deploy target from CLI flags and config.
 
     Precedence:
-        1. CLI flags (workspace_id + lakehouse_id) override everything.
+        1. CLI flags (workspace_id + one of lakehouse_id/lakehouse_name) override.
         2. --target name looked up in config targets.
         3. default_target from config.
 
@@ -60,7 +61,8 @@ def resolve_target(
         config: Parsed weevr configuration.
         target_name: Named target from --target flag.
         workspace_id: Override workspace ID from CLI flag.
-        lakehouse_id: Override lakehouse ID from CLI flag.
+        lakehouse_id: Override lakehouse GUID from CLI flag.
+        lakehouse_name: Override lakehouse friendly name from CLI flag.
         path_prefix: Override path prefix from CLI flag.
 
     Returns:
@@ -69,20 +71,30 @@ def resolve_target(
     Raises:
         TargetError: If target cannot be resolved or IDs are invalid.
     """
-    # Case 1: Both CLI flags provided — direct override
-    if workspace_id and lakehouse_id:
+    # CLI flag mutual exclusion
+    if lakehouse_id and lakehouse_name:
+        raise TargetError(
+            "Cannot specify both --lakehouse-id and --lakehouse-name; choose one.",
+            code="incomplete_target",
+        )
+
+    # Case 1: workspace + lakehouse identifier provided as flags — direct override
+    if workspace_id and (lakehouse_id or lakehouse_name):
         validate_uuid(workspace_id, "workspace_id")
-        validate_uuid(lakehouse_id, "lakehouse_id")
+        if lakehouse_id:
+            validate_uuid(lakehouse_id, "lakehouse_id")
         return DeployTarget(
             workspace_id=workspace_id,
             lakehouse_id=lakehouse_id,
+            lakehouse_name=lakehouse_name,
             path_prefix=path_prefix,
         )
 
-    # Case 2: One CLI flag without the other — error
-    if workspace_id or lakehouse_id:
+    # Case 2: Partial CLI flags — error
+    if workspace_id or lakehouse_id or lakehouse_name:
         raise TargetError(
-            "Both --workspace-id and --lakehouse-id must be provided together.",
+            "Both --workspace-id and --lakehouse-id (or --lakehouse-name) "
+            "must be provided together.",
             code="incomplete_target",
         )
 
@@ -103,11 +115,13 @@ def resolve_target(
         )
 
     validate_uuid(target_config.workspace_id, "workspace_id")
-    validate_uuid(target_config.lakehouse_id, "lakehouse_id")
+    if target_config.lakehouse_id:
+        validate_uuid(target_config.lakehouse_id, "lakehouse_id")
 
     return DeployTarget(
         workspace_id=target_config.workspace_id,
         lakehouse_id=target_config.lakehouse_id,
+        lakehouse_name=target_config.lakehouse_name,
         path_prefix=path_prefix if path_prefix is not None else target_config.path_prefix,
         name=name,
     )
@@ -128,6 +142,7 @@ def resolve_deploy_context(
     target_name: str = "",
     workspace_id: str | None = None,
     lakehouse_id: str | None = None,
+    lakehouse_name: str | None = None,
     path_prefix: str | None = None,
 ) -> DeployContext:
     """Resolve a deploy target and project root together.
@@ -140,7 +155,8 @@ def resolve_deploy_context(
         config: Parsed weevr configuration.
         target_name: Named target from --target flag.
         workspace_id: Override workspace ID from CLI flag.
-        lakehouse_id: Override lakehouse ID from CLI flag.
+        lakehouse_id: Override lakehouse GUID from CLI flag.
+        lakehouse_name: Override lakehouse friendly name from CLI flag.
         path_prefix: Override path prefix from CLI flag.
 
     Returns:
@@ -155,6 +171,7 @@ def resolve_deploy_context(
         target_name=target_name,
         workspace_id=workspace_id,
         lakehouse_id=lakehouse_id,
+        lakehouse_name=lakehouse_name,
         path_prefix=path_prefix,
     )
 

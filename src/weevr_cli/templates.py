@@ -156,6 +156,10 @@ _CLI_YAML_TEMPLATE = """\
 # Deploy target environments
 # Uncomment and fill in your workspace and lakehouse IDs:
 #
+# Use lakehouse_id (a GUID) by default. Use lakehouse_name only if your
+# tenant supports friendly-name lookup for the target workspace; lakehouse_id
+# and lakehouse_name are mutually exclusive.
+#
 # targets:
 #   dev:
 #     workspace_id: "<your-workspace-id>"
@@ -215,7 +219,9 @@ def render_cli_yaml(
     When called with targets, returns a populated configuration.
 
     Args:
-        targets: Dict of target_name -> {workspace_id, lakehouse_id, path_prefix?}.
+        targets: Dict of target_name -> {workspace_id, lakehouse_id | lakehouse_name,
+            path_prefix?}. Each target must include workspace_id plus exactly one of
+            lakehouse_id (GUID) or lakehouse_name (friendly display name).
         default_target: Name of the default deploy target.
 
     Returns:

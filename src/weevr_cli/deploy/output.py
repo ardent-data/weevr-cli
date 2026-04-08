@@ -28,10 +28,11 @@ def render_target_header(target: DeployTarget, console: Console) -> None:
     """Display the deploy target header."""
     label = target.name or "custom"
     prefix = target.path_prefix or "(root)"
+    lakehouse = target.lakehouse_id or target.lakehouse_name
     console.print(
         f"\n[bold]Deploy target:[/bold] {label}"
         f"  workspace={target.workspace_id}"
-        f"  lakehouse={target.lakehouse_id}"
+        f"  lakehouse={lakehouse}"
         f"  path={prefix}"
     )
 
@@ -155,10 +156,11 @@ def _result_json(result: DeployResult, target: DeployTarget) -> dict[str, Any]:
 
 def _target_json(target: DeployTarget) -> dict[str, Any]:
     """Build JSON target info."""
-    info: dict[str, Any] = {
-        "workspace_id": target.workspace_id,
-        "lakehouse_id": target.lakehouse_id,
-    }
+    info: dict[str, Any] = {"workspace_id": target.workspace_id}
+    if target.lakehouse_id:
+        info["lakehouse_id"] = target.lakehouse_id
+    if target.lakehouse_name:
+        info["lakehouse_name"] = target.lakehouse_name
     if target.name:
         info["name"] = target.name
     if target.path_prefix:

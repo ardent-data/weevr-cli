@@ -8,7 +8,7 @@ This is the main configuration file, created by `weevr init`. It defines deploy 
 
 ### Targets
 
-Each target maps a name to a Fabric Lakehouse destination:
+Each target maps a name to a Fabric Lakehouse destination. Identify the lakehouse with **either** `lakehouse_id` (a GUID — recommended) **or** `lakehouse_name` (the friendly display name). Exactly one of the two is required per target.
 
 ```yaml
 targets:
@@ -18,14 +18,18 @@ targets:
     path_prefix: "weevr"
   prod:
     workspace_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-    lakehouse_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    lakehouse_name: "MyLakehouse"
 ```
 
 | Field | Required | Description |
 |---|---|---|
 | `workspace_id` | Yes | Fabric workspace GUID |
-| `lakehouse_id` | Yes | Fabric Lakehouse GUID |
+| `lakehouse_id` | One of | Fabric Lakehouse GUID. Mutually exclusive with `lakehouse_name`. |
+| `lakehouse_name` | One of | Fabric Lakehouse friendly display name. The `.Lakehouse` suffix is appended automatically if you omit it. Mutually exclusive with `lakehouse_id`. |
 | `path_prefix` | No | Optional namespace prepended before the project folder in remote paths (e.g., `weevr`) |
+
+!!! note "When to use `lakehouse_name`"
+    Prefer `lakehouse_id` (GUID). Use `lakehouse_name` only if your tenant supports friendly-name lookup for the target workspace. Some tenants reject GUID-style identifiers carrying the `.Lakehouse` suffix with `FriendlyNameSupportDisabled`; the CLI handles this by sending bare GUIDs and only attaching `.Lakehouse` to friendly names.
 
 ### Remote Path Structure
 
@@ -83,8 +87,9 @@ targets:
     lakehouse_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
     path_prefix: "weevr"
   prod:
+    # This target uses a friendly name instead of a GUID.
     workspace_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-    lakehouse_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    lakehouse_name: "MyProdLakehouse"
 
 default_target: dev
 
@@ -96,15 +101,19 @@ schema:
 
 CLI flags override config file values. The resolution order (highest to lowest priority):
 
-1. **CLI flags** — `--workspace-id` and `--lakehouse-id` (both must be provided together)
+1. **CLI flags** — `--workspace-id` together with **either** `--lakehouse-id` (GUID) **or** `--lakehouse-name` (friendly display name). The two lakehouse flags are mutually exclusive.
 2. **Named or default target** — `--target <name>` selects a target from config; if omitted, `default_target` is used
 
 The `--path-prefix` flag can be combined with either approach to override just the path prefix. The project folder name is always appended after the prefix automatically.
 
-This makes CI/CD pipelines straightforward — inject IDs from pipeline variables:
+This makes CI/CD pipelines straightforward — inject identifiers from pipeline variables:
 
 ```bash
+# GUID-based (recommended)
 weevr deploy --workspace-id "$WORKSPACE_ID" --lakehouse-id "$LAKEHOUSE_ID"
+
+# Or, on tenants where friendly-name lookup is enabled
+weevr deploy --workspace-id "$WORKSPACE_ID" --lakehouse-name "$LAKEHOUSE_NAME"
 ```
 
 ## Ignore files

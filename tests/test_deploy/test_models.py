@@ -26,19 +26,19 @@ class TestDeployTarget:
 
     def test_base_directory_without_prefix(self) -> None:
         target = DeployTarget(workspace_id="ws-id", lakehouse_id="lh-id")
-        assert target.base_directory == "lh-id.Lakehouse/Files"
+        assert target.base_directory == "lh-id/Files"
 
     def test_base_directory_with_prefix(self) -> None:
         target = DeployTarget(
             workspace_id="ws-id", lakehouse_id="lh-id", path_prefix="weevr/project"
         )
-        assert target.base_directory == "lh-id.Lakehouse/Files/weevr/project"
+        assert target.base_directory == "lh-id/Files/weevr/project"
 
     def test_base_directory_with_project_folder(self) -> None:
         target = DeployTarget(
             workspace_id="ws-id", lakehouse_id="lh-id", project_folder="datalake.weevr"
         )
-        assert target.base_directory == "lh-id.Lakehouse/Files/datalake.weevr"
+        assert target.base_directory == "lh-id/Files/datalake.weevr"
 
     def test_base_directory_with_prefix_and_project_folder(self) -> None:
         target = DeployTarget(
@@ -47,7 +47,7 @@ class TestDeployTarget:
             path_prefix="custom/path",
             project_folder="datalake.weevr",
         )
-        assert target.base_directory == "lh-id.Lakehouse/Files/custom/path/datalake.weevr"
+        assert target.base_directory == "lh-id/Files/custom/path/datalake.weevr"
 
     def test_project_folder_rejects_path_separators(self) -> None:
         with pytest.raises(ValueError, match="single path component"):
@@ -58,6 +58,39 @@ class TestDeployTarget:
     def test_name_optional(self) -> None:
         target = DeployTarget(workspace_id="ws-id", lakehouse_id="lh-id", name="dev")
         assert target.name == "dev"
+
+    def test_base_directory_with_lakehouse_name_appends_suffix(self) -> None:
+        target = DeployTarget(workspace_id="ws-id", lakehouse_name="MyLake")
+        assert target.base_directory == "MyLake.Lakehouse/Files"
+
+    def test_base_directory_with_lakehouse_name_already_suffixed(self) -> None:
+        target = DeployTarget(workspace_id="ws-id", lakehouse_name="MyLake.Lakehouse")
+        assert target.base_directory == "MyLake.Lakehouse/Files"
+
+    def test_base_directory_with_lakehouse_name_lowercase_suffix(self) -> None:
+        target = DeployTarget(workspace_id="ws-id", lakehouse_name="MyLake.lakehouse")
+        assert target.base_directory == "MyLake.lakehouse/Files"
+
+    def test_base_directory_with_lakehouse_name_upper_suffix(self) -> None:
+        target = DeployTarget(workspace_id="ws-id", lakehouse_name="MyLake.LAKEHOUSE")
+        assert target.base_directory == "MyLake.LAKEHOUSE/Files"
+
+    def test_base_directory_with_lakehouse_name_and_prefix(self) -> None:
+        target = DeployTarget(
+            workspace_id="ws-id",
+            lakehouse_name="MyLake",
+            path_prefix="weevr",
+            project_folder="datalake.weevr",
+        )
+        assert target.base_directory == "MyLake.Lakehouse/Files/weevr/datalake.weevr"
+
+    def test_rejects_both_id_and_name(self) -> None:
+        with pytest.raises(ValueError, match="lakehouse_id.*lakehouse_name"):
+            DeployTarget(workspace_id="ws-id", lakehouse_id="lh-id", lakehouse_name="MyLake")
+
+    def test_rejects_neither_id_nor_name(self) -> None:
+        with pytest.raises(ValueError, match="lakehouse_id.*lakehouse_name"):
+            DeployTarget(workspace_id="ws-id")
 
 
 class TestRemoteFile:

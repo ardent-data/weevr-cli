@@ -22,10 +22,16 @@ class ConfigError(Exception):
 
 @dataclass
 class TargetConfig:
-    """A single deploy target environment."""
+    """A single deploy target environment.
+
+    Exactly one of ``lakehouse_id`` (GUID) or ``lakehouse_name`` (friendly
+    display name) must be provided. Use ``lakehouse_name`` only on tenants
+    where friendly-name lookup is supported by your workspace.
+    """
 
     workspace_id: str
-    lakehouse_id: str
+    lakehouse_id: str | None = None
+    lakehouse_name: str | None = None
     path_prefix: str | None = None
 
 
@@ -66,14 +72,27 @@ class WeevrConfig:
                 )
             workspace_id = target_data.get("workspace_id")
             lakehouse_id = target_data.get("lakehouse_id")
-            if not workspace_id or not lakehouse_id:
+            lakehouse_name = target_data.get("lakehouse_name")
+            if not workspace_id:
                 raise ConfigError(
-                    f"Target '{name}' is missing required fields: workspace_id, lakehouse_id.",
+                    f"Target '{name}' is missing required field: workspace_id.",
+                    code="config_invalid",
+                )
+            if lakehouse_id and lakehouse_name:
+                raise ConfigError(
+                    f"Target '{name}' specifies both lakehouse_id and lakehouse_name; "
+                    "use exactly one.",
+                    code="config_invalid",
+                )
+            if not lakehouse_id and not lakehouse_name:
+                raise ConfigError(
+                    f"Target '{name}' must specify either lakehouse_id (GUID) or lakehouse_name.",
                     code="config_invalid",
                 )
             targets[name] = TargetConfig(
                 workspace_id=str(workspace_id),
-                lakehouse_id=str(lakehouse_id),
+                lakehouse_id=str(lakehouse_id) if lakehouse_id else None,
+                lakehouse_name=str(lakehouse_name) if lakehouse_name else None,
                 path_prefix=target_data.get("path_prefix"),
             )
 
