@@ -1097,10 +1097,10 @@
 <h2 id="deploy-target-resolution">Deploy Target Resolution<a class="headerlink" href="#deploy-target-resolution" title="Permanent link">&para;</a></h2>
 <p>When you run <code>weevr deploy</code>, the target is resolved in this order:</p>
 <ol>
-<li><strong>CLI flags</strong> (<code>--workspace-id</code> and <code>--lakehouse-id</code>, both required together) — highest priority</li>
+<li><strong>CLI flags</strong> (<code>--workspace-id</code> together with <strong>either</strong> <code>--lakehouse-id</code> or <code>--lakehouse-name</code>, both required together) — highest priority. The two lakehouse flags are mutually exclusive.</li>
 <li><strong>Named or default target</strong> (<code>--target &lt;name&gt;</code>, or <code>default_target</code> from <code>cli.yaml</code> if <code>--target</code> is omitted)</li>
 </ol>
-<p>The <code>--path-prefix</code> flag can be combined with either approach — it overrides the target's <code>path_prefix</code> without changing how the target itself is resolved. The project folder name (e.g., <code>my-project.weevr</code>) is always appended after the prefix, so the effective remote base is <code>Files/{path_prefix}/{project_folder}/</code>.</p>
+<p>The <code>--path-prefix</code> flag can be combined with either approach — it overrides the target's <code>path_prefix</code> without changing how the target itself is resolved. The project folder name (e.g., <code>my-project.weevr</code>) is always appended after the prefix, so the effective remote base under the lakehouse Files folder is <code>{lakehouse}/Files/{path_prefix}/{project_folder}/</code>, where <code>{lakehouse}</code> is the bare GUID when you use <code>lakehouse_id</code> or <code>{name}.Lakehouse</code> when you use <code>lakehouse_name</code>.</p>
 <p>See <a href="../../configuration/">Configuration</a> for the full <code>cli.yaml</code> reference.</p>
 <h2 id="cicd-patterns">CI/CD Patterns<a class="headerlink" href="#cicd-patterns" title="Permanent link">&para;</a></h2>
 <h3 id="github-actions">GitHub Actions<a class="headerlink" href="#github-actions" title="Permanent link">&para;</a></h3>
@@ -1111,14 +1111,23 @@
 <a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">      </span><span class="no">--lakehouse-id &quot;${{ secrets.FABRIC_LAKEHOUSE_ID }}&quot; \</span>
 <a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">      </span><span class="no">--strict-validation</span>
 </code></pre></div>
-<h3 id="azure-devops">Azure DevOps<a class="headerlink" href="#azure-devops" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">script</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="no">weevr deploy \</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">      </span><span class="no">--workspace-id &quot;$(FABRIC_WORKSPACE_ID)&quot; \</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">      </span><span class="no">--lakehouse-id &quot;$(FABRIC_LAKEHOUSE_ID)&quot; \</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">      </span><span class="no">--strict-validation</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="nt">displayName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deploy to Fabric Lakehouse</span>
+<p>If your tenant supports friendly-name lookup and you prefer to inject a display name instead of a GUID, swap <code>--lakehouse-id</code> for <code>--lakehouse-name</code> (the two flags are mutually exclusive):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deploy to dev</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="no">weevr deploy \</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">      </span><span class="no">--workspace-id &quot;${{ secrets.FABRIC_WORKSPACE_ID }}&quot; \</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">      </span><span class="no">--lakehouse-name &quot;${{ secrets.FABRIC_LAKEHOUSE_NAME }}&quot; \</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">      </span><span class="no">--strict-validation</span>
 </code></pre></div>
+<h3 id="azure-devops">Azure DevOps<a class="headerlink" href="#azure-devops" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">script</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="no">weevr deploy \</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">      </span><span class="no">--workspace-id &quot;$(FABRIC_WORKSPACE_ID)&quot; \</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">      </span><span class="no">--lakehouse-id &quot;$(FABRIC_LAKEHOUSE_ID)&quot; \</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">      </span><span class="no">--strict-validation</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span><span class="nt">displayName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deploy to Fabric Lakehouse</span>
+</code></pre></div>
+<p>As with GitHub Actions, substitute <code>--lakehouse-name "$(FABRIC_LAKEHOUSE_NAME)"</code> if you are passing a friendly display name instead of a GUID.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>Use <code>--strict-validation</code> in CI/CD to fail the pipeline on validation warnings, not just errors. <code>--force</code> is only needed when combining <code>--clean --all</code> in a non-interactive environment — it suppresses the confirmation prompt that would otherwise block the pipeline. Plain <code>weevr deploy</code> (without <code>--clean --all</code>) has no interactive prompts and does not need <code>--force</code>.</p>

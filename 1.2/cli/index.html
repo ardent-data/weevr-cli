@@ -1132,19 +1132,21 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>weevr deploy [OPTIONS] [PATHS]...
 </code></pre></div>
 <p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>  [PATHS]...           Specific files to deploy.
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>  -t, --target TEXT    Named deploy target.
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>  --workspace-id TEXT  Override workspace.
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>  --lakehouse-id TEXT  Override lakehouse.
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>  --path-prefix TEXT   Override path prefix.
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>  --full               Full overwrite instead of smart sync.
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>  --clean              Remove remote files not present locally.
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>  --all                With --clean, remove all remote files.
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>  --dry-run            Show what would change.
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>  --skip-validation    Skip pre-deploy validation.
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>  --strict-validation  Block deploy on validation warnings.
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>  --force              Skip confirmation prompts.
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>  --help               Show this message and exit.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>  [PATHS]...             Specific files to deploy.
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>  -t, --target TEXT      Named deploy target.
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>  --workspace-id TEXT    Override workspace.
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>  --lakehouse-id TEXT    Override lakehouse GUID.
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>  --lakehouse-name TEXT  Override lakehouse friendly name (mutually exclusive
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>                         with --lakehouse-id).
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>  --path-prefix TEXT     Override path prefix.
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>  --full                 Full overwrite instead of smart sync.
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>  --clean                Remove remote files not present locally.
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>  --all                  With --clean, remove all remote files.
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>  --dry-run              Show what would change.
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>  --skip-validation      Skip pre-deploy validation.
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>  --strict-validation    Block deploy on validation warnings.
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>  --force                Skip confirmation prompts.
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>  --help                 Show this message and exit.
 </code></pre></div>
 <h4 id="init">init<a class="headerlink" href="#init" title="Permanent link">&para;</a></h4>
 <p>Create a new weevr project.</p>
@@ -1233,13 +1235,15 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>weevr status [OPTIONS]
 </code></pre></div>
 <p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>  -t, --target TEXT    Named deploy target.
-<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>  --workspace-id TEXT  Override workspace.
-<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>  --lakehouse-id TEXT  Override lakehouse.
-<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>  --path-prefix TEXT   Override path prefix.
-<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>  --exit-code          Exit 1 if differences exist.
-<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>  --verbose            Show all files including non-weevr.
-<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a>  --help               Show this message and exit.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>  -t, --target TEXT      Named deploy target.
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>  --workspace-id TEXT    Override workspace.
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>  --lakehouse-id TEXT    Override lakehouse GUID.
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>  --lakehouse-name TEXT  Override lakehouse friendly name (mutually exclusive
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>                         with --lakehouse-id).
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>  --path-prefix TEXT     Override path prefix.
+<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a>  --exit-code            Exit 1 if differences exist.
+<a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a>  --verbose              Show all files including non-weevr.
+<a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a>  --help                 Show this message and exit.
 </code></pre></div>
 <h4 id="validate">validate<a class="headerlink" href="#validate" title="Permanent link">&para;</a></h4>
 <p>Validate project files against schemas and check reference integrity.</p>

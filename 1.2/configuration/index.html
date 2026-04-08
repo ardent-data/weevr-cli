@@ -1077,7 +1077,7 @@
 <h2 id="weevrcliyaml"><code>.weevr/cli.yaml</code><a class="headerlink" href="#weevrcliyaml" title="Permanent link">&para;</a></h2>
 <p>This is the main configuration file, created by <code>weevr init</code>. It defines deploy targets and schema settings.</p>
 <h3 id="targets">Targets<a class="headerlink" href="#targets" title="Permanent link">&para;</a></h3>
-<p>Each target maps a name to a Fabric Lakehouse destination:</p>
+<p>Each target maps a name to a Fabric Lakehouse destination. Identify the lakehouse with <strong>either</strong> <code>lakehouse_id</code> (a GUID — recommended) <strong>or</strong> <code>lakehouse_name</code> (the friendly display name). Exactly one of the two is required per target.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">targets</span><span class="p">:</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">dev</span><span class="p">:</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="nt">workspace_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&quot;</span>
@@ -1085,7 +1085,7 @@
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="nt">path_prefix</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;weevr&quot;</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="nt">prod</span><span class="p">:</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="nt">workspace_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&quot;</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="nt">lakehouse_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&quot;</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="nt">lakehouse_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;MyLakehouse&quot;</span>
 </code></pre></div>
 <table>
 <thead>
@@ -1103,8 +1103,13 @@
 </tr>
 <tr>
 <td><code>lakehouse_id</code></td>
-<td>Yes</td>
-<td>Fabric Lakehouse GUID</td>
+<td>One of</td>
+<td>Fabric Lakehouse GUID. Mutually exclusive with <code>lakehouse_name</code>.</td>
+</tr>
+<tr>
+<td><code>lakehouse_name</code></td>
+<td>One of</td>
+<td>Fabric Lakehouse friendly display name. The <code>.Lakehouse</code> suffix is appended automatically if you omit it. Mutually exclusive with <code>lakehouse_id</code>.</td>
 </tr>
 <tr>
 <td><code>path_prefix</code></td>
@@ -1113,6 +1118,10 @@
 </tr>
 </tbody>
 </table>
+<div class="admonition note">
+<p class="admonition-title">When to use <code>lakehouse_name</code></p>
+<p>Prefer <code>lakehouse_id</code> (GUID). Use <code>lakehouse_name</code> only if your tenant supports friendly-name lookup for the target workspace. Some tenants reject GUID-style identifiers carrying the <code>.Lakehouse</code> suffix with <code>FriendlyNameSupportDisabled</code>; the CLI handles this by sending bare GUIDs and only attaching <code>.Lakehouse</code> to friendly names.</p>
+</div>
 <h3 id="remote-path-structure">Remote Path Structure<a class="headerlink" href="#remote-path-structure" title="Permanent link">&para;</a></h3>
 <p>The CLI automatically includes the project folder name (e.g., <code>my-project.weevr</code>) in all remote paths. The full remote base path is:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Files/{path_prefix}/{project_folder}/
@@ -1147,23 +1156,28 @@
 <a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">    </span><span class="nt">lakehouse_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&quot;</span>
 <a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">    </span><span class="nt">path_prefix</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;weevr&quot;</span>
 <a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">  </span><span class="nt">prod</span><span class="p">:</span>
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">    </span><span class="nt">workspace_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&quot;</span>
-<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">    </span><span class="nt">lakehouse_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&quot;</span>
-<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>
-<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="nt">default_target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dev</span>
-<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>
-<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="nt">schema</span><span class="p">:</span>
-<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.16&quot;</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">    </span><span class="c1"># This target uses a friendly name instead of a GUID.</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">    </span><span class="nt">workspace_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx&quot;</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">    </span><span class="nt">lakehouse_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;MyProdLakehouse&quot;</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="nt">default_target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dev</span>
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="nt">schema</span><span class="p">:</span>
+<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.16&quot;</span>
 </code></pre></div>
 <h2 id="flag-override-precedence">Flag Override Precedence<a class="headerlink" href="#flag-override-precedence" title="Permanent link">&para;</a></h2>
 <p>CLI flags override config file values. The resolution order (highest to lowest priority):</p>
 <ol>
-<li><strong>CLI flags</strong> — <code>--workspace-id</code> and <code>--lakehouse-id</code> (both must be provided together)</li>
+<li><strong>CLI flags</strong> — <code>--workspace-id</code> together with <strong>either</strong> <code>--lakehouse-id</code> (GUID) <strong>or</strong> <code>--lakehouse-name</code> (friendly display name). The two lakehouse flags are mutually exclusive.</li>
 <li><strong>Named or default target</strong> — <code>--target &lt;name&gt;</code> selects a target from config; if omitted, <code>default_target</code> is used</li>
 </ol>
 <p>The <code>--path-prefix</code> flag can be combined with either approach to override just the path prefix. The project folder name is always appended after the prefix automatically.</p>
-<p>This makes CI/CD pipelines straightforward — inject IDs from pipeline variables:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>--workspace-id<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$WORKSPACE_ID</span><span class="s2">&quot;</span><span class="w"> </span>--lakehouse-id<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$LAKEHOUSE_ID</span><span class="s2">&quot;</span>
+<p>This makes CI/CD pipelines straightforward — inject identifiers from pipeline variables:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># GUID-based (recommended)</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>--workspace-id<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$WORKSPACE_ID</span><span class="s2">&quot;</span><span class="w"> </span>--lakehouse-id<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$LAKEHOUSE_ID</span><span class="s2">&quot;</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Or, on tenants where friendly-name lookup is enabled</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>--workspace-id<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$WORKSPACE_ID</span><span class="s2">&quot;</span><span class="w"> </span>--lakehouse-name<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$LAKEHOUSE_NAME</span><span class="s2">&quot;</span>
 </code></pre></div>
 <h2 id="ignore-files">Ignore files<a class="headerlink" href="#ignore-files" title="Permanent link">&para;</a></h2>
 <p>Project-wide ignore patterns control which files weevr considers part of the project. Ignored files are skipped by <code>weevr validate</code>, <code>weevr list</code>, <code>weevr status</code>, and <code>weevr deploy</code> alike — useful for scratch folders, drafts, and editor backups that should never be validated or deployed.</p>

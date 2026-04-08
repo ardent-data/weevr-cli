@@ -1143,16 +1143,17 @@ gitignore-style location), or both. See
 <a href="../configuration/#ignore-files">Configuration › Ignore files</a> for the
 full reference, including how explicit target paths bypass the filter.</p>
 <h2 id="configure-a-deploy-target">Configure a Deploy Target<a class="headerlink" href="#configure-a-deploy-target" title="Permanent link">&para;</a></h2>
-<p>Edit <code>.weevr/cli.yaml</code> with your Fabric workspace and lakehouse IDs:</p>
+<p>Edit <code>.weevr/cli.yaml</code> with your Fabric workspace GUID and lakehouse identifier. Use <code>lakehouse_id</code> (a GUID) by default; use <code>lakehouse_name</code> only if your tenant supports friendly-name lookup. The two are mutually exclusive — provide exactly one per target.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nt">targets</span><span class="p">:</span>
 <a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nt">dev</span><span class="p">:</span>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="nt">workspace_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;your-workspace-id&quot;</span>
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="nt">lakehouse_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;your-lakehouse-id&quot;</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="nt">workspace_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;your-workspace-guid&quot;</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="nt">lakehouse_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;your-lakehouse-guid&quot;</span>
 <a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">    </span><span class="nt">path_prefix</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;weevr&quot;</span>
 <a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>
 <a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="nt">default_target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dev</span>
 </code></pre></div>
 <p>The <code>path_prefix</code> is optional — it adds a namespace before the project folder on the Lakehouse. With this config, files deploy to <code>Files/weevr/my-project.weevr/...</code>. The project folder name is always included automatically.</p>
+<p>See <a href="../configuration/#targets">Configuration › Targets</a> for the <code>lakehouse_name</code> alternative and the full field reference.</p>
 <p>You can define multiple targets (e.g., <code>dev</code>, <code>staging</code>, <code>prod</code>) and switch between them with <code>--target</code>.</p>
 <h2 id="authenticate">Authenticate<a class="headerlink" href="#authenticate" title="Permanent link">&para;</a></h2>
 <p>Log in with the Azure CLI:</p>
