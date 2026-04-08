@@ -3,6 +3,8 @@
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+from azure.core.exceptions import ResourceNotFoundError
+
 from weevr_cli.deploy.models import DeployTarget
 from weevr_cli.deploy.onelake import OneLakeClient
 
@@ -87,6 +89,38 @@ class TestOneLakeClient:
         expected_path = f"{target.base_directory}/old/file.yaml"
         mock_fs.get_file_client.assert_called_once_with(expected_path)
         mock_file_client.delete_file.assert_called_once()
+
+    @patch("weevr_cli.deploy.onelake.DataLakeServiceClient")
+    def test_list_files_path_not_found_returns_empty(self, mock_service_cls: MagicMock) -> None:
+        """First-deploy: missing remote subfolder is treated as empty, not an error."""
+        target = _target()
+        mock_fs = MagicMock()
+        mock_service_cls.return_value.get_file_system_client.return_value = mock_fs
+        mock_fs.get_paths.side_effect = ResourceNotFoundError("PathNotFound")
+
+        client = OneLakeClient(target, MagicMock())
+        files = client.list_files()
+
+        assert files == []
+
+    @patch("weevr_cli.deploy.onelake.DataLakeServiceClient")
+    def test_list_files_path_not_found_on_iteration(self, mock_service_cls: MagicMock) -> None:
+        """ItemPaged from get_paths raises lazily on iteration — must still be caught."""
+        target = _target()
+        mock_fs = MagicMock()
+        mock_service_cls.return_value.get_file_system_client.return_value = mock_fs
+
+        def _raise_on_iter() -> list[MagicMock]:
+            raise ResourceNotFoundError("PathNotFound")
+
+        lazy = MagicMock()
+        lazy.__iter__ = lambda self: iter(_raise_on_iter())
+        mock_fs.get_paths.return_value = lazy
+
+        client = OneLakeClient(target, MagicMock())
+        files = client.list_files()
+
+        assert files == []
 
     @patch("weevr_cli.deploy.onelake.DataLakeServiceClient")
     def test_list_files_no_prefix(self, mock_service_cls: MagicMock) -> None:

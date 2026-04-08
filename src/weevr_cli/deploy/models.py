@@ -84,6 +84,17 @@ class DeployTarget:
             base = f"{base}/{self.project_folder}"
         return base
 
+    @property
+    def remote_subpath(self) -> str:
+        """Effective remote path under ``Files/``, joining path_prefix and project_folder.
+
+        This is what the deploy/status banners should display so users can
+        see exactly which directory weevr will list against the lakehouse.
+        Returns ``"(root)"`` when neither segment is set.
+        """
+        parts = [p for p in (self.path_prefix, self.project_folder) if p]
+        return "/".join(parts) if parts else "(root)"
+
 
 @dataclass
 class RemoteFile:

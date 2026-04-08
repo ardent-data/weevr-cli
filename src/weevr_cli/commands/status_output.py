@@ -28,8 +28,7 @@ def print_status_header(target: DeployTarget, console: Console) -> None:
     console.print(f"\n[bold]Target:[/bold] {name}")
     console.print(f"  Workspace: {target.workspace_id}")
     console.print(f"  Lakehouse: {target.lakehouse_id or target.lakehouse_name}")
-    if target.path_prefix:
-        console.print(f"  Path prefix: {target.path_prefix}")
+    console.print(f"  Remote path: {target.remote_subpath}")
     console.print()
 
 

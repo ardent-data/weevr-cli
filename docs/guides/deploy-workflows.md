@@ -15,6 +15,20 @@ weevr deploy --target dev
 - **Unchanged files** — skipped
 - **Deleted local files** — remain on remote (use `--clean` to remove them)
 
+### First Deploy
+
+`weevr deploy` bootstraps a fresh Lakehouse automatically. You do not need to pre-create the project folder under `Files/`, run an init step, or perform any setup on the OneLake side — when the destination folder does not yet exist, smart sync treats the remote as empty and uploads everything on the first run.
+
+### Reading the Deploy Banner
+
+Before deploying, the CLI prints a one-line banner showing the resolved target:
+
+```
+Deploy target: dev  workspace=<guid>  lakehouse=<guid>  path=weevr/my-project.weevr
+```
+
+The `path=` field shows the effective remote location under `Files/` — that is, `<path_prefix>/<project_folder>` joined together (or `(root)` when neither is set). This is the directory weevr will list against the lakehouse and upload into. If something looks wrong about where your files are landing, this is the field to check first.
+
 ## Full Overwrite
 
 Upload all files regardless of remote state:
@@ -67,7 +81,7 @@ weevr deploy --target dev --clean --all
 
 Without `--clean`, orphaned remote files are left untouched. The `--all` flag only takes effect when combined with `--clean` — on its own it is a no-op.
 
-The tiered clean behavior protects non-weevr files by default. Use `--clean --all` only when you're certain the remote path prefix is exclusively managed by this project.
+The tiered clean behavior protects non-weevr files by default. Use `--clean --all` only when you're certain the remote path is exclusively managed by this project.
 
 ## Validation Control
 

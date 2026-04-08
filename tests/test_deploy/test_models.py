@@ -92,6 +92,29 @@ class TestDeployTarget:
         with pytest.raises(ValueError, match="lakehouse_id.*lakehouse_name"):
             DeployTarget(workspace_id="ws-id")
 
+    def test_remote_subpath_root(self) -> None:
+        target = DeployTarget(workspace_id="ws-id", lakehouse_id="lh-id")
+        assert target.remote_subpath == "(root)"
+
+    def test_remote_subpath_prefix_only(self) -> None:
+        target = DeployTarget(workspace_id="ws-id", lakehouse_id="lh-id", path_prefix="weevr/proj")
+        assert target.remote_subpath == "weevr/proj"
+
+    def test_remote_subpath_project_folder_only(self) -> None:
+        target = DeployTarget(
+            workspace_id="ws-id", lakehouse_id="lh-id", project_folder="datalake.weevr"
+        )
+        assert target.remote_subpath == "datalake.weevr"
+
+    def test_remote_subpath_prefix_and_project_folder(self) -> None:
+        target = DeployTarget(
+            workspace_id="ws-id",
+            lakehouse_id="lh-id",
+            path_prefix="weevr",
+            project_folder="datalake.weevr",
+        )
+        assert target.remote_subpath == "weevr/datalake.weevr"
+
 
 class TestRemoteFile:
     def test_creation(self) -> None:

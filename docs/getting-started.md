@@ -177,6 +177,9 @@ Preview what would change without deploying:
 weevr deploy --target dev --dry-run
 ```
 
+!!! tip
+    Your first deploy works against an empty Lakehouse — you don't need to pre-create the project folder under `Files/` or run any setup on the OneLake side. The CLI prints a `path=...` banner showing exactly where your files will land under `Files/`.
+
 ## Check Status
 
 See what differs between local files and the deployed state:
