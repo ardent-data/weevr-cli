@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.3](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.2.2...weevr-cli-v1.2.3) (2026-04-08)
+
+
+### Bug Fixes
+
+* **deploy:** bootstrap first deploy on empty Lakehouse ([#44](https://github.com/ardent-data/weevr-cli/issues/44)) ([443dc32](https://github.com/ardent-data/weevr-cli/commit/443dc32fab0e46e0dd0534ebc5a5d1946e7d9904))
+
 ## [1.2.2](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.2.1...weevr-cli-v1.2.2) (2026-04-08)
 
 
