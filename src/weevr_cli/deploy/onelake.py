@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from azure.core.exceptions import ResourceNotFoundError
 from azure.storage.filedatalake import DataLakeServiceClient
 
 from weevr_cli.deploy.models import DeployTarget, RemoteFile
@@ -30,13 +31,23 @@ class OneLakeClient:
     def list_files(self) -> list[RemoteFile]:
         """List all files under the deploy target's base directory.
 
+        If the base directory does not exist on the remote — typically
+        because no prior deploy has populated it — this is treated as
+        "remote is empty" and an empty list is returned. Upload operations
+        create parent directories on demand, so smart-sync can bootstrap
+        a fresh lakehouse without an explicit init step.
+
         Returns:
             List of RemoteFile objects representing remote files.
         """
         base_dir = self._target.base_directory
         files: list[RemoteFile] = []
-        paths = self._fs_client.get_paths(path=base_dir, recursive=True)
-        for path_props in paths:
+        try:
+            paths = self._fs_client.get_paths(path=base_dir, recursive=True)
+            path_iter = list(paths)
+        except ResourceNotFoundError:
+            return []
+        for path_props in path_iter:
             if path_props.is_directory:
                 continue
             # Strip base directory prefix to get relative path

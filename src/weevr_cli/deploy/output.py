@@ -27,13 +27,12 @@ _ACTION_LABELS = {
 def render_target_header(target: DeployTarget, console: Console) -> None:
     """Display the deploy target header."""
     label = target.name or "custom"
-    prefix = target.path_prefix or "(root)"
     lakehouse = target.lakehouse_id or target.lakehouse_name
     console.print(
         f"\n[bold]Deploy target:[/bold] {label}"
         f"  workspace={target.workspace_id}"
         f"  lakehouse={lakehouse}"
-        f"  path={prefix}"
+        f"  path={target.remote_subpath}"
     )
 
 
