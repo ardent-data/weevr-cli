@@ -155,6 +155,14 @@ If neither file exists, nothing is excluded.
 
 When you pass a specific file or directory to `weevr validate <path>`, the ignore filter is bypassed for that target. The reasoning: if you asked for a file by name, you meant it. The full-project scan (no path argument) honors the ignore filter.
 
+### `.weevr/.deploy-state/` (deploy manifest)
+
+The `.weevr/.deploy-state/` directory contains per-target deploy manifests — JSON files that record the MD5 hashes of files at deploy time. The CLI uses these manifests to detect content changes on subsequent deploys, even when the remote storage does not provide content checksums.
+
+This directory is machine-local state and should **not** be committed to version control. Add `.weevr/.deploy-state/` to your `.gitignore`.
+
+The manifests are created automatically on the first successful deploy and updated on each subsequent deploy. To reset change detection (e.g., after a manual remote upload), delete the `.weevr/.deploy-state/` directory — the CLI will fall back to file-size comparison until the next deploy creates a fresh manifest.
+
 ### `.weevr/deploy-ignore` (deprecated)
 
 `.weevr/deploy-ignore` is the legacy deploy-only ignore file. It is still honored for its original purpose — its patterns continue to filter files for `weevr deploy` and `weevr status` during the deprecation window — but **it will be removed in v1.3.0**. Move its patterns into `.weevr/ignore` (or `.weevrignore`) and delete the old file.
