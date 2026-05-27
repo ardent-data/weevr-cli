@@ -6,7 +6,6 @@ import pathspec
 
 from weevr_cli.deploy.collector import LocalFile
 from weevr_cli.deploy.diff import compute_diff
-from weevr_cli.deploy.manifest import DeployManifest
 from weevr_cli.deploy.models import ActionType, DeployTarget, RemoteFile
 
 
@@ -192,73 +191,3 @@ class TestCleanWithIgnore:
             clean=True,
         )
         assert len(plan.deletes) == 2
-
-
-class TestManifestDiff:
-    """Tests for manifest-based change detection (no remote MD5)."""
-
-    def test_same_size_different_content_detected(self) -> None:
-        local_md5 = b"\xaa" * 16
-        manifest_md5 = (b"\xbb" * 16).hex()
-        manifest = DeployManifest(files={"a.yaml": manifest_md5})
-
-        plan = compute_diff(
-            _target(),
-            [_local("a.yaml", md5=local_md5, size=100)],
-            [_remote("a.yaml", md5=None, size=100)],
-            manifest=manifest,
-        )
-        assert plan.actions[0].action == ActionType.UPLOAD_MODIFIED
-        assert "content changed" in plan.actions[0].reason
-
-    def test_unchanged_content_with_manifest(self) -> None:
-        local_md5 = b"\xaa" * 16
-        manifest = DeployManifest(files={"a.yaml": local_md5.hex()})
-
-        plan = compute_diff(
-            _target(),
-            [_local("a.yaml", md5=local_md5, size=100)],
-            [_remote("a.yaml", md5=None, size=100)],
-            manifest=manifest,
-        )
-        assert plan.actions[0].action == ActionType.SKIP
-
-    def test_no_manifest_falls_back_to_size(self) -> None:
-        plan = compute_diff(
-            _target(),
-            [_local("a.yaml", md5=b"\xaa" * 16, size=100)],
-            [_remote("a.yaml", md5=None, size=100)],
-        )
-        assert plan.actions[0].action == ActionType.SKIP
-
-    def test_no_manifest_entry_falls_back_to_size(self) -> None:
-        manifest = DeployManifest(files={"other.yaml": "abc123"})
-        plan = compute_diff(
-            _target(),
-            [_local("a.yaml", md5=b"\xaa" * 16, size=100)],
-            [_remote("a.yaml", md5=None, size=100)],
-            manifest=manifest,
-        )
-        assert plan.actions[0].action == ActionType.SKIP
-
-    def test_remote_md5_takes_precedence_over_manifest(self) -> None:
-        remote_md5 = b"\xaa" * 16
-        manifest = DeployManifest(files={"a.yaml": (b"\xbb" * 16).hex()})
-
-        plan = compute_diff(
-            _target(),
-            [_local("a.yaml", md5=remote_md5, size=100)],
-            [_remote("a.yaml", md5=remote_md5, size=100)],
-            manifest=manifest,
-        )
-        assert plan.actions[0].action == ActionType.SKIP
-
-    def test_new_file_not_affected_by_manifest(self) -> None:
-        manifest = DeployManifest(files={"old.yaml": "abc"})
-        plan = compute_diff(
-            _target(),
-            [_local("new.yaml")],
-            [],
-            manifest=manifest,
-        )
-        assert plan.actions[0].action == ActionType.UPLOAD_NEW

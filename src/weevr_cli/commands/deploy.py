@@ -7,7 +7,6 @@ import sys
 from weevr_cli.deploy.collector import collect_local_files
 from weevr_cli.deploy.diff import compute_diff
 from weevr_cli.deploy.executor import execute_plan
-from weevr_cli.deploy.manifest import build_manifest, load_manifest, save_manifest
 from weevr_cli.deploy.onelake import OneLakeClient
 from weevr_cli.deploy.output import render_dry_run, render_result, render_target_header
 from weevr_cli.deploy.target import TargetError, resolve_deploy_context
@@ -153,8 +152,7 @@ def run_deploy(
         )
         raise SystemExit(1) from exc
 
-    # 8. Load manifest and compute diff
-    manifest = load_manifest(target, project_root)
+    # 8. Compute diff
     plan = compute_diff(
         target,
         local_files,
@@ -163,7 +161,6 @@ def run_deploy(
         clean=clean and not clean_all,
         clean_all=clean_all,
         ignore_spec=ignore_spec,
-        manifest=manifest,
     )
 
     # 9. Dry run — show plan and exit
@@ -196,11 +193,6 @@ def run_deploy(
 
     # 11. Output results
     render_result(result, target, json_mode=state.json_mode, console=state.console)
-
-    # 12. Save manifest on full success
-    if result.is_success:
-        all_files = {lf.relative_path: lf.content_md5 for lf in local_files}
-        save_manifest(build_manifest(all_files), target, project_root)
 
     if not result.is_success:
         raise SystemExit(1) from None

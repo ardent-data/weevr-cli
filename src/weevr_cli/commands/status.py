@@ -16,7 +16,6 @@ from weevr_cli.commands.status_output import (
 )
 from weevr_cli.deploy.collector import collect_local_files
 from weevr_cli.deploy.diff import compute_diff
-from weevr_cli.deploy.manifest import load_manifest
 from weevr_cli.deploy.onelake import OneLakeClient
 from weevr_cli.deploy.target import TargetError, resolve_deploy_context
 from weevr_cli.ignore import (
@@ -110,15 +109,8 @@ def run_status(
         raise SystemExit(1) from exc
 
     # 5. Compute diff (smart sync mode, include remote-only for status)
-    manifest = load_manifest(target, project_root)
     plan = compute_diff(
-        target,
-        local_files,
-        remote_files,
-        clean=True,
-        clean_all=True,
-        ignore_spec=ignore_spec,
-        manifest=manifest,
+        target, local_files, remote_files, clean=True, clean_all=True, ignore_spec=ignore_spec
     )
 
     # 6. Convert to status entries
