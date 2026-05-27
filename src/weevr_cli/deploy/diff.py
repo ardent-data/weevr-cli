@@ -5,6 +5,7 @@ from __future__ import annotations
 import pathspec
 
 from weevr_cli.deploy.collector import LocalFile
+from weevr_cli.deploy.manifest import DeployManifest
 from weevr_cli.deploy.models import (
     ActionType,
     DeployAction,
@@ -25,6 +26,7 @@ def compute_diff(
     clean: bool = False,
     clean_all: bool = False,
     ignore_spec: pathspec.PathSpec | None = None,
+    manifest: DeployManifest | None = None,
 ) -> DeployPlan:
     """Compute a deploy plan by comparing local and remote files.
 
@@ -37,6 +39,9 @@ def compute_diff(
         clean_all: If True, delete all remote files not present locally.
         ignore_spec: Deploy-ignore patterns. Remote files matching these
             patterns are excluded from clean actions.
+        manifest: Previously saved deploy manifest. When the remote does not
+            provide content hashes, the manifest's stored hashes are used
+            to detect content changes.
 
     Returns:
         DeployPlan with actions for each file.
@@ -68,13 +73,13 @@ def compute_diff(
                     reason="new (not on remote)",
                 )
             )
-        elif _has_changed(lf, remote):
+        elif _has_changed(lf, remote, manifest):
             actions.append(
                 DeployAction(
                     local_path=lf.absolute_path,
                     remote_path=lf.relative_path,
                     action=ActionType.UPLOAD_MODIFIED,
-                    reason="modified (hash mismatch)",
+                    reason="modified (content changed)",
                 )
             )
         else:
@@ -105,14 +110,24 @@ def compute_diff(
     return DeployPlan(target=target, actions=actions)
 
 
-def _has_changed(local: LocalFile, remote: RemoteFile) -> bool:
+def _has_changed(
+    local: LocalFile,
+    remote: RemoteFile,
+    manifest: DeployManifest | None = None,
+) -> bool:
     """Check if a local file differs from its remote counterpart.
 
-    Uses MD5 hash comparison when available, falls back to size comparison.
+    Uses MD5 hash comparison when available. When the remote does not
+    provide a content hash (common with OneLake), falls back to comparing
+    the local hash against the deploy manifest. Size comparison is the
+    last resort when neither remote hash nor manifest is available.
     """
     if remote.content_md5 is not None:
         return local.content_md5 != remote.content_md5
-    # Fallback: size-based comparison
+    if manifest is not None:
+        manifest_md5 = manifest.get_md5(local.relative_path)
+        if manifest_md5 is not None:
+            return local.content_md5.hex() != manifest_md5
     return local.size != remote.size
 
 
