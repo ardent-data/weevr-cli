@@ -1,9 +1,10 @@
 """Tests for OneLake client wrapper (mocked SDK)."""
 
+import warnings
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from azure.core.exceptions import ResourceNotFoundError
+from azure.core.exceptions import AzureError, ResourceNotFoundError
 
 from weevr_cli.deploy.models import DeployTarget
 from weevr_cli.deploy.onelake import OneLakeClient
@@ -18,15 +19,18 @@ def _target(path_prefix: str | None = "weevr/proj") -> DeployTarget:
     )
 
 
-def _mock_path_props(
-    name: str, is_dir: bool = False, size: int = 100, md5: bytes | None = None
-) -> MagicMock:
+def _mock_path_props(name: str, is_dir: bool = False, size: int = 100) -> MagicMock:
     props = MagicMock()
     props.name = name
     props.is_directory = is_dir
     props.content_length = size
-    if md5 is not None:
-        props.content_settings = MagicMock()
+    return props
+
+
+def _mock_file_props(md5: bytes | None = None, *, has_content_settings: bool = True) -> MagicMock:
+    """Build a mock return value for get_file_properties()."""
+    props = MagicMock()
+    if has_content_settings:
         props.content_settings.content_md5 = md5
     else:
         props.content_settings = None
@@ -42,10 +46,17 @@ class TestOneLakeClient:
 
         base = target.base_directory
         mock_fs.get_paths.return_value = [
-            _mock_path_props(f"{base}/threads/orders.yaml", size=512, md5=b"\x01" * 16),
+            _mock_path_props(f"{base}/threads/orders.yaml", size=512),
             _mock_path_props(f"{base}/subdir", is_dir=True),
             _mock_path_props(f"{base}/weaves/dim.yaml", size=256),
         ]
+
+        mock_file_client = MagicMock()
+        mock_file_client.get_file_properties.side_effect = [
+            _mock_file_props(md5=b"\x01" * 16),
+            _mock_file_props(md5=None),
+        ]
+        mock_fs.get_file_client.return_value = mock_file_client
 
         client = OneLakeClient(target, MagicMock())
         files = client.list_files()
@@ -58,7 +69,55 @@ class TestOneLakeClient:
         assert files[1].content_md5 is None
 
     @patch("weevr_cli.deploy.onelake.DataLakeServiceClient")
-    def test_upload_file(self, mock_service_cls: MagicMock, tmp_path: Path) -> None:
+    def test_list_files_properties_error_gives_none_md5(self, mock_service_cls: MagicMock) -> None:
+        target = _target()
+        mock_fs = MagicMock()
+        mock_service_cls.return_value.get_file_system_client.return_value = mock_fs
+
+        base = target.base_directory
+        mock_fs.get_paths.return_value = [
+            _mock_path_props(f"{base}/file.yaml", size=100),
+        ]
+        mock_file_client = MagicMock()
+        mock_file_client.get_file_properties.side_effect = AzureError("rate limited")
+        mock_fs.get_file_client.return_value = mock_file_client
+
+        client = OneLakeClient(target, MagicMock())
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            files = client.list_files()
+
+        assert len(files) == 1
+        assert files[0].content_md5 is None
+        assert len(w) == 1
+        assert "rate limited" in str(w[0].message)
+
+    @patch("weevr_cli.deploy.onelake.DataLakeServiceClient")
+    def test_list_files_no_content_settings(self, mock_service_cls: MagicMock) -> None:
+        target = _target()
+        mock_fs = MagicMock()
+        mock_service_cls.return_value.get_file_system_client.return_value = mock_fs
+
+        base = target.base_directory
+        mock_fs.get_paths.return_value = [
+            _mock_path_props(f"{base}/file.yaml", size=100),
+        ]
+        mock_file_client = MagicMock()
+        mock_file_client.get_file_properties.return_value = _mock_file_props(
+            has_content_settings=False,
+        )
+        mock_fs.get_file_client.return_value = mock_file_client
+
+        client = OneLakeClient(target, MagicMock())
+        files = client.list_files()
+
+        assert len(files) == 1
+        assert files[0].content_md5 is None
+
+    @patch("weevr_cli.deploy.onelake.DataLakeServiceClient")
+    def test_upload_file_sets_content_md5(
+        self, mock_service_cls: MagicMock, tmp_path: Path
+    ) -> None:
         target = _target()
         mock_fs = MagicMock()
         mock_service_cls.return_value.get_file_system_client.return_value = mock_fs
@@ -73,7 +132,12 @@ class TestOneLakeClient:
 
         expected_path = f"{target.base_directory}/threads/test.yaml"
         mock_fs.get_file_client.assert_called_once_with(expected_path)
-        mock_file_client.upload_data.assert_called_once()
+        upload_call = mock_file_client.upload_data.call_args
+        assert upload_call is not None
+        assert upload_call.kwargs.get("overwrite") is True
+        cs = upload_call.kwargs.get("content_settings")
+        assert cs is not None
+        assert cs.content_md5 is not None
 
     @patch("weevr_cli.deploy.onelake.DataLakeServiceClient")
     def test_delete_file(self, mock_service_cls: MagicMock) -> None:
@@ -132,6 +196,9 @@ class TestOneLakeClient:
         mock_fs.get_paths.return_value = [
             _mock_path_props(f"{base}/file.yaml", size=100),
         ]
+        mock_file_client = MagicMock()
+        mock_file_client.get_file_properties.return_value = _mock_file_props(md5=None)
+        mock_fs.get_file_client.return_value = mock_file_client
 
         client = OneLakeClient(target, MagicMock())
         files = client.list_files()

@@ -4,14 +4,14 @@ This guide covers the different deployment modes and how to integrate `weevr dep
 
 ## Smart Sync (Default)
 
-By default, `weevr deploy` compares local files against the remote state using MD5 checksums (falling back to file size when checksums are unavailable). Only changed files are uploaded:
+By default, `weevr deploy` compares local files against the remote state using MD5 content hashes. The CLI stores each file's MD5 in OneLake metadata at upload time and reads it back on subsequent deploys to detect changes accurately — even when the bulk listing API does not include content checksums. Only changed files are uploaded:
 
 ```bash
 weevr deploy --target dev
 ```
 
 - **New files** — uploaded
-- **Modified files** — re-uploaded (detected via MD5 mismatch)
+- **Modified files** — re-uploaded (detected via MD5 hash comparison)
 - **Unchanged files** — skipped
 - **Deleted local files** — remain on remote (use `--clean` to remove them)
 

@@ -74,7 +74,7 @@ def compute_diff(
                     local_path=lf.absolute_path,
                     remote_path=lf.relative_path,
                     action=ActionType.UPLOAD_MODIFIED,
-                    reason="modified (hash mismatch)",
+                    reason="modified (content changed)",
                 )
             )
         else:
@@ -112,7 +112,6 @@ def _has_changed(local: LocalFile, remote: RemoteFile) -> bool:
     """
     if remote.content_md5 is not None:
         return local.content_md5 != remote.content_md5
-    # Fallback: size-based comparison
     return local.size != remote.size
 
 

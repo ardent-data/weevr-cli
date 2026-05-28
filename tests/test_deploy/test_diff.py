@@ -50,7 +50,7 @@ class TestSmartSync:
         )
         assert len(plan.actions) == 1
         assert plan.actions[0].action == ActionType.UPLOAD_MODIFIED
-        assert "hash mismatch" in plan.actions[0].reason
+        assert "content changed" in plan.actions[0].reason
 
     def test_modified_file_size_fallback(self) -> None:
         plan = compute_diff(

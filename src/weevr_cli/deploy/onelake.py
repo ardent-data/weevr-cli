@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import hashlib
+import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from azure.core.exceptions import ResourceNotFoundError
-from azure.storage.filedatalake import DataLakeServiceClient
+from azure.core.exceptions import AzureError, ResourceNotFoundError
+from azure.storage.filedatalake import ContentSettings, DataLakeServiceClient
 
 from weevr_cli.deploy.models import DeployTarget, RemoteFile
 
@@ -55,8 +57,19 @@ class OneLakeClient:
             relative = (
                 full_path[len(base_dir) + 1 :] if full_path.startswith(base_dir) else full_path
             )
-            settings = getattr(path_props, "content_settings", None)
-            content_md5 = getattr(settings, "content_md5", None) if settings else None
+            # get_paths() doesn't return content_md5 on OneLake, so fetch
+            # per-file properties where the stored hash is available.
+            content_md5: bytes | None = None
+            try:
+                file_client = self._fs_client.get_file_client(full_path)
+                file_props = file_client.get_file_properties()
+                cs = getattr(file_props, "content_settings", None)
+                content_md5 = getattr(cs, "content_md5", None) if cs else None
+            except AzureError as exc:
+                warnings.warn(
+                    f"Could not read properties for {relative}: {exc}",
+                    stacklevel=2,
+                )
             files.append(
                 RemoteFile(
                     path=relative,
@@ -69,7 +82,9 @@ class OneLakeClient:
     def upload_file(self, local_path: Path, remote_path: str) -> None:
         """Upload a local file to the remote target.
 
-        Creates parent directories as needed.
+        Creates parent directories as needed. Stores the file's MD5 hash
+        in ``content_settings`` so subsequent ``get_file_properties()``
+        calls can retrieve it for change detection.
 
         Args:
             local_path: Path to the local file.
@@ -77,8 +92,15 @@ class OneLakeClient:
         """
         full_remote = f"{self._target.base_directory}/{remote_path}"
         file_client = self._fs_client.get_file_client(full_remote)
-        with local_path.open("rb") as f:
-            file_client.upload_data(f, overwrite=True)
+        # Read fully to compute MD5 before upload. Weevr artifacts are small
+        # YAML files so buffering the entire content is acceptable.
+        data = local_path.read_bytes()
+        md5 = hashlib.md5(data).digest()  # noqa: S324
+        file_client.upload_data(
+            data,
+            overwrite=True,
+            content_settings=ContentSettings(content_md5=md5),
+        )
 
     def delete_file(self, remote_path: str) -> None:
         """Delete a file from the remote target.
