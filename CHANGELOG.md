@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.4](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.2.3...weevr-cli-v1.2.4) (2026-05-28)
+
+
+### Bug Fixes
+
+* **deploy:** detect same-size content changes via content_md5 ([#49](https://github.com/ardent-data/weevr-cli/issues/49)) ([3dff4e7](https://github.com/ardent-data/weevr-cli/commit/3dff4e736f46b870bd01053d7c1f2c1470a5cabe))
+
 ## [1.2.3](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.2.2...weevr-cli-v1.2.3) (2026-04-08)
 
 
