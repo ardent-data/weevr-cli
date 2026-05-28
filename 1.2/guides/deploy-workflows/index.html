@@ -1102,12 +1102,12 @@
 <h1 id="deploy-workflows">Deploy Workflows<a class="headerlink" href="#deploy-workflows" title="Permanent link">&para;</a></h1>
 <p>This guide covers the different deployment modes and how to integrate <code>weevr deploy</code> into CI/CD pipelines.</p>
 <h2 id="smart-sync-default">Smart Sync (Default)<a class="headerlink" href="#smart-sync-default" title="Permanent link">&para;</a></h2>
-<p>By default, <code>weevr deploy</code> compares local files against the remote state using MD5 checksums (falling back to file size when checksums are unavailable). Only changed files are uploaded:</p>
+<p>By default, <code>weevr deploy</code> compares local files against the remote state using MD5 content hashes. The CLI stores each file's MD5 in OneLake metadata at upload time and reads it back on subsequent deploys to detect changes accurately — even when the bulk listing API does not include content checksums. Only changed files are uploaded:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>weevr<span class="w"> </span>deploy<span class="w"> </span>--target<span class="w"> </span>dev
 </code></pre></div>
 <ul>
 <li><strong>New files</strong> — uploaded</li>
-<li><strong>Modified files</strong> — re-uploaded (detected via MD5 mismatch)</li>
+<li><strong>Modified files</strong> — re-uploaded (detected via MD5 hash comparison)</li>
 <li><strong>Unchanged files</strong> — skipped</li>
 <li><strong>Deleted local files</strong> — remain on remote (use <code>--clean</code> to remove them)</li>
 </ul>
