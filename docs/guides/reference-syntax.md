@@ -146,7 +146,11 @@ during validation. Because validation runs without a Fabric run context:
   `${fabric.workspace_name}` resolve to placeholder values, so the rest of
   the file is still checked.
 
-Use `--strict` to treat these warnings as errors.
+Loading stops at the first unresolved parameter or variable, so a file with
+one of these warnings is only partly validated: later problems in it, and
+the plan-time checks for its weave, are not reported until it resolves.
+Give parameters defaults where you can, and use `--strict` in CI to treat
+these warnings as errors.
 
 ## Orphan detection
 

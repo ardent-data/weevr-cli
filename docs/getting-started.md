@@ -119,6 +119,8 @@ weevr validate --strict
 !!! tip "Parameters and Fabric values"
     Validation runs without a Fabric run context. A declared parameter with no default, or a `${...}` variable with nothing to resolve it, is reported as a **warning** rather than an error (`--strict` makes it an error). `${fabric.workspace_id}`, `${fabric.lakehouse_id}`, and `${fabric.workspace_name}` resolve to placeholder values so the rest of the file is still checked.
 
+    A file stops loading at the first unresolved parameter or variable, so anything after that point (and the plan checks for its weave) is not checked until a value is available. Give parameters defaults where you can, and use `--strict` in CI so these files fail the build instead of passing with a warning.
+
 To see the order the engine will run a weave's threads in, use:
 
 ```bash
