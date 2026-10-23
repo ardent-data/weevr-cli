@@ -16,6 +16,7 @@ from weevr.config.validation import validate_incremental_config
 from weevr.model import Thread
 
 from weevr_cli.validation.engine import LOAD_FAILURES, display_path
+from weevr_cli.validation.orphans import normalize_ref
 from weevr_cli.validation.resolved import load_resolved
 from weevr_cli.validation.results import ValidationIssue
 
@@ -77,7 +78,7 @@ def check_resolved(path: Path, *, project_root: Path | None = None) -> list[Vali
         # Children loaded from a file carry their project-relative path as the
         # qualified key; inline definitions carry only their name.
         if qualified_key and Path(qualified_key).suffix in TYPED_EXTENSIONS:
-            candidate = root / qualified_key
+            candidate = root / normalize_ref(qualified_key)
             if candidate.is_file():
                 return display_path(candidate, project_root)
         return fallback

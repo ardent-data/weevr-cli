@@ -16,6 +16,7 @@ from weevr.engine.planner import ExecutionPlan
 
 from weevr_cli.listing.models import DependencyGraph
 from weevr_cli.validation.engine import LOAD_FAILURES
+from weevr_cli.validation.orphans import normalize_ref
 from weevr_cli.validation.resolved import load_resolved
 
 
@@ -50,10 +51,12 @@ def _plans_for(project_root: Path, rel: str) -> tuple[list[ExecutionPlan], dict[
         plans = loaded.execution_plan or []
     except LOAD_FAILURES as exc:
         raise DagError(f"{rel}: {exc}") from exc
+    # qualified_key is the ref as written, so normalize it before comparing
+    # against project-relative paths.
     weave_files = {
-        name: weave.qualified_key
+        name: normalize_ref(weave.qualified_key)
         for name, weave in loaded.resolved_weaves.items()
-        if (project_root / weave.qualified_key).is_file()
+        if (project_root / normalize_ref(weave.qualified_key)).is_file()
     }
     return plans, weave_files
 

@@ -6,19 +6,25 @@ still reported when other files in the project fail validation.
 
 from __future__ import annotations
 
+import posixpath
 from typing import Any
 
 from weevr_cli.validation.results import ValidationIssue
 
 
 def normalize_ref(ref_value: str) -> str:
-    """Normalize a ref to a project-root-relative POSIX path.
+    """Normalize a ref to a project-root-relative POSIX path for comparison.
 
-    Accepts the documented leading-'/' project-root marker and strips it.
-    Backslashes are converted to forward slashes so refs authored on
-    Windows still compare correctly against POSIX file paths.
+    ``./`` and ``a/../`` segments collapse, so ``./staging/a.thread`` and
+    ``staging/a.thread`` name the same file, as they do in weevr-core.
+
+    This is deliberately more lenient than weevr-core: a leading ``/`` is
+    stripped and backslashes become forward slashes, although weevr-core
+    rejects both. Validation already reports those refs as errors; matching
+    them here keeps their targets from also showing up as orphans.
     """
-    return ref_value.replace("\\", "/").lstrip("/")
+    normalized = posixpath.normpath(ref_value.replace("\\", "/")).lstrip("/")
+    return "" if normalized == "." else normalized
 
 
 def extract_refs(data: dict[str, Any], file_path: str) -> list[tuple[str, str, str]]:

@@ -88,7 +88,9 @@ def test_windows_separators_in_discovered_paths() -> None:
     assert _orphans(files, ["staging\\a.thread", "staging.weave", "daily.loom"]) == []
 
 
-def test_leading_slash_and_backslash_refs_match() -> None:
+def test_leading_slash_and_backslash_refs_still_count_as_references() -> None:
+    # weevr-core rejects these refs and validation reports them; orphan
+    # detection stays lenient so their targets aren't flagged as well.
     files = {
         "staging/a.thread": _THREAD,
         "staging/b.thread": _THREAD,
@@ -115,3 +117,16 @@ def test_extract_refs_reports_locations() -> None:
 
 def test_normalize_ref() -> None:
     assert normalize_ref("/staging\\a.thread") == "staging/a.thread"
+    assert normalize_ref("./staging/a.thread") == "staging/a.thread"
+    assert normalize_ref("staging/x/../a.thread") == "staging/a.thread"
+    assert normalize_ref("") == ""
+    assert normalize_ref("/") == ""
+
+
+def test_dot_slash_refs_count_as_references() -> None:
+    files = {
+        "a/x.thread": _THREAD,
+        "a/main.weave": _weave("./a/x.thread"),
+        "daily.loom": _loom({"ref": "./a/main.weave"}),
+    }
+    assert _orphans(files) == []

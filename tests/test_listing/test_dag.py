@@ -144,3 +144,12 @@ def test_unloadable_loom_raises_dag_error(tmp_path: Path) -> None:
     (project / "num.loom").write_text('config_version: "1.0"\nweaves:\n  - ref: 7\n')
     with pytest.raises(DagError, match="num.loom"):
         build_weave_plans(project, build_dependency_graph(project))
+
+
+def test_dot_slash_loom_ref_does_not_duplicate_weave(tmp_path: Path) -> None:
+    project = _make_project(tmp_path)
+    _write(
+        project / "daily.loom", {"config_version": "1.0", "weaves": [{"ref": "./staging.weave"}]}
+    )
+    plans = build_weave_plans(project, build_dependency_graph(project))
+    assert [(p.file, p.weave) for p in plans] == [("staging.weave", "staging")]
