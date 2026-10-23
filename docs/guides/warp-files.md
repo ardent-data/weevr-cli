@@ -134,9 +134,9 @@ column list you can fill in.
 All the project-tree commands recognize warps as a first-class file type
 alongside threads, weaves, and looms:
 
-- **`weevr validate`** — warps are validated against the bundled warp schema.
-  Cross-field checks verify column name uniqueness and that any `keys.surrogate`
-  or `keys.business` values reference declared columns.
+- **`weevr validate`** — warps are loaded with weevr-core's warp model, which
+  checks the structure along with column name uniqueness and that any
+  `keys.surrogate` or `keys.business` values reference declared columns.
 - **`weevr list`** — warps appear in the project graph. They are never flagged
   as orphans (they are standalone, like looms).
 - **`weevr deploy`** and **`weevr status`** — warps sync to the lakehouse

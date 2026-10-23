@@ -15,6 +15,8 @@ from weevr_cli.plugins.registry import PluginRecord, get_registry
 
 ENTRY_POINT_GROUP = "weevr.plugins"
 
+# "schema" stays reserved after the command's removal in 2.0 so a plugin
+# cannot quietly take over the old name. Drop it in 3.0.
 RESERVED_NAMES: frozenset[str] = frozenset(
     {"init", "new", "validate", "deploy", "status", "list", "schema", "plugins"}
 )

@@ -15,11 +15,10 @@ The weevr engine runs inside Fabric notebooks; the CLI runs on your workstation 
 
 - **`weevr init`** — scaffold a new project
 - **`weevr new`** — generate thread, weave, loom, and warp files from templates
-- **`weevr validate`** — check YAML schema conformance and reference integrity
+- **`weevr validate`** — check files with the weevr engine's own loader and planner
 - **`weevr deploy`** — sync files to a Fabric Lakehouse via the OneLake API
 - **`weevr status`** — diff local files against deployed state
-- **`weevr list`** — view project structure and dependencies
-- **`weevr schema`** — manage validation schemas
+- **`weevr list`** — view project structure, dependencies, and execution plans
 - **`weevr plugins`** — manage CLI plugins
 
 ## Installation
@@ -50,11 +49,11 @@ See the [Getting Started guide](https://ardent-data.github.io/weevr-cli/getting-
 
 ## Configuration
 
-The CLI reads `.weevr/cli.yaml` for deploy targets and schema settings. See the [Configuration Reference](https://ardent-data.github.io/weevr-cli/configuration/) for details.
+The CLI reads `.weevr/cli.yaml` for deploy targets. See the [Configuration Reference](https://ardent-data.github.io/weevr-cli/configuration/) for details.
 
 ## Requirements
 
-- Python 3.11+
+- Python 3.11 (matches Fabric Runtime 1.3)
 - Azure CLI (`az login`) or equivalent credential for deploy/status commands
 
 ## Development

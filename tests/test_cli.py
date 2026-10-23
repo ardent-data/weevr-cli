@@ -1,4 +1,5 @@
 import json
+from importlib.metadata import version
 from pathlib import Path
 
 import pytest
@@ -14,7 +15,9 @@ runner = CliRunner()
 def test_version_flag() -> None:
     result = runner.invoke(app, ["--version"])
     assert result.exit_code == 0
-    assert __version__ in result.output
+    assert result.output.strip() == (
+        f"weevr-cli {__version__} (weevr-core {version('weevr-core')})"
+    )
 
 
 def test_version_json() -> None:
@@ -22,6 +25,7 @@ def test_version_json() -> None:
     assert result.exit_code == 0
     data = json.loads(result.output)
     assert data["version"] == __version__
+    assert data["weevr_core_version"] == version("weevr-core")
 
 
 def test_help() -> None:
@@ -106,21 +110,18 @@ def test_validate_end_to_end(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) ->
     thread = project / "staging" / "stg.thread"
     thread.parent.mkdir()
     thread.write_text(
-        'config_version: "1.0"\nsources:\n  raw:\n    type: csv\ntarget:\n  path: Tables/raw\n'
+        'config_version: "1.0"\nsources:\n  raw:\n    type: csv\n    path: Files/raw.csv\n'
+        "target:\n  path: Tables/raw\n"
     )
     monkeypatch.chdir(project)
     result = runner.invoke(app, ["validate"])
     assert result.exit_code == 0
 
 
-def test_schema_version_end_to_end(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    project = tmp_path / "test.weevr"
-    project.mkdir()
-    (project / ".weevr").mkdir()
-    monkeypatch.chdir(project)
+def test_schema_command_is_removed() -> None:
     result = runner.invoke(app, ["schema", "version"])
-    assert result.exit_code == 0
-    assert "bundled" in result.output.lower()
+    assert result.exit_code != 0
+    assert "No such command" in result.output
 
 
 def test_plugins_subcommand_exists() -> None:

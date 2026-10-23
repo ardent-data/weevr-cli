@@ -85,7 +85,10 @@ The tiered clean behavior protects non-weevr files by default. Use `--clean --al
 
 ## Validation Control
 
-By default, `weevr deploy` runs validation before deploying. You can adjust this:
+By default, `weevr deploy` runs `weevr validate` before deploying. That
+includes the engine's plan-time checks, so a weave with a dependency cycle or
+two unordered writers of the same target blocks the deploy instead of failing
+in Fabric. You can adjust this:
 
 ```bash
 # Skip pre-deploy validation entirely

@@ -16,24 +16,24 @@ config_version: "1.0"
 sources:
   {name}:
     type: csv
-    # path: data/{name}.csv
+    path: data/{name}.csv
     options:
       header: "true"
       inferSchema: "true"
 
-steps:
-  # - select:
-  #     columns:
-  #       - id
-  #       - name
-  # - filter:
-  #     expr: "status = 'active'"
-  # - cast:
-  #     columns:
-  #       id: "int"
+# steps:
+#   - select:
+#       columns:
+#         - id
+#         - name
+#   - filter:
+#       expr: "status = 'active'"
+#   - cast:
+#       columns:
+#         id: "int"
 
 target:
-  # path: Tables/{name}
+  path: Tables/{name}
 
 write:
   mode: overwrite
@@ -46,8 +46,9 @@ _WEAVE_TEMPLATE = """\
 
 config_version: "1.0"
 
-threads:
-  # - ref: staging/stg_example.thread
+# threads:
+#   - ref: staging/stg_example.thread
+threads: []
 """
 
 _LOOM_TEMPLATE = """\
@@ -57,8 +58,9 @@ _LOOM_TEMPLATE = """\
 
 config_version: "1.0"
 
-weaves:
-  # - ref: staging.weave
+# weaves:
+#   - ref: staging.weave
+weaves: []
 """
 
 _WARP_TEMPLATE = """\
@@ -171,10 +173,6 @@ _CLI_YAML_TEMPLATE = """\
 #     path_prefix: "weevr"
 #
 # default_target: dev
-
-# Schema settings
-schema:
-  version: "1.16"
 """
 
 
@@ -237,7 +235,6 @@ def render_cli_yaml(
     }
     if default_target:
         config["default_target"] = default_target
-    config["schema"] = {"version": "1.16"}
 
     header = "# weevr CLI configuration\n# See: https://github.com/ardent-data/weevr-cli\n\n"
     return header + yaml.dump(config, default_flow_style=False, sort_keys=False)

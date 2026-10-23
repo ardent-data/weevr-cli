@@ -8,6 +8,7 @@ from typing import Any
 import pathspec
 import yaml
 from rich.table import Table
+from weevr.config.parser import TYPED_EXTENSIONS
 
 from weevr_cli.config import WEEVR_PROJECT_EXT, find_project_root
 from weevr_cli.ignore import (
@@ -17,11 +18,10 @@ from weevr_cli.ignore import (
 )
 from weevr_cli.output import print_error, print_json
 from weevr_cli.state import AppState
-from weevr_cli.validation.refs import check_refs, find_orphans
+from weevr_cli.validation.engine import dedupe_issues, silence_weevr_logging, validate_file
+from weevr_cli.validation.orphans import find_orphans
 from weevr_cli.validation.results import ValidationIssue, ValidationResult
-from weevr_cli.validation.schema import validate_file
-
-_WEEVR_EXTENSIONS = (".thread", ".weave", ".loom", ".warp")
+from weevr_cli.validation.semantic import check_resolved
 
 
 def _find_weevr_files(
@@ -39,7 +39,7 @@ def _find_weevr_files(
     """
     directory = directory.resolve()
     files: list[Path] = []
-    for ext in _WEEVR_EXTENSIONS:
+    for ext in TYPED_EXTENSIONS:
         files.extend(directory.rglob(f"*{ext}"))
 
     if ignore_spec is not None and ignore_root is not None:
@@ -79,7 +79,7 @@ def _parse_file(path: Path) -> dict[str, Any] | None:
         text = path.read_text(encoding="utf-8")
         data = yaml.safe_load(text)
         return data if isinstance(data, dict) else None
-    except (yaml.YAMLError, OSError):
+    except (yaml.YAMLError, OSError, UnicodeDecodeError):
         return None
 
 
@@ -134,6 +134,7 @@ def run_validate(
     Raises:
         SystemExit: With code 1 on validation errors or no files found.
     """
+    silence_weevr_logging()
     project_root = _determine_project_root()
     if project_root is not None:
         project_root = project_root.resolve()
@@ -163,7 +164,7 @@ def run_validate(
 
     # Determine what to validate
     if target_path is not None and target_path.is_file():
-        # Single file: schema + immediate refs
+        # Single file. A weave or loom also validates the children it references.
         files_to_check = [target_path]
     elif target_path is not None and target_path.is_dir():
         # Directory: recursive scan. Explicit path — ignore filter bypassed
@@ -188,14 +189,16 @@ def run_validate(
         )
         raise SystemExit(1)
 
-    # Schema validation for each file
     for file_path in files_to_check:
-        issues = validate_file(file_path, project_root=project_root)
-        all_issues.extend(issues)
+        file_issues = validate_file(file_path, project_root=project_root)
+        all_issues.extend(file_issues)
+        # Plan-time checks need a clean load, so they run only for weaves and
+        # looms that passed.
+        if not file_issues and file_path.suffix in (".weave", ".loom"):
+            all_issues.extend(check_resolved(file_path, project_root=project_root))
 
-    # Reference checking
-    if project_root is not None:
-        # Parse all files for ref extraction (skip files outside project root)
+    # Orphan detection only in full-project mode (no target arg)
+    if project_root is not None and target_path is None:
         parsed: dict[str, Any] = {}
         for file_path in files_to_check:
             try:
@@ -207,22 +210,10 @@ def run_validate(
             data = _parse_file(file_path)
             if data is not None:
                 parsed[rel] = data
-
-        # Check refs
-        ref_issues = check_refs(parsed, project_root)
-        all_issues.extend(ref_issues)
-
-        # Orphan detection only in full-project mode (no target arg)
-        if target_path is None:
-            all_paths = list(parsed.keys())
-            orphan_issues = find_orphans(parsed, all_paths)
-            all_issues.extend(orphan_issues)
-    elif target_path is not None and target_path.is_file():
-        # Single file without project root — warn about limited checking
-        state.console.print("[yellow]No project root found — ref checking skipped[/yellow]")
+        all_issues.extend(find_orphans(parsed, list(parsed.keys())))
 
     result = ValidationResult(
-        issues=all_issues,
+        issues=dedupe_issues(all_issues),
         files_checked=len(files_to_check),
     )
 

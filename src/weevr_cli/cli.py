@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as package_version
+
 import typer
 
 from weevr_cli import __version__
 from weevr_cli.commands.plugins_cmd import plugins_app
-from weevr_cli.commands.schema_cmd import schema_app
 from weevr_cli.config import ConfigError, find_project_root, load_config
 from weevr_cli.output import create_console, print_error, print_json
 from weevr_cli.plugins.discovery import discover_and_mount_plugins
@@ -23,11 +25,15 @@ def _version_callback(ctx: typer.Context, value: bool) -> None:
     """Print version and exit."""
     if not value:
         return
+    try:
+        core_version = package_version("weevr-core")
+    except PackageNotFoundError:
+        core_version = "not installed"
     json_mode = ctx.params.get("json", False)
     if json_mode:
-        print_json({"version": __version__})
+        print_json({"version": __version__, "weevr_core_version": core_version})
     else:
-        typer.echo(f"weevr {__version__}")
+        typer.echo(f"weevr-cli {__version__} (weevr-core {core_version})")
     raise typer.Exit()
 
 
@@ -241,7 +247,9 @@ def status(
 @app.command(name="list")
 def list_cmd(
     ctx: typer.Context,
-    format: str = typer.Option("tree", "--format", "-f", help="Output format: tree or table."),
+    format: str = typer.Option(
+        "tree", "--format", "-f", help="Output format: tree, table, or dag."
+    ),
 ) -> None:
     """Display project structure and dependency relationships."""
     from weevr_cli.commands.list_cmd import run_list
@@ -253,6 +261,5 @@ def list_cmd(
         raise typer.Exit(code=int(exc.code) if exc.code is not None else 1) from exc
 
 
-app.add_typer(schema_app, name="schema")
 app.add_typer(plugins_app, name="plugins")
 discover_and_mount_plugins(app)

@@ -13,7 +13,11 @@ from weevr_cli.cli import app
 runner = CliRunner()
 
 # Minimal valid file content
-_THREAD = 'config_version: "1.0"\nsources:\n  raw:\n    type: csv\ntarget:\n  path: Tables/raw\n'
+_THREAD = (
+    'config_version: "1.0"\n'
+    "sources:\n  raw:\n    type: csv\n    path: Files/raw.csv\n"
+    "target:\n  path: Tables/raw\n"
+)
 _WEAVE = 'config_version: "1.0"\nthreads:\n  - ref: staging/stg_customers.thread\n'
 _LOOM = 'config_version: "1.0"\nweaves:\n  - ref: staging.weave\n'
 
@@ -181,32 +185,6 @@ def test_validate_json_output(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -
     assert "warnings" in data
     assert "files_checked" in data
     assert "issues" in data
-
-
-def test_validate_uses_local_schemas(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Local schema in .weevr/schemas/ overrides bundled (EC-007)."""
-    # Create a local schema that rejects everything (empty required list + no additionalProperties)
-    restrictive_schema = json.dumps(
-        {
-            "type": "object",
-            "properties": {"config_version": {"type": "string"}},
-            "required": ["config_version", "nonexistent_field"],
-            "additionalProperties": False,
-        }
-    )
-    project = _make_project(
-        tmp_path,
-        {
-            "staging/stg.thread": _THREAD,
-        },
-    )
-    schemas_dir = project / ".weevr" / "schemas"
-    schemas_dir.mkdir()
-    (schemas_dir / "thread.json").write_text(restrictive_schema)
-    monkeypatch.chdir(project)
-    # Should fail because local schema requires nonexistent_field
-    result = runner.invoke(app, ["validate"])
-    assert result.exit_code == 1
 
 
 def test_validate_path_traversal_rejected(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -418,3 +396,238 @@ def test_validate_json_mode_suppresses_deprecation_warning(
     # And the JSON payload itself must parse cleanly.
     payload = json.loads(result.output)
     assert isinstance(payload, dict)
+
+
+def _json_validate(args: list[str]) -> dict:
+    result = runner.invoke(app, ["--json", "validate", *args])
+    return {"exit_code": result.exit_code, **json.loads(result.output)}
+
+
+def test_validate_schema_error_has_location(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A structural error comes back as a Pydantic issue with its location."""
+    project = _make_project(
+        tmp_path, {"bad.thread": 'config_version: "1.0"\nsources:\n  raw: {type: csv}\n'}
+    )
+    monkeypatch.chdir(project)
+    data = _json_validate(["bad.thread"])
+    assert data["exit_code"] == 1
+    assert data["issues"] == [
+        {
+            "severity": "error",
+            "file": "bad.thread",
+            "message": "Field required",
+            "location": "target",
+        }
+    ]
+
+
+_PARAM_THREAD = (
+    'config_version: "1.0"\n'
+    "params: {run_date: {type: string}}\n"
+    "sources:\n"
+    '  raw: {type: csv, path: "Files/${param.run_date}.csv"}\n'
+    "target: {path: Tables/raw}\n"
+)
+
+
+def test_validate_missing_param_is_warning(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    project = _make_project(tmp_path, {"p.thread": _PARAM_THREAD})
+    monkeypatch.chdir(project)
+    data = _json_validate(["p.thread"])
+    assert data["exit_code"] == 0
+    assert data["warnings"] == 1
+    assert data["issues"][0]["location"] == "run_date"
+
+
+def test_validate_missing_param_strict_is_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    project = _make_project(tmp_path, {"p.thread": _PARAM_THREAD})
+    monkeypatch.chdir(project)
+    data = _json_validate(["--strict", "p.thread"])
+    assert data["exit_code"] == 1
+    assert data["errors"] == 1
+
+
+def test_validate_broken_ref_reported_on_weave(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    weave = 'config_version: "1.0"\nthreads:\n  - ref: staging/missing.thread\n'
+    project = _make_project(tmp_path, {"staging.weave": weave})
+    monkeypatch.chdir(project)
+    data = _json_validate([])
+    errors = [i for i in data["issues"] if i["severity"] == "error"]
+    assert len(errors) == 1
+    assert errors[0]["file"] == "staging.weave"
+    assert "staging/missing.thread" in errors[0]["message"]
+
+
+def test_validate_broken_child_reported_once_on_thread(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A broken thread is validated directly and via its weave, but reported once."""
+    project = _make_project(
+        tmp_path,
+        {
+            "staging/stg_customers.thread": 'config_version: "1.0"\nsources: {}\n',
+            "staging.weave": _WEAVE,
+            "daily.loom": _LOOM,
+        },
+    )
+    monkeypatch.chdir(project)
+    data = _json_validate([])
+    errors = [i for i in data["issues"] if i["severity"] == "error"]
+    assert len(errors) == 1
+    assert errors[0]["file"] == "staging/stg_customers.thread"
+
+
+def test_validate_targeted_weave_reports_child_errors(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    project = _make_project(
+        tmp_path,
+        {
+            "staging/stg_customers.thread": 'config_version: "1.0"\nsources: {}\n',
+            "staging.weave": _WEAVE,
+        },
+    )
+    monkeypatch.chdir(project)
+    data = _json_validate(["staging.weave"])
+    assert data["exit_code"] == 1
+    assert data["files_checked"] == 1
+    assert {i["file"] for i in data["issues"]} == {"staging/stg_customers.thread"}
+
+
+def test_validate_json_contract(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    project = _make_project(tmp_path, {"p.thread": _PARAM_THREAD})
+    monkeypatch.chdir(project)
+    data = _json_validate(["p.thread"])
+    assert set(data) == {"exit_code", "valid", "errors", "warnings", "files_checked", "issues"}
+    assert set(data["issues"][0]) == {"severity", "file", "message", "location"}
+
+
+def test_validate_reports_orphans_when_other_files_fail(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    project = _make_project(
+        tmp_path,
+        {
+            "staging/stg_customers.thread": _THREAD,
+            "staging/unused.thread": _THREAD,
+            "staging/broken.thread": 'config_version: "1.0"\nsources: {}\n',
+            "staging.weave": 'config_version: "1.0"\nthreads:\n'
+            "  - ref: staging/stg_customers.thread\n  - ref: staging/broken.thread\n",
+            "daily.loom": 'config_version: "1.0"\nweaves:\n  - staging\n',
+        },
+    )
+    monkeypatch.chdir(project)
+    data = _json_validate([])
+    assert data["exit_code"] == 1
+    warnings = [i["file"] for i in data["issues"] if i["severity"] == "warning"]
+    assert warnings == ["staging/unused.thread"]
+
+
+def _delta_thread(source: str, target: str, extra: str = "") -> str:
+    return (
+        'config_version: "1.0"\n'
+        f"sources: {{main: {{type: delta, alias: {source}}}}}\n"
+        f"target: {{alias: {target}}}\n{extra}"
+    )
+
+
+_SAME_TARGET = {
+    "staging/a.thread": _delta_thread("silver.one", "silver.same"),
+    "staging/b.thread": _delta_thread("silver.two", "silver.same"),
+    "staging.weave": 'config_version: "1.0"\nthreads:\n'
+    "  - ref: staging/a.thread\n  - ref: staging/b.thread\n",
+    "daily.loom": _LOOM,
+}
+
+
+def test_validate_reports_plan_errors_once(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """The weave is checked directly and through the loom; the error appears once."""
+    project = _make_project(tmp_path, _SAME_TARGET)
+    monkeypatch.chdir(project)
+    data = _json_validate([])
+    assert data["exit_code"] == 1
+    assert [(i["severity"], i["file"]) for i in data["issues"]] == [("error", "staging.weave")]
+    assert "silver.same" in data["issues"][0]["message"]
+
+
+def test_validate_targeted_weave_runs_plan_checks(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    project = _make_project(tmp_path, _SAME_TARGET)
+    monkeypatch.chdir(project)
+    data = _json_validate(["staging.weave"])
+    assert data["exit_code"] == 1
+    assert data["errors"] == 1
+
+
+def test_validate_skips_plan_checks_when_load_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    files = dict(_SAME_TARGET)
+    files["staging/b.thread"] = 'config_version: "1.0"\nsources: {}\n'
+    project = _make_project(tmp_path, files)
+    monkeypatch.chdir(project)
+    data = _json_validate([])
+    assert {i["file"] for i in data["issues"]} == {"staging/b.thread"}
+
+
+def test_validate_load_warnings_become_issues_not_log_lines(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    project = _make_project(
+        tmp_path,
+        {
+            "staging/stg_customers.thread": _THREAD + "execution: {trace: true}\n",
+            "staging.weave": _WEAVE,
+            "daily.loom": _LOOM,
+        },
+    )
+    monkeypatch.chdir(project)
+    result = runner.invoke(app, ["--json", "validate"])
+    data = json.loads(result.output)
+    assert result.exit_code == 0
+    assert data["warnings"] >= 1
+    assert all(not i["message"].startswith("WARN") for i in data["issues"])
+
+
+def test_validate_continues_past_unloadable_files(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    project = _make_project(
+        tmp_path,
+        {
+            "staging/stg_customers.thread": _THREAD,
+            "staging.weave": _WEAVE,
+            "daily.loom": _LOOM,
+            "num.loom": 'config_version: "1.0"\nweaves:\n  - ref: 7\n',
+        },
+    )
+    (project / "bin.thread").write_bytes(b"\xff\xfe\x00bad")
+    monkeypatch.chdir(project)
+    data = _json_validate([])
+    assert data["exit_code"] == 1
+    assert data["files_checked"] == 5
+    errors = sorted(i["file"] for i in data["issues"] if i["severity"] == "error")
+    assert errors == ["bin.thread", "num.loom"]
+
+
+def test_validate_silences_weevr_logging(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Load warnings are reported as issues, so weevr's logger must not print them.
+
+    pytest captures log records itself, so assert on the handler rather than
+    on stderr.
+    """
+    import logging
+
+    logger = logging.getLogger("weevr")
+    monkeypatch.setattr(logger, "handlers", [])
+    project = _make_project(tmp_path, {"staging/stg_customers.thread": _THREAD})
+    monkeypatch.chdir(project)
+    runner.invoke(app, ["validate"])
+    assert any(isinstance(h, logging.NullHandler) for h in logger.handlers)

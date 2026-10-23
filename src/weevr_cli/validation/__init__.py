@@ -1,1 +1,1 @@
-"""Validation engine for weevr project files."""
+"""Validation of weevr project files, backed by weevr-core."""

@@ -1,27 +1,28 @@
 # Reference Syntax
 
-Weaves and looms use `ref:` entries to point at other weevr files. This page
-covers how the CLI resolves those references, what forms are valid, and what
-error messages mean when validation fails.
+Weaves and looms point at other weevr files. This page covers how those
+references resolve, what forms are valid, and what `weevr validate` reports
+when one is wrong. The CLI validates with weevr-core, the same loader the
+engine uses in Fabric, so a reference that passes here resolves the same way
+at run time.
 
 ## What is a ref?
 
 A ref is a pointer from one weevr file to another:
 
 - A **weave** references one or more **threads** via `threads[].ref`.
-- A **loom** references one or more **weaves** via `weaves[].ref`.
+- A **loom** references one or more **weaves** via `weaves[].ref`, or by name.
 
 Refs always resolve **relative to the project root** — the directory with the
 `.weevr` suffix (e.g. `my-project.weevr/`). They never reach outside the
-project, and they cannot be absolute filesystem paths.
+project.
 
 ## Valid forms
 
-Two syntactic forms are accepted and resolve identically.
+### Path refs
 
-### Bare form (recommended)
-
-The path to the target file, written project-root-relative:
+Write the path to the target file relative to the project root, with forward
+slashes and the file's typed extension:
 
 ```yaml
 # staging.weave
@@ -31,46 +32,44 @@ threads:
   - ref: staging/stg_orders.thread
 ```
 
-### Leading-slash form
+```yaml
+# daily.loom
+config_version: "1.0"
+weaves:
+  - ref: staging.weave
+  - ref: curated/customer_dim.weave
+```
 
-A leading `/` marks the path as project-root-relative explicitly:
+Do not start a ref with `/` or use backslashes. A leading `/` is treated as an
+absolute path, which resolves outside the project and is rejected; a
+backslash is taken literally, so the file is not found.
+
+### Loom weaves by name
+
+A loom can also name a weave instead of giving its path. The name resolves to
+`{name}.weave` at the project root:
 
 ```yaml
 # daily.loom
 config_version: "1.0"
 weaves:
-  - ref: /staging.weave
-  - ref: /curated/customer_dim.weave
+  - staging            # -> staging.weave
+  - name: curated      # -> curated.weave
 ```
 
-The two forms are equivalent. Use whichever is clearer in context — the
-leading slash can help readers scan a long loom and immediately see that
-every ref is project-rooted.
-
-## Cross-platform authoring
-
-Refs are normalized before resolution:
-
-- **Backslashes are converted to forward slashes.** A YAML file edited on
-  Windows that ends up with `threads\raw.thread` resolves the same as
-  `threads/raw.thread`. You should still prefer forward slashes in source
-  files — they're the YAML norm and the only form that survives a round-trip
-  through unrelated tooling — but the CLI will not reject a ref simply
-  because an editor inserted backslashes.
-- **Resolution is always POSIX-style** internally, regardless of host OS.
-  `weevr validate` and `weevr list` both produce identical results on
-  Windows, macOS, and Linux for the same project.
+This applies to looms only. In a weave, a thread entry with only a `name` is
+an inline thread definition, not a reference to `{name}.thread`.
 
 ## Error messages
 
-When `weevr validate` rejects a ref, the message comes from one of three
-cases:
+When a ref is wrong, `weevr validate` reports it on the weave or loom that
+contains it. The messages come from weevr-core:
 
-### `Broken reference: <ref> does not exist`
+### `Referenced file not found: <ref>`
 
-The ref is syntactically valid but the target file cannot be found on disk.
-Usually this means a typo, a file that was renamed or moved without updating
-its referrers, or a missing file extension.
+The ref is well formed but the file does not exist. Usually this is a typo, a
+file that was renamed or moved without updating its referrers, or a backslash
+in the path.
 
 ```yaml
 threads:
@@ -79,32 +78,79 @@ threads:
 
 Fix: correct the path, or create the missing file.
 
-### `Path traversal not allowed: <ref> must be a relative path within the project`
+### `Reference '<ref>' resolves outside project root`
 
-The ref contains `..` segments that would escape the project root. Refs are
-confined to the project — if you need to share data between projects, publish
-it through the lakehouse rather than reaching across filesystems.
+The ref would escape the project, through `..` segments or a leading `/`.
+Refs are confined to the project — if you need to share data between
+projects, publish it through the lakehouse rather than reaching across
+filesystems.
 
 ```yaml
 threads:
   - ref: ../other-project.weevr/shared.thread  # rejected
+  - ref: /staging/stg_customers.thread         # rejected — drop the leading /
 ```
 
-Fix: keep the target inside the project, or copy it in if it's truly shared.
+Fix: write the path relative to the project root, or copy the file in if
+it's truly shared.
 
-### `Empty reference: <ref> does not name a file`
+### `Unsupported extension '<ext>'. Expected .thread, .weave, or .loom`
 
-The ref is present but contains no meaningful path — commonly `/`, `""`, or
-a string that normalizes to empty after stripping separators. This usually
-indicates a template that was scaffolded but never filled in.
+The ref does not end in a typed extension. This includes empty refs such as
+`""` or `"/"`, which usually come from a template that was never filled in.
 
 ```yaml
 threads:
-  - ref: ""      # rejected
-  - ref: "/"     # rejected
+  - ref: staging/stg_customers.yaml  # rejected — use .thread
+  - ref: ""                          # rejected
 ```
 
-Fix: supply the actual target path, or remove the incomplete entry.
+Fix: point at the `.thread`, `.weave`, or `.loom` file, or remove the
+incomplete entry.
+
+### Errors inside a referenced file
+
+Loading a weave or loom also loads every file it references. A problem inside
+a referenced thread is reported against that thread's file, once, even when
+several weaves reference it.
+
+## Checks across threads
+
+After a weave or loom loads cleanly, `weevr validate` runs the checks the
+engine otherwise only runs when it plans the weave:
+
+- **Dependency cycles** — threads that depend on each other in a loop, whether
+  through declared `dependencies` or because one reads another's target.
+- **Unknown dependencies** — a `dependencies` entry naming a thread that is
+  not in the weave.
+- **Unordered writers** — two threads writing the same target with no
+  dependency between them and no mutually exclusive conditions.
+- **Incremental loads** — load and write modes that the engine rejects at run
+  time, such as `incremental_watermark` with `write.mode: overwrite`.
+- **Ignored settings** — thread-level `execution:` blocks, which the engine
+  does not apply (warning).
+
+These are reported on the weave file, or on the thread file for per-thread
+problems. `weevr list --format dag` shows the plan the engine builds when a
+weave passes.
+
+## Variables and parameters
+
+References to `${param.x}`, `${env.X}`, and other variables are resolved
+during validation. Because validation runs without a Fabric run context:
+
+- A declared parameter with no default and no runtime value is a **warning**.
+- A `${...}` variable with nothing to resolve it and no `:-default` is a
+  **warning**.
+- `${fabric.workspace_id}`, `${fabric.lakehouse_id}`, and
+  `${fabric.workspace_name}` resolve to placeholder values, so the rest of
+  the file is still checked.
+
+Loading stops at the first unresolved parameter or variable, so a file with
+one of these warnings is only partly validated: later problems in it, and
+the plan-time checks for its weave, are not reported until it resolves.
+Give parameters defaults where you can, and use `--strict` in CI to treat
+these warnings as errors.
 
 ## Orphan detection
 
@@ -114,10 +160,12 @@ Orphan detection is a warning, not an error: it helps you spot dead files
 without blocking validation.
 
 - **Threads** are expected to be referenced by at least one weave.
-- **Weaves** are expected to be referenced by at least one loom.
+- **Weaves** are expected to be referenced by at least one loom, by path or
+  by name.
 - **Looms** are top-level entry points and are never considered orphans.
 - **Warps** are standalone schema contracts and are never considered orphans.
 
+Orphans are still reported when other files in the project fail validation.
 If you intentionally keep scratch or draft files in the project, add them to
 a project-wide ignore file so they don't appear as orphans. See
 [Configuration › Ignore files](../configuration/index.md#ignore-files).
@@ -135,5 +183,5 @@ weevr validate
 weevr validate scratch/draft.thread
 ```
 
-This applies only to the ignore filter. Ref resolution and path-traversal
-rules still apply in both cases.
+This applies only to the ignore filter. Reference rules apply in both cases,
+and a targeted weave or loom still loads and checks the files it references.

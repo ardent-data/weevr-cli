@@ -1,8 +1,10 @@
+from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
 import yaml
 
+from weevr_cli import config as config_module
 from weevr_cli.config import (
     ConfigError,
     TargetConfig,
@@ -45,7 +47,6 @@ def test_parse_valid_config(tmp_path: Path) -> None:
     )
     assert config.targets["prod"].path_prefix is None
     assert config.default_target == "dev"
-    assert config.schema_version == "1.16"
 
 
 def test_parse_minimal_config(tmp_path: Path) -> None:
@@ -68,7 +69,6 @@ def test_parse_minimal_config(tmp_path: Path) -> None:
     config = load_config(config_file)
 
     assert config.default_target is None
-    assert config.schema_version is None
     assert config.targets["dev"].path_prefix is None
 
 
@@ -186,3 +186,34 @@ def test_find_project_root_not_found(tmp_path: Path) -> None:
 
     root = find_project_root(empty)
     assert root is None
+
+
+_TARGETS = {"dev": {"workspace_id": "ws-111", "lakehouse_id": "lh-222"}}
+
+
+@pytest.fixture()
+def fresh_deprecation() -> Iterator[None]:
+    config_module._warn_schema_deprecated.cache_clear()
+    yield
+    config_module._warn_schema_deprecated.cache_clear()
+
+
+@pytest.mark.usefixtures("fresh_deprecation")
+def test_schema_section_warns_once(capsys: pytest.CaptureFixture[str]) -> None:
+    data = {"targets": _TARGETS, "schema": {"version": "1.16"}}
+    WeevrConfig.from_dict(data)
+    WeevrConfig.from_dict(data)
+    err = capsys.readouterr().err
+    assert err.count("schema.version in cli.yaml is deprecated") == 1
+    assert "weevr-core" in err
+
+
+@pytest.mark.usefixtures("fresh_deprecation")
+def test_no_schema_section_no_warning(capsys: pytest.CaptureFixture[str]) -> None:
+    WeevrConfig.from_dict({"targets": _TARGETS})
+    assert capsys.readouterr().err == ""
+
+
+def test_schema_version_is_not_a_config_field() -> None:
+    config = WeevrConfig.from_dict({"targets": _TARGETS})
+    assert not hasattr(config, "schema_version")

@@ -4,7 +4,7 @@ This guide walks you through installing the CLI, creating a project, and deployi
 
 ## Prerequisites
 
-- **Python 3.11+**
+- **Python 3.11** — the same version as Fabric Runtime 1.3. Python 3.12 and later are not supported.
 - **Azure CLI** (`az`) — required for deploy and status commands
 
 ## Installation
@@ -32,6 +32,10 @@ Verify the installation:
 ```bash
 weevr --version
 ```
+
+This prints the CLI version and the version of `weevr-core`, the weevr package
+that provides validation. It is installed automatically with the CLI, and
+`weevr validate` accepts exactly what that version of the engine accepts.
 
 ## Create a Project
 
@@ -93,11 +97,18 @@ Each command generates a file with the standard schema fields pre-filled. Files 
 
 ## Validate
 
-Check schema conformance and cross-file reference integrity:
+Check every file the way the weevr engine will load it:
 
 ```bash
 weevr validate
 ```
+
+Validation covers file structure, parameters and variables, references
+between files, inheritance from looms and weaves, and the rules the engine
+checks when it plans a weave, such as dependency cycles and two threads
+writing the same target without an explicit order. Problems are reported
+against the file that contains them, even when they are found while loading
+a weave or loom.
 
 Use `--strict` to treat warnings as errors:
 
@@ -105,8 +116,16 @@ Use `--strict` to treat warnings as errors:
 weevr validate --strict
 ```
 
-!!! tip "Parameterized templates"
-    Files that use variable references like `${param.pk_columns}` or `${env.DB_NAME}` pass validation even when the referenced field expects a non-string type (e.g. an array). The validator skips static type checks on bare `${...}` values since they are resolved at runtime by the weevr engine.
+!!! tip "Parameters and Fabric values"
+    Validation runs without a Fabric run context. A declared parameter with no default, or a `${...}` variable with nothing to resolve it, is reported as a **warning** rather than an error (`--strict` makes it an error). `${fabric.workspace_id}`, `${fabric.lakehouse_id}`, and `${fabric.workspace_name}` resolve to placeholder values so the rest of the file is still checked.
+
+    A file stops loading at the first unresolved parameter or variable, so anything after that point (and the plan checks for its weave) is not checked until a value is available. Give parameters defaults where you can, and use `--strict` in CI so these files fail the build instead of passing with a warning.
+
+To see the order the engine will run a weave's threads in, use:
+
+```bash
+weevr list --format dag
+```
 
 ## Exclude Files From the Project
 

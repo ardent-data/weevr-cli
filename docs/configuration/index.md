@@ -4,7 +4,7 @@ The weevr CLI is configured through two files in the `.weevr/` directory at your
 
 ## `.weevr/cli.yaml`
 
-This is the main configuration file, created by `weevr init`. It defines deploy targets and schema settings.
+This is the main configuration file, created by `weevr init`. It defines deploy targets.
 
 ### Targets
 
@@ -63,14 +63,18 @@ default_target: dev
 
 When no `--target` flag is provided and no `default_target` is set, commands that require a target exit with an error. You must specify `--target` or set `default_target` in `cli.yaml`.
 
-### Schema Settings
+### Schema Settings (deprecated)
 
-Pin the schema version used for validation:
+`schema.version` is ignored as of v2.0 and will be removed in v3.0. If your
+`cli.yaml` still has a `schema:` section, the CLI prints a one-time warning and
+otherwise ignores it. Validation now comes from the installed `weevr-core`
+package; to validate against a newer weevr release, upgrade it:
 
-```yaml
-schema:
-  version: "1.16"
+```bash
+pip install --upgrade weevr-core
 ```
+
+You can delete the `schema:` section.
 
 ### Complete Example
 
@@ -92,9 +96,6 @@ targets:
     lakehouse_name: "MyProdLakehouse"
 
 default_target: dev
-
-schema:
-  version: "1.16"
 ```
 
 ## Flag Override Precedence
