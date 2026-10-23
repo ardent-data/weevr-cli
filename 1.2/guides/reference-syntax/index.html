@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -640,10 +640,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#bare-form-recommended" class="md-nav__link">
+  <a href="#path-refs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Bare form (recommended)
+        Path refs
       
     </span>
   </a>
@@ -651,10 +651,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#leading-slash-form" class="md-nav__link">
+  <a href="#loom-weaves-by-name" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Leading-slash form
+        Loom weaves by name
       
     </span>
   </a>
@@ -663,17 +663,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cross-platform-authoring" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cross-platform authoring
-      
-    </span>
-  </a>
   
 </li>
       
@@ -690,10 +679,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#broken-reference-ref-does-not-exist" class="md-nav__link">
+  <a href="#referenced-file-not-found-ref" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Broken reference: &lt;ref&gt; does not exist
+        Referenced file not found: &lt;ref&gt;
       
     </span>
   </a>
@@ -701,10 +690,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#path-traversal-not-allowed-ref-must-be-a-relative-path-within-the-project" class="md-nav__link">
+  <a href="#reference-ref-resolves-outside-project-root" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Path traversal not allowed: &lt;ref&gt; must be a relative path within the project
+        Reference '&lt;ref&gt;' resolves outside project root
       
     </span>
   </a>
@@ -712,10 +701,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#empty-reference-ref-does-not-name-a-file" class="md-nav__link">
+  <a href="#unsupported-extension-ext-expected-thread-weave-or-loom" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Empty reference: &lt;ref&gt; does not name a file
+        Unsupported extension '&lt;ext&gt;'. Expected .thread, .weave, or .loom
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#errors-inside-a-referenced-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Errors inside a referenced file
       
     </span>
   </a>
@@ -724,6 +724,28 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#checks-across-threads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checks across threads
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#variables-and-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variables and parameters
+      
+    </span>
+  </a>
   
 </li>
       
@@ -926,10 +948,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#bare-form-recommended" class="md-nav__link">
+  <a href="#path-refs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Bare form (recommended)
+        Path refs
       
     </span>
   </a>
@@ -937,10 +959,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#leading-slash-form" class="md-nav__link">
+  <a href="#loom-weaves-by-name" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Leading-slash form
+        Loom weaves by name
       
     </span>
   </a>
@@ -949,17 +971,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cross-platform-authoring" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cross-platform authoring
-      
-    </span>
-  </a>
   
 </li>
       
@@ -976,10 +987,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#broken-reference-ref-does-not-exist" class="md-nav__link">
+  <a href="#referenced-file-not-found-ref" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Broken reference: &lt;ref&gt; does not exist
+        Referenced file not found: &lt;ref&gt;
       
     </span>
   </a>
@@ -987,10 +998,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#path-traversal-not-allowed-ref-must-be-a-relative-path-within-the-project" class="md-nav__link">
+  <a href="#reference-ref-resolves-outside-project-root" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Path traversal not allowed: &lt;ref&gt; must be a relative path within the project
+        Reference '&lt;ref&gt;' resolves outside project root
       
     </span>
   </a>
@@ -998,10 +1009,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#empty-reference-ref-does-not-name-a-file" class="md-nav__link">
+  <a href="#unsupported-extension-ext-expected-thread-weave-or-loom" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Empty reference: &lt;ref&gt; does not name a file
+        Unsupported extension '&lt;ext&gt;'. Expected .thread, .weave, or .loom
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#errors-inside-a-referenced-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Errors inside a referenced file
       
     </span>
   </a>
@@ -1010,6 +1032,28 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#checks-across-threads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checks across threads
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#variables-and-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variables and parameters
+      
+    </span>
+  </a>
   
 </li>
       
@@ -1056,80 +1100,119 @@
 
 
 <h1 id="reference-syntax">Reference Syntax<a class="headerlink" href="#reference-syntax" title="Permanent link">&para;</a></h1>
-<p>Weaves and looms use <code>ref:</code> entries to point at other weevr files. This page
-covers how the CLI resolves those references, what forms are valid, and what
-error messages mean when validation fails.</p>
+<p>Weaves and looms point at other weevr files. This page covers how those
+references resolve, what forms are valid, and what <code>weevr validate</code> reports
+when one is wrong. The CLI validates with weevr-core, the same loader the
+engine uses in Fabric, so a reference that passes here resolves the same way
+at run time.</p>
 <h2 id="what-is-a-ref">What is a ref?<a class="headerlink" href="#what-is-a-ref" title="Permanent link">&para;</a></h2>
 <p>A ref is a pointer from one weevr file to another:</p>
 <ul>
 <li>A <strong>weave</strong> references one or more <strong>threads</strong> via <code>threads[].ref</code>.</li>
-<li>A <strong>loom</strong> references one or more <strong>weaves</strong> via <code>weaves[].ref</code>.</li>
+<li>A <strong>loom</strong> references one or more <strong>weaves</strong> via <code>weaves[].ref</code>, or by name.</li>
 </ul>
 <p>Refs always resolve <strong>relative to the project root</strong> — the directory with the
 <code>.weevr</code> suffix (e.g. <code>my-project.weevr/</code>). They never reach outside the
-project, and they cannot be absolute filesystem paths.</p>
+project.</p>
 <h2 id="valid-forms">Valid forms<a class="headerlink" href="#valid-forms" title="Permanent link">&para;</a></h2>
-<p>Two syntactic forms are accepted and resolve identically.</p>
-<h3 id="bare-form-recommended">Bare form (recommended)<a class="headerlink" href="#bare-form-recommended" title="Permanent link">&para;</a></h3>
-<p>The path to the target file, written project-root-relative:</p>
+<h3 id="path-refs">Path refs<a class="headerlink" href="#path-refs" title="Permanent link">&para;</a></h3>
+<p>Write the path to the target file relative to the project root, with forward
+slashes and the file's typed extension:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># staging.weave</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">config_version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nt">threads</span><span class="p">:</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">staging/stg_customers.thread</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">staging/stg_orders.thread</span>
 </code></pre></div>
-<h3 id="leading-slash-form">Leading-slash form<a class="headerlink" href="#leading-slash-form" title="Permanent link">&para;</a></h3>
-<p>A leading <code>/</code> marks the path as project-root-relative explicitly:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># daily.loom</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nt">config_version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nt">weaves</span><span class="p">:</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/staging.weave</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/curated/customer_dim.weave</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">staging.weave</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">curated/customer_dim.weave</span>
 </code></pre></div>
-<p>The two forms are equivalent. Use whichever is clearer in context — the
-leading slash can help readers scan a long loom and immediately see that
-every ref is project-rooted.</p>
-<h2 id="cross-platform-authoring">Cross-platform authoring<a class="headerlink" href="#cross-platform-authoring" title="Permanent link">&para;</a></h2>
-<p>Refs are normalized before resolution:</p>
-<ul>
-<li><strong>Backslashes are converted to forward slashes.</strong> A YAML file edited on
-  Windows that ends up with <code>threads\raw.thread</code> resolves the same as
-  <code>threads/raw.thread</code>. You should still prefer forward slashes in source
-  files — they're the YAML norm and the only form that survives a round-trip
-  through unrelated tooling — but the CLI will not reject a ref simply
-  because an editor inserted backslashes.</li>
-<li><strong>Resolution is always POSIX-style</strong> internally, regardless of host OS.
-  <code>weevr validate</code> and <code>weevr list</code> both produce identical results on
-  Windows, macOS, and Linux for the same project.</li>
-</ul>
+<p>Do not start a ref with <code>/</code> or use backslashes. A leading <code>/</code> is treated as an
+absolute path, which resolves outside the project and is rejected; a
+backslash is taken literally, so the file is not found.</p>
+<h3 id="loom-weaves-by-name">Loom weaves by name<a class="headerlink" href="#loom-weaves-by-name" title="Permanent link">&para;</a></h3>
+<p>A loom can also name a weave instead of giving its path. The name resolves to
+<code>{name}.weave</code> at the project root:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># daily.loom</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nt">config_version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nt">weaves</span><span class="p">:</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">staging</span><span class="w">            </span><span class="c1"># -&gt; staging.weave</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">curated</span><span class="w">      </span><span class="c1"># -&gt; curated.weave</span>
+</code></pre></div>
+<p>This applies to looms only. In a weave, a thread entry with only a <code>name</code> is
+an inline thread definition, not a reference to <code>{name}.thread</code>.</p>
 <h2 id="error-messages">Error messages<a class="headerlink" href="#error-messages" title="Permanent link">&para;</a></h2>
-<p>When <code>weevr validate</code> rejects a ref, the message comes from one of three
-cases:</p>
-<h3 id="broken-reference-ref-does-not-exist"><code>Broken reference: &lt;ref&gt; does not exist</code><a class="headerlink" href="#broken-reference-ref-does-not-exist" title="Permanent link">&para;</a></h3>
-<p>The ref is syntactically valid but the target file cannot be found on disk.
-Usually this means a typo, a file that was renamed or moved without updating
-its referrers, or a missing file extension.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">threads</span><span class="p">:</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">staging/stg_coustomers.thread</span><span class="w">  </span><span class="c1"># typo — file is stg_customers</span>
+<p>When a ref is wrong, <code>weevr validate</code> reports it on the weave or loom that
+contains it. The messages come from weevr-core:</p>
+<h3 id="referenced-file-not-found-ref"><code>Referenced file not found: &lt;ref&gt;</code><a class="headerlink" href="#referenced-file-not-found-ref" title="Permanent link">&para;</a></h3>
+<p>The ref is well formed but the file does not exist. Usually this is a typo, a
+file that was renamed or moved without updating its referrers, or a backslash
+in the path.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">threads</span><span class="p">:</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">staging/stg_coustomers.thread</span><span class="w">  </span><span class="c1"># typo — file is stg_customers</span>
 </code></pre></div>
 <p>Fix: correct the path, or create the missing file.</p>
-<h3 id="path-traversal-not-allowed-ref-must-be-a-relative-path-within-the-project"><code>Path traversal not allowed: &lt;ref&gt; must be a relative path within the project</code><a class="headerlink" href="#path-traversal-not-allowed-ref-must-be-a-relative-path-within-the-project" title="Permanent link">&para;</a></h3>
-<p>The ref contains <code>..</code> segments that would escape the project root. Refs are
-confined to the project — if you need to share data between projects, publish
-it through the lakehouse rather than reaching across filesystems.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">threads</span><span class="p">:</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../other-project.weevr/shared.thread</span><span class="w">  </span><span class="c1"># rejected</span>
-</code></pre></div>
-<p>Fix: keep the target inside the project, or copy it in if it's truly shared.</p>
-<h3 id="empty-reference-ref-does-not-name-a-file"><code>Empty reference: &lt;ref&gt; does not name a file</code><a class="headerlink" href="#empty-reference-ref-does-not-name-a-file" title="Permanent link">&para;</a></h3>
-<p>The ref is present but contains no meaningful path — commonly <code>/</code>, <code>""</code>, or
-a string that normalizes to empty after stripping separators. This usually
-indicates a template that was scaffolded but never filled in.</p>
+<h3 id="reference-ref-resolves-outside-project-root"><code>Reference '&lt;ref&gt;' resolves outside project root</code><a class="headerlink" href="#reference-ref-resolves-outside-project-root" title="Permanent link">&para;</a></h3>
+<p>The ref would escape the project, through <code>..</code> segments or a leading <code>/</code>.
+Refs are confined to the project — if you need to share data between
+projects, publish it through the lakehouse rather than reaching across
+filesystems.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">threads</span><span class="p">:</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">      </span><span class="c1"># rejected</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/&quot;</span><span class="w">     </span><span class="c1"># rejected</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../other-project.weevr/shared.thread</span><span class="w">  </span><span class="c1"># rejected</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/staging/stg_customers.thread</span><span class="w">         </span><span class="c1"># rejected — drop the leading /</span>
 </code></pre></div>
-<p>Fix: supply the actual target path, or remove the incomplete entry.</p>
+<p>Fix: write the path relative to the project root, or copy the file in if
+it's truly shared.</p>
+<h3 id="unsupported-extension-ext-expected-thread-weave-or-loom"><code>Unsupported extension '&lt;ext&gt;'. Expected .thread, .weave, or .loom</code><a class="headerlink" href="#unsupported-extension-ext-expected-thread-weave-or-loom" title="Permanent link">&para;</a></h3>
+<p>The ref does not end in a typed extension. This includes empty refs such as
+<code>""</code> or <code>"/"</code>, which usually come from a template that was never filled in.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">threads</span><span class="p">:</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">staging/stg_customers.yaml</span><span class="w">  </span><span class="c1"># rejected — use .thread</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w">                          </span><span class="c1"># rejected</span>
+</code></pre></div>
+<p>Fix: point at the <code>.thread</code>, <code>.weave</code>, or <code>.loom</code> file, or remove the
+incomplete entry.</p>
+<h3 id="errors-inside-a-referenced-file">Errors inside a referenced file<a class="headerlink" href="#errors-inside-a-referenced-file" title="Permanent link">&para;</a></h3>
+<p>Loading a weave or loom also loads every file it references. A problem inside
+a referenced thread is reported against that thread's file, once, even when
+several weaves reference it.</p>
+<h2 id="checks-across-threads">Checks across threads<a class="headerlink" href="#checks-across-threads" title="Permanent link">&para;</a></h2>
+<p>After a weave or loom loads cleanly, <code>weevr validate</code> runs the checks the
+engine otherwise only runs when it plans the weave:</p>
+<ul>
+<li><strong>Dependency cycles</strong> — threads that depend on each other in a loop, whether
+  through declared <code>dependencies</code> or because one reads another's target.</li>
+<li><strong>Unknown dependencies</strong> — a <code>dependencies</code> entry naming a thread that is
+  not in the weave.</li>
+<li><strong>Unordered writers</strong> — two threads writing the same target with no
+  dependency between them and no mutually exclusive conditions.</li>
+<li><strong>Incremental loads</strong> — load and write modes that the engine rejects at run
+  time, such as <code>incremental_watermark</code> with <code>write.mode: overwrite</code>.</li>
+<li><strong>Ignored settings</strong> — thread-level <code>execution:</code> blocks, which the engine
+  does not apply (warning).</li>
+</ul>
+<p>These are reported on the weave file, or on the thread file for per-thread
+problems. <code>weevr list --format dag</code> shows the plan the engine builds when a
+weave passes.</p>
+<h2 id="variables-and-parameters">Variables and parameters<a class="headerlink" href="#variables-and-parameters" title="Permanent link">&para;</a></h2>
+<p>References to <code>${param.x}</code>, <code>${env.X}</code>, and other variables are resolved
+during validation. Because validation runs without a Fabric run context:</p>
+<ul>
+<li>A declared parameter with no default and no runtime value is a <strong>warning</strong>.</li>
+<li>A <code>${...}</code> variable with nothing to resolve it and no <code>:-default</code> is a
+  <strong>warning</strong>.</li>
+<li><code>${fabric.workspace_id}</code>, <code>${fabric.lakehouse_id}</code>, and
+  <code>${fabric.workspace_name}</code> resolve to placeholder values, so the rest of
+  the file is still checked.</li>
+</ul>
+<p>Loading stops at the first unresolved parameter or variable, so a file with
+one of these warnings is only partly validated: later problems in it, and
+the plan-time checks for its weave, are not reported until it resolves.
+Give parameters defaults where you can, and use <code>--strict</code> in CI to treat
+these warnings as errors.</p>
 <h2 id="orphan-detection">Orphan detection<a class="headerlink" href="#orphan-detection" title="Permanent link">&para;</a></h2>
 <p><code>weevr validate</code> and <code>weevr list</code> also check for <strong>orphans</strong> — thread and
 weave files that exist in the project but are not referenced by anything.
@@ -1137,24 +1220,26 @@ Orphan detection is a warning, not an error: it helps you spot dead files
 without blocking validation.</p>
 <ul>
 <li><strong>Threads</strong> are expected to be referenced by at least one weave.</li>
-<li><strong>Weaves</strong> are expected to be referenced by at least one loom.</li>
+<li><strong>Weaves</strong> are expected to be referenced by at least one loom, by path or
+  by name.</li>
 <li><strong>Looms</strong> are top-level entry points and are never considered orphans.</li>
 <li><strong>Warps</strong> are standalone schema contracts and are never considered orphans.</li>
 </ul>
-<p>If you intentionally keep scratch or draft files in the project, add them to
+<p>Orphans are still reported when other files in the project fail validation.
+If you intentionally keep scratch or draft files in the project, add them to
 a project-wide ignore file so they don't appear as orphans. See
 <a href="../../configuration/#ignore-files">Configuration › Ignore files</a>.</p>
 <h2 id="explicit-path-bypass">Explicit path bypass<a class="headerlink" href="#explicit-path-bypass" title="Permanent link">&para;</a></h2>
 <p>When you pass a specific file or directory to <code>weevr validate</code> on the
 command line, the ignore filter does not apply:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Full-project scan — obeys .weevr/ignore</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>weevr<span class="w"> </span>validate
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Explicit path — validates the file regardless of ignore rules</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>weevr<span class="w"> </span>validate<span class="w"> </span>scratch/draft.thread
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Full-project scan — obeys .weevr/ignore</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>weevr<span class="w"> </span>validate
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Explicit path — validates the file regardless of ignore rules</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>weevr<span class="w"> </span>validate<span class="w"> </span>scratch/draft.thread
 </code></pre></div>
-<p>This applies only to the ignore filter. Ref resolution and path-traversal
-rules still apply in both cases.</p>
+<p>This applies only to the ignore filter. Reference rules apply in both cases,
+and a targeted weave or loom still loads and checks the files it references.</p>
 
 
 
@@ -1215,7 +1300,7 @@ rules still apply in both cases.</p>
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

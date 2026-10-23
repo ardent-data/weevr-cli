@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -578,10 +578,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#schema-settings" class="md-nav__link">
+  <a href="#schema-settings-deprecated" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Schema Settings
+        Schema Settings (deprecated)
       
     </span>
   </a>
@@ -954,10 +954,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#schema-settings" class="md-nav__link">
+  <a href="#schema-settings-deprecated" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Schema Settings
+        Schema Settings (deprecated)
       
     </span>
   </a>
@@ -1075,7 +1075,7 @@
 <h1 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h1>
 <p>The weevr CLI is configured through two files in the <code>.weevr/</code> directory at your project root.</p>
 <h2 id="weevrcliyaml"><code>.weevr/cli.yaml</code><a class="headerlink" href="#weevrcliyaml" title="Permanent link">&para;</a></h2>
-<p>This is the main configuration file, created by <code>weevr init</code>. It defines deploy targets and schema settings.</p>
+<p>This is the main configuration file, created by <code>weevr init</code>. It defines deploy targets.</p>
 <h3 id="targets">Targets<a class="headerlink" href="#targets" title="Permanent link">&para;</a></h3>
 <p>Each target maps a name to a Fabric Lakehouse destination. Identify the lakehouse with <strong>either</strong> <code>lakehouse_id</code> (a GUID — recommended) <strong>or</strong> <code>lakehouse_name</code> (the friendly display name). Exactly one of the two is required per target.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">targets</span><span class="p">:</span>
@@ -1138,11 +1138,14 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">default_target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dev</span>
 </code></pre></div>
 <p>When no <code>--target</code> flag is provided and no <code>default_target</code> is set, commands that require a target exit with an error. You must specify <code>--target</code> or set <code>default_target</code> in <code>cli.yaml</code>.</p>
-<h3 id="schema-settings">Schema Settings<a class="headerlink" href="#schema-settings" title="Permanent link">&para;</a></h3>
-<p>Pin the schema version used for validation:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">schema</span><span class="p">:</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.16&quot;</span>
+<h3 id="schema-settings-deprecated">Schema Settings (deprecated)<a class="headerlink" href="#schema-settings-deprecated" title="Permanent link">&para;</a></h3>
+<p><code>schema.version</code> is ignored as of v2.0 and will be removed in v3.0. If your
+<code>cli.yaml</code> still has a <code>schema:</code> section, the CLI prints a one-time warning and
+otherwise ignores it. Validation now comes from the installed <code>weevr-core</code>
+package; to validate against a newer weevr release, upgrade it:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>weevr-core
 </code></pre></div>
+<p>You can delete the <code>schema:</code> section.</p>
 <h3 id="complete-example">Complete Example<a class="headerlink" href="#complete-example" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># weevr CLI configuration</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
@@ -1161,9 +1164,6 @@
 <a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">    </span><span class="nt">lakehouse_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;MyProdLakehouse&quot;</span>
 <a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>
 <a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="nt">default_target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dev</span>
-<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>
-<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="nt">schema</span><span class="p">:</span>
-<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.16&quot;</span>
 </code></pre></div>
 <h2 id="flag-override-precedence">Flag Override Precedence<a class="headerlink" href="#flag-override-precedence" title="Permanent link">&para;</a></h2>
 <p>CLI flags override config file values. The resolution order (highest to lowest priority):</p>
@@ -1286,7 +1286,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>
