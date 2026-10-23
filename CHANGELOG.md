@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v2.0.0...weevr-cli-v2.0.1) (2026-10-23)
+
+
+### Bug Fixes
+
+* **build:** update package status and license metadata ([#61](https://github.com/ardent-data/weevr-cli/issues/61)) ([32f701d](https://github.com/ardent-data/weevr-cli/commit/32f701df69ec660266f985d8b17f3a628914e96b))
+
 ## [2.0.0](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.2.4...weevr-cli-v2.0.0) (2026-10-23)
 
 
