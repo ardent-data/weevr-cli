@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.2.4...weevr-cli-v2.0.0) (2026-10-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* **validate:** drops Python 3.12; removes weevr schema and .weevr/schemas overrides; ignores schema.version in cli.yaml; validation is stricter and messages come from weevr-core.
+
+### Features
+
+* **validate:** replace validation engine with weevr-core ([#59](https://github.com/ardent-data/weevr-cli/issues/59)) ([7e7db88](https://github.com/ardent-data/weevr-cli/commit/7e7db88bc8ab5e5c2ce452223ecafa4e5f4fc6af))
+
 ## [1.2.4](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v1.2.3...weevr-cli-v1.2.4) (2026-05-28)
 
 
