@@ -222,3 +222,11 @@ def test_dedupe_issues_keeps_first_occurrence() -> None:
     c = ValidationIssue("warning", "Field required", "t.thread", "target")
     d = ValidationIssue("error", "Other", "t.thread", None)
     assert dedupe_issues([a, d, b, c]) == [a, d, c]
+
+
+@pytest.mark.parametrize("ref", ['"/"', '""', "../outside.thread", "/staging/a.thread"])
+def test_bad_ref_forms_are_reported_on_the_weave(tmp_path: Path, ref: str) -> None:
+    _write(tmp_path, "staging/a.thread", GOOD_THREAD)
+    path = _write(tmp_path, "w.weave", f'config_version: "1.0"\nthreads:\n  - ref: {ref}\n')
+    issues = validate_file(path, project_root=tmp_path)
+    assert [(i.severity, i.file) for i in issues] == [("error", "w.weave")]

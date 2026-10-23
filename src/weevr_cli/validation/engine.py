@@ -62,13 +62,13 @@ def _issue_file(exc: WeevError, validated: Path, project_root: Path | None) -> s
     """Pick the file an exception belongs to.
 
     weevr-core names the file it was loading when the error happened. For a
-    missing ``ref:`` target that is the file that does not exist, so the
-    issue goes on the file being validated instead.
+    bad ``ref:`` it names the ref string itself, which is not a real file, so
+    the issue goes on the file being validated instead.
     """
     file_path = getattr(exc, "file_path", None)
     if file_path:
         candidate = Path(file_path)
-        if candidate.exists():
+        if candidate.is_absolute() and candidate.is_file():
             return display_path(candidate, project_root)
     return display_path(validated, project_root)
 
