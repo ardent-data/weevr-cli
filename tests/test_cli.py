@@ -106,7 +106,8 @@ def test_validate_end_to_end(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) ->
     thread = project / "staging" / "stg.thread"
     thread.parent.mkdir()
     thread.write_text(
-        'config_version: "1.0"\nsources:\n  raw:\n    type: csv\ntarget:\n  path: Tables/raw\n'
+        'config_version: "1.0"\nsources:\n  raw:\n    type: csv\n    path: Files/raw.csv\n'
+        "target:\n  path: Tables/raw\n"
     )
     monkeypatch.chdir(project)
     result = runner.invoke(app, ["validate"])
