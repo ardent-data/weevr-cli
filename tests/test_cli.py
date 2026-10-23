@@ -1,4 +1,5 @@
 import json
+from importlib.metadata import version
 from pathlib import Path
 
 import pytest
@@ -14,7 +15,9 @@ runner = CliRunner()
 def test_version_flag() -> None:
     result = runner.invoke(app, ["--version"])
     assert result.exit_code == 0
-    assert __version__ in result.output
+    assert result.output.strip() == (
+        f"weevr-cli {__version__} (weevr-core {version('weevr-core')})"
+    )
 
 
 def test_version_json() -> None:
@@ -22,6 +25,7 @@ def test_version_json() -> None:
     assert result.exit_code == 0
     data = json.loads(result.output)
     assert data["version"] == __version__
+    assert data["weevr_core_version"] == version("weevr-core")
 
 
 def test_help() -> None:

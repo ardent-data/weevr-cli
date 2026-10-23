@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as package_version
+
 import typer
 
 from weevr_cli import __version__
@@ -22,11 +25,15 @@ def _version_callback(ctx: typer.Context, value: bool) -> None:
     """Print version and exit."""
     if not value:
         return
+    try:
+        core_version = package_version("weevr-core")
+    except PackageNotFoundError:
+        core_version = "not installed"
     json_mode = ctx.params.get("json", False)
     if json_mode:
-        print_json({"version": __version__})
+        print_json({"version": __version__, "weevr_core_version": core_version})
     else:
-        typer.echo(f"weevr {__version__}")
+        typer.echo(f"weevr-cli {__version__} (weevr-core {core_version})")
     raise typer.Exit()
 
 

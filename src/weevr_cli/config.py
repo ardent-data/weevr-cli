@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -9,6 +10,22 @@ from typing import Any
 import yaml
 
 WEEVR_PROJECT_EXT = ".weevr"
+
+SCHEMA_DEPRECATION_MESSAGE = (
+    "schema.version in cli.yaml is deprecated in v2.0 and will be removed in v3.0. "
+    "Validation schemas are now provided by the weevr-core package."
+)
+
+_schema_deprecation_warned = False
+
+
+def _warn_schema_deprecated() -> None:
+    """Print the schema.version deprecation warning once per process."""
+    global _schema_deprecation_warned
+    if _schema_deprecation_warned:
+        return
+    _schema_deprecation_warned = True
+    sys.stderr.write(f"Warning: {SCHEMA_DEPRECATION_MESSAGE}\n")
 
 
 class ConfigError(Exception):
@@ -41,7 +58,6 @@ class WeevrConfig:
 
     targets: dict[str, TargetConfig]
     default_target: str | None = None
-    schema_version: str | None = None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> WeevrConfig:
@@ -96,14 +112,11 @@ class WeevrConfig:
                 path_prefix=target_data.get("path_prefix"),
             )
 
-        schema_data = data.get("schema", {})
-        schema_version = schema_data.get("version") if isinstance(schema_data, dict) else None
+        # Ignored since 2.0; weevr-core supplies the schemas.
+        if "schema" in data:
+            _warn_schema_deprecated()
 
-        return cls(
-            targets=targets,
-            default_target=data.get("default_target"),
-            schema_version=str(schema_version) if schema_version is not None else None,
-        )
+        return cls(targets=targets, default_target=data.get("default_target"))
 
 
 def load_config(path: Path) -> WeevrConfig:

@@ -81,7 +81,7 @@ def test_init_cli_yaml_content(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
     content = (tmp_path / "my-project.weevr" / ".weevr" / "cli.yaml").read_text()
     assert "#" in content
     assert "targets" in content.lower()
-    assert "schema" in content.lower()
+    assert "schema" not in content.lower()
 
 
 def test_init_json_output(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

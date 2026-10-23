@@ -1,4 +1,7 @@
+from pathlib import Path
+
 import pytest
+from weevr.config import load_config
 
 from weevr_cli.templates import (
     VALID_TYPES,
@@ -104,3 +107,27 @@ def test_render_cli_yaml_with_targets() -> None:
     assert "lh-222" in content
     assert "weevr/proj" in content
     assert "dev" in content
+
+
+@pytest.mark.parametrize("file_type", VALID_TYPES)
+def test_template_loads_with_weevr_core(file_type: str, tmp_path: Path) -> None:
+    path = tmp_path / f"demo.{file_type}"
+    path.write_text(get_template(file_type).format(name="demo"))
+    load_config(path, project_root=tmp_path)
+
+
+def test_example_files_load_with_weevr_core(tmp_path: Path) -> None:
+    files = get_example_files()
+    for rel, content in files.items():
+        path = tmp_path / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content)
+    for rel in files:
+        load_config(tmp_path / rel, project_root=tmp_path)
+
+
+@pytest.mark.parametrize(
+    "kwargs", [{}, {"targets": {"dev": {"workspace_id": "w", "lakehouse_id": "l"}}}]
+)
+def test_render_cli_yaml_has_no_schema_section(kwargs: dict) -> None:  # type: ignore[type-arg]
+    assert "schema" not in render_cli_yaml(**kwargs)

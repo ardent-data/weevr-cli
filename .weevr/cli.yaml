@@ -14,7 +14,3 @@ targets:
 
 # Default target for deploy commands
 default_target: dev
-
-# Schema settings
-schema:
-  version: "1.16"
