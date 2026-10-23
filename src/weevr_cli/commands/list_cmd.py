@@ -14,6 +14,7 @@ from weevr_cli.listing.table import render_table, render_table_json
 from weevr_cli.listing.tree import render_tree, render_tree_json
 from weevr_cli.output import print_error, print_json
 from weevr_cli.state import AppState
+from weevr_cli.validation.engine import silence_weevr_logging
 
 
 def run_list(*, format: str, state: AppState) -> None:
@@ -59,6 +60,7 @@ def run_list(*, format: str, state: AppState) -> None:
         else:
             render_table(graph, state.console)
     elif format == "dag":
+        silence_weevr_logging()
         try:
             plans = build_weave_plans(project_root, graph)
         except DagError as exc:

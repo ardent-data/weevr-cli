@@ -18,7 +18,7 @@ from weevr_cli.ignore import (
 )
 from weevr_cli.output import print_error, print_json
 from weevr_cli.state import AppState
-from weevr_cli.validation.engine import dedupe_issues, validate_file
+from weevr_cli.validation.engine import dedupe_issues, silence_weevr_logging, validate_file
 from weevr_cli.validation.orphans import find_orphans
 from weevr_cli.validation.results import ValidationIssue, ValidationResult
 from weevr_cli.validation.semantic import check_resolved
@@ -134,6 +134,7 @@ def run_validate(
     Raises:
         SystemExit: With code 1 on validation errors or no files found.
     """
+    silence_weevr_logging()
     project_root = _determine_project_root()
     if project_root is not None:
         project_root = project_root.resolve()

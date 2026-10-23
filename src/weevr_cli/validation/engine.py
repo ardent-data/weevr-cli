@@ -38,9 +38,17 @@ _NO_PROJECT_HINT = "(run from inside a .weevr project so references resolve)"
 # pathlib). Treat these as a problem with the file rather than a crash.
 LOAD_FAILURES: tuple[type[Exception], ...] = (WeevError, OSError, TypeError, ValueError)
 
-# weevr-core logs load warnings as well as returning them. The CLI reports
-# them as issues, so keep the raw log lines off the terminal.
-logging.getLogger("weevr").addHandler(logging.NullHandler())
+
+def silence_weevr_logging() -> None:
+    """Keep weevr-core's log output off the terminal.
+
+    weevr-core logs load warnings as well as returning them. With no handler
+    configured, Python prints those records raw to stderr. Commands that
+    report the warnings as issues call this first.
+    """
+    logger = logging.getLogger("weevr")
+    if not any(isinstance(handler, logging.NullHandler) for handler in logger.handlers):
+        logger.addHandler(logging.NullHandler())
 
 
 def _upgrade_hint() -> str:

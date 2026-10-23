@@ -615,3 +615,19 @@ def test_validate_continues_past_unloadable_files(
     assert data["files_checked"] == 5
     errors = sorted(i["file"] for i in data["issues"] if i["severity"] == "error")
     assert errors == ["bin.thread", "num.loom"]
+
+
+def test_validate_silences_weevr_logging(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Load warnings are reported as issues, so weevr's logger must not print them.
+
+    pytest captures log records itself, so assert on the handler rather than
+    on stderr.
+    """
+    import logging
+
+    logger = logging.getLogger("weevr")
+    monkeypatch.setattr(logger, "handlers", [])
+    project = _make_project(tmp_path, {"staging/stg_customers.thread": _THREAD})
+    monkeypatch.chdir(project)
+    runner.invoke(app, ["validate"])
+    assert any(isinstance(h, logging.NullHandler) for h in logger.handlers)
