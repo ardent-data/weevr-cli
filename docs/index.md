@@ -7,10 +7,9 @@ The [weevr](https://github.com/ardent-data/weevr) engine runs inside Fabric note
 ## Key Features
 
 - **Project scaffolding** — `weevr init` creates a project with the standard layout; `weevr new` generates thread, weave, loom, and warp files from templates
-- **YAML validation** — `weevr validate` checks schema conformance and cross-file reference integrity
+- **Validation** — `weevr validate` checks files with the weevr engine's own loader and planner, so it accepts what the engine accepts
 - **Smart deployment** — `weevr deploy` syncs files to a Fabric Lakehouse via the OneLake API, uploading only what changed
-- **Status tracking** — `weevr status` diffs local files against what's deployed; `weevr list` shows project structure and dependencies
-- **Schema management** — `weevr schema` manages validation schemas with version pinning
+- **Status tracking** — `weevr status` diffs local files against what's deployed; `weevr list` shows project structure, dependencies, and execution plans
 - **Plugin system** — extend the CLI with custom commands via entry-point plugins
 
 ## Quick Install
