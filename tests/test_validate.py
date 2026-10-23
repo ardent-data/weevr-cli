@@ -506,3 +506,24 @@ def test_validate_json_contract(tmp_path: Path, monkeypatch: pytest.MonkeyPatch)
     data = _json_validate(["p.thread"])
     assert set(data) == {"exit_code", "valid", "errors", "warnings", "files_checked", "issues"}
     assert set(data["issues"][0]) == {"severity", "file", "message", "location"}
+
+
+def test_validate_reports_orphans_when_other_files_fail(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    project = _make_project(
+        tmp_path,
+        {
+            "staging/stg_customers.thread": _THREAD,
+            "staging/unused.thread": _THREAD,
+            "staging/broken.thread": 'config_version: "1.0"\nsources: {}\n',
+            "staging.weave": 'config_version: "1.0"\nthreads:\n'
+            "  - ref: staging/stg_customers.thread\n  - ref: staging/broken.thread\n",
+            "daily.loom": 'config_version: "1.0"\nweaves:\n  - staging\n',
+        },
+    )
+    monkeypatch.chdir(project)
+    data = _json_validate([])
+    assert data["exit_code"] == 1
+    warnings = [i["file"] for i in data["issues"] if i["severity"] == "warning"]
+    assert warnings == ["staging/unused.thread"]

@@ -11,7 +11,7 @@ import yaml
 from weevr.config.parser import TYPED_EXTENSIONS
 
 from weevr_cli.listing.models import DependencyGraph, GraphNode
-from weevr_cli.validation.refs import extract_refs, normalize_ref
+from weevr_cli.validation.orphans import extract_refs, normalize_ref
 
 logger = logging.getLogger(__name__)
 

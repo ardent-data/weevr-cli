@@ -17,6 +17,17 @@ def _write_yaml(path: Path, data: dict) -> None:  # type: ignore[type-arg]
 class TestBuildDependencyGraph:
     """Tests for build_dependency_graph."""
 
+    def test_loom_name_only_entry_links_root_weave(self, tmp_path: Path) -> None:
+        """A loom entry given by name refers to {name}.weave at the project root."""
+        root = tmp_path / "project.weevr"
+        _write_yaml(root / "customer.weave", {"threads": []})
+        _write_yaml(root / "daily.loom", {"weaves": ["customer"]})
+
+        graph = build_dependency_graph(root)
+        assert graph.nodes["daily.loom"].refs_out == ["customer.weave"]
+        assert graph.nodes["customer.weave"].refs_in == ["daily.loom"]
+        assert graph.orphans == []
+
     def test_simple_chain(self, tmp_path: Path) -> None:
         """loom → weave → thread — all connected, no orphans."""
         root = tmp_path / "project.weevr"

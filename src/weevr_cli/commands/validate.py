@@ -19,7 +19,7 @@ from weevr_cli.ignore import (
 from weevr_cli.output import print_error, print_json
 from weevr_cli.state import AppState
 from weevr_cli.validation.engine import dedupe_issues, validate_file
-from weevr_cli.validation.refs import find_orphans
+from weevr_cli.validation.orphans import find_orphans
 from weevr_cli.validation.results import ValidationIssue, ValidationResult
 
 
