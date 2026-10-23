@@ -6,7 +6,6 @@ import typer
 
 from weevr_cli import __version__
 from weevr_cli.commands.plugins_cmd import plugins_app
-from weevr_cli.commands.schema_cmd import schema_app
 from weevr_cli.config import ConfigError, find_project_root, load_config
 from weevr_cli.output import create_console, print_error, print_json
 from weevr_cli.plugins.discovery import discover_and_mount_plugins
@@ -253,6 +252,5 @@ def list_cmd(
         raise typer.Exit(code=int(exc.code) if exc.code is not None else 1) from exc
 
 
-app.add_typer(schema_app, name="schema")
 app.add_typer(plugins_app, name="plugins")
 discover_and_mount_plugins(app)

@@ -113,14 +113,10 @@ def test_validate_end_to_end(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) ->
     assert result.exit_code == 0
 
 
-def test_schema_version_end_to_end(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    project = tmp_path / "test.weevr"
-    project.mkdir()
-    (project / ".weevr").mkdir()
-    monkeypatch.chdir(project)
+def test_schema_command_is_removed() -> None:
     result = runner.invoke(app, ["schema", "version"])
-    assert result.exit_code == 0
-    assert "bundled" in result.output.lower()
+    assert result.exit_code != 0
+    assert "No such command" in result.output
 
 
 def test_plugins_subcommand_exists() -> None:
