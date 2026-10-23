@@ -7,7 +7,7 @@ license = { file = "LICENSE" }
 authors = [
     { name = "Pierre LaFromboise", email = "44212292+DataInsightPro@users.noreply.github.com" }
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.12"
 keywords = ["weevr", "fabric", "onelake", "cli", "yaml", "deployment", "data-pipeline"]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -15,7 +15,6 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
     "Topic :: Software Development :: Build Tools",
     "Topic :: Utilities",
     "Typing :: Typed",
@@ -25,6 +24,7 @@ dependencies = [
     "rich>=13.0.0",
     "pyyaml>=6.0,<7.0",
     "jsonschema>=4.0,<5.0",
+    "weevr-core>=1.20.0,<2.0",
     "azure-storage-file-datalake>=12.0.0",
     "azure-identity>=1.0.0",
     "pathspec>=0.12.0",

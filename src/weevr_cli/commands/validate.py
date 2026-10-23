@@ -8,6 +8,7 @@ from typing import Any
 import pathspec
 import yaml
 from rich.table import Table
+from weevr.config.parser import TYPED_EXTENSIONS
 
 from weevr_cli.config import WEEVR_PROJECT_EXT, find_project_root
 from weevr_cli.ignore import (
@@ -20,8 +21,6 @@ from weevr_cli.state import AppState
 from weevr_cli.validation.refs import check_refs, find_orphans
 from weevr_cli.validation.results import ValidationIssue, ValidationResult
 from weevr_cli.validation.schema import validate_file
-
-_WEEVR_EXTENSIONS = (".thread", ".weave", ".loom", ".warp")
 
 
 def _find_weevr_files(
@@ -39,7 +38,7 @@ def _find_weevr_files(
     """
     directory = directory.resolve()
     files: list[Path] = []
-    for ext in _WEEVR_EXTENSIONS:
+    for ext in TYPED_EXTENSIONS:
         files.extend(directory.rglob(f"*{ext}"))
 
     if ignore_spec is not None and ignore_root is not None:

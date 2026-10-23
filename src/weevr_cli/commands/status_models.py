@@ -5,9 +5,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
-from weevr_cli.deploy.models import ActionType, DeployAction
+from weevr.config.parser import TYPED_EXTENSIONS
 
-WEEVR_EXTENSIONS = {".thread", ".weave", ".loom", ".warp"}
+from weevr_cli.deploy.models import ActionType, DeployAction
 
 _ACTION_TO_STATUS: dict[ActionType, tuple[Literal["+", "~", "=", "-"], str]] = {
     ActionType.UPLOAD_NEW: ("+", "new, not deployed"),
@@ -30,7 +30,7 @@ class StatusEntry:
 
 def _is_weevr_file(path: str) -> bool:
     """Check if a path has a weevr file extension."""
-    return any(path.endswith(ext) for ext in WEEVR_EXTENSIONS)
+    return any(path.endswith(ext) for ext in TYPED_EXTENSIONS)
 
 
 def actions_to_status_entries(actions: list[DeployAction]) -> list[StatusEntry]:

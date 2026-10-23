@@ -4,22 +4,18 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 import pathspec
 import yaml
+from weevr.config.parser import TYPED_EXTENSIONS
 
 from weevr_cli.listing.models import DependencyGraph, GraphNode
 from weevr_cli.validation.refs import extract_refs, normalize_ref
 
 logger = logging.getLogger(__name__)
 
-WEEVR_EXTENSIONS: dict[str, Literal["thread", "weave", "loom", "warp"]] = {
-    ".thread": "thread",
-    ".weave": "weave",
-    ".loom": "loom",
-    ".warp": "warp",
-}
+FileType = Literal["thread", "weave", "loom", "warp"]
 
 
 def build_dependency_graph(
@@ -41,9 +37,10 @@ def build_dependency_graph(
         A DependencyGraph with all discovered nodes and edges.
     """
     # Scan for weevr files
-    file_data: dict[str, tuple[Literal["thread", "weave", "loom", "warp"], dict[str, Any]]] = {}
+    file_data: dict[str, tuple[FileType, dict[str, Any]]] = {}
 
-    for ext, file_type in WEEVR_EXTENSIONS.items():
+    for ext, config_type in TYPED_EXTENSIONS.items():
+        file_type = cast(FileType, config_type)
         for path in sorted(project_root.rglob(f"*{ext}")):
             if not path.is_file():
                 continue
