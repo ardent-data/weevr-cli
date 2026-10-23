@@ -86,9 +86,6 @@ typeCheckingMode = "standard"
 include = ["src", "tests"]
 exclude = ["**/__pycache__", ".venv", ".git", ".github"]
 
-venvPath = "."
-venv = ".venv"
-
 reportMissingTypeStubs = false
 reportMissingImports = true
 
