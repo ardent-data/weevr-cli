@@ -13,9 +13,9 @@ from typing import Any
 from rich.console import Console
 from rich.tree import Tree
 from weevr.engine.planner import ExecutionPlan
-from weevr.errors import WeevError
 
 from weevr_cli.listing.models import DependencyGraph
+from weevr_cli.validation.engine import LOAD_FAILURES
 from weevr_cli.validation.resolved import load_resolved
 
 
@@ -48,7 +48,7 @@ def _plans_for(project_root: Path, rel: str) -> tuple[list[ExecutionPlan], dict[
     try:
         loaded = load_resolved(project_root / rel, project_root=project_root)
         plans = loaded.execution_plan or []
-    except WeevError as exc:
+    except LOAD_FAILURES as exc:
         raise DagError(f"{rel}: {exc}") from exc
     weave_files = {
         name: weave.qualified_key

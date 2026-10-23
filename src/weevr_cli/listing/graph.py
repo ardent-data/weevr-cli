@@ -50,7 +50,7 @@ def build_dependency_graph(
             try:
                 text = path.read_text(encoding="utf-8")
                 data = yaml.safe_load(text)
-            except (yaml.YAMLError, OSError):
+            except (yaml.YAMLError, OSError, UnicodeDecodeError):
                 logger.warning("Skipping unparseable file: %s", relative)
                 continue
             if not isinstance(data, dict):

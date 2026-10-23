@@ -32,6 +32,12 @@ FABRIC_PLACEHOLDERS: dict[str, Any] = {
 
 _NO_PROJECT_HINT = "(run from inside a .weevr project so references resolve)"
 
+# weevr-core raises WeevError for config problems, but some malformed input
+# escapes as a plain exception: a file that is not UTF-8 (UnicodeDecodeError,
+# a ValueError), or a non-string ref such as ``ref: 7`` (TypeError from
+# pathlib). Treat these as a problem with the file rather than a crash.
+LOAD_FAILURES: tuple[type[Exception], ...] = (WeevError, OSError, TypeError, ValueError)
+
 # weevr-core logs load warnings as well as returning them. The CLI reports
 # them as issues, so keep the raw log lines off the terminal.
 logging.getLogger("weevr").addHandler(logging.NullHandler())
@@ -137,6 +143,9 @@ def validate_file(path: Path, *, project_root: Path | None = None) -> list[Valid
         load_config(path, runtime_params=FABRIC_PLACEHOLDERS, project_root=project_root)
     except WeevError as exc:
         return _issues_from_exception(exc, path, project_root)
+    except LOAD_FAILURES as exc:
+        message = f"Cannot load file: {type(exc).__name__}: {exc}"
+        return [ValidationIssue("error", message, display_path(path, project_root))]
     return []
 
 

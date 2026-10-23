@@ -13,10 +13,9 @@ from typing import Any, Literal
 
 from weevr.config.parser import TYPED_EXTENSIONS
 from weevr.config.validation import validate_incremental_config
-from weevr.errors import WeevError
 from weevr.model import Thread
 
-from weevr_cli.validation.engine import display_path
+from weevr_cli.validation.engine import LOAD_FAILURES, display_path
 from weevr_cli.validation.resolved import load_resolved
 from weevr_cli.validation.results import ValidationIssue
 
@@ -68,7 +67,7 @@ def check_resolved(path: Path, *, project_root: Path | None = None) -> list[Vali
     """
     try:
         loaded = load_resolved(path, project_root=project_root)
-    except WeevError:
+    except LOAD_FAILURES:
         return []
 
     root = project_root if project_root is not None else path.parent

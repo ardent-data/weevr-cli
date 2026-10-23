@@ -79,7 +79,7 @@ def _parse_file(path: Path) -> dict[str, Any] | None:
         text = path.read_text(encoding="utf-8")
         data = yaml.safe_load(text)
         return data if isinstance(data, dict) else None
-    except (yaml.YAMLError, OSError):
+    except (yaml.YAMLError, OSError, UnicodeDecodeError):
         return None
 
 

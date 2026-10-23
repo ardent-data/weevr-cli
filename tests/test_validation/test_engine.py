@@ -230,3 +230,17 @@ def test_bad_ref_forms_are_reported_on_the_weave(tmp_path: Path, ref: str) -> No
     path = _write(tmp_path, "w.weave", f'config_version: "1.0"\nthreads:\n  - ref: {ref}\n')
     issues = validate_file(path, project_root=tmp_path)
     assert [(i.severity, i.file) for i in issues] == [("error", "w.weave")]
+
+
+def test_non_utf8_file_is_an_error_not_a_crash(tmp_path: Path) -> None:
+    path = tmp_path / "bin.thread"
+    path.write_bytes(b"\xff\xfe\x00bad")
+    issues = validate_file(path, project_root=tmp_path)
+    assert [(i.severity, i.file) for i in issues] == [("error", "bin.thread")]
+    assert "UnicodeDecodeError" in issues[0].message
+
+
+def test_non_string_ref_is_an_error_not_a_crash(tmp_path: Path) -> None:
+    path = _write(tmp_path, "num.loom", 'config_version: "1.0"\nweaves:\n  - ref: 7\n')
+    issues = validate_file(path, project_root=tmp_path)
+    assert [(i.severity, i.file) for i in issues] == [("error", "num.loom")]

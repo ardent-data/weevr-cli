@@ -594,3 +594,24 @@ def test_validate_load_warnings_become_issues_not_log_lines(
     assert result.exit_code == 0
     assert data["warnings"] >= 1
     assert all(not i["message"].startswith("WARN") for i in data["issues"])
+
+
+def test_validate_continues_past_unloadable_files(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    project = _make_project(
+        tmp_path,
+        {
+            "staging/stg_customers.thread": _THREAD,
+            "staging.weave": _WEAVE,
+            "daily.loom": _LOOM,
+            "num.loom": 'config_version: "1.0"\nweaves:\n  - ref: 7\n',
+        },
+    )
+    (project / "bin.thread").write_bytes(b"\xff\xfe\x00bad")
+    monkeypatch.chdir(project)
+    data = _json_validate([])
+    assert data["exit_code"] == 1
+    assert data["files_checked"] == 5
+    errors = sorted(i["file"] for i in data["issues"] if i["severity"] == "error")
+    assert errors == ["bin.thread", "num.loom"]

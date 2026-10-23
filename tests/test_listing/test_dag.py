@@ -137,3 +137,10 @@ def test_list_dag_command_failure_exits_nonzero(
     monkeypatch.chdir(project)
     result = runner.invoke(app, ["list", "--format", "dag"])
     assert result.exit_code == 1
+
+
+def test_unloadable_loom_raises_dag_error(tmp_path: Path) -> None:
+    project = _make_project(tmp_path)
+    (project / "num.loom").write_text('config_version: "1.0"\nweaves:\n  - ref: 7\n')
+    with pytest.raises(DagError, match="num.loom"):
+        build_weave_plans(project, build_dependency_graph(project))
