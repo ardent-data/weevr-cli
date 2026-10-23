@@ -21,6 +21,7 @@ from weevr_cli.state import AppState
 from weevr_cli.validation.engine import dedupe_issues, validate_file
 from weevr_cli.validation.orphans import find_orphans
 from weevr_cli.validation.results import ValidationIssue, ValidationResult
+from weevr_cli.validation.semantic import check_resolved
 
 
 def _find_weevr_files(
@@ -188,7 +189,12 @@ def run_validate(
         raise SystemExit(1)
 
     for file_path in files_to_check:
-        all_issues.extend(validate_file(file_path, project_root=project_root))
+        file_issues = validate_file(file_path, project_root=project_root)
+        all_issues.extend(file_issues)
+        # Plan-time checks need a clean load, so they run only for weaves and
+        # looms that passed.
+        if not file_issues and file_path.suffix in (".weave", ".loom"):
+            all_issues.extend(check_resolved(file_path, project_root=project_root))
 
     # Orphan detection only in full-project mode (no target arg)
     if project_root is not None and target_path is None:

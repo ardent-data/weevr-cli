@@ -527,3 +527,70 @@ def test_validate_reports_orphans_when_other_files_fail(
     assert data["exit_code"] == 1
     warnings = [i["file"] for i in data["issues"] if i["severity"] == "warning"]
     assert warnings == ["staging/unused.thread"]
+
+
+def _delta_thread(source: str, target: str, extra: str = "") -> str:
+    return (
+        'config_version: "1.0"\n'
+        f"sources: {{main: {{type: delta, alias: {source}}}}}\n"
+        f"target: {{alias: {target}}}\n{extra}"
+    )
+
+
+_SAME_TARGET = {
+    "staging/a.thread": _delta_thread("silver.one", "silver.same"),
+    "staging/b.thread": _delta_thread("silver.two", "silver.same"),
+    "staging.weave": 'config_version: "1.0"\nthreads:\n'
+    "  - ref: staging/a.thread\n  - ref: staging/b.thread\n",
+    "daily.loom": _LOOM,
+}
+
+
+def test_validate_reports_plan_errors_once(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """The weave is checked directly and through the loom; the error appears once."""
+    project = _make_project(tmp_path, _SAME_TARGET)
+    monkeypatch.chdir(project)
+    data = _json_validate([])
+    assert data["exit_code"] == 1
+    assert [(i["severity"], i["file"]) for i in data["issues"]] == [("error", "staging.weave")]
+    assert "silver.same" in data["issues"][0]["message"]
+
+
+def test_validate_targeted_weave_runs_plan_checks(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    project = _make_project(tmp_path, _SAME_TARGET)
+    monkeypatch.chdir(project)
+    data = _json_validate(["staging.weave"])
+    assert data["exit_code"] == 1
+    assert data["errors"] == 1
+
+
+def test_validate_skips_plan_checks_when_load_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    files = dict(_SAME_TARGET)
+    files["staging/b.thread"] = 'config_version: "1.0"\nsources: {}\n'
+    project = _make_project(tmp_path, files)
+    monkeypatch.chdir(project)
+    data = _json_validate([])
+    assert {i["file"] for i in data["issues"]} == {"staging/b.thread"}
+
+
+def test_validate_load_warnings_become_issues_not_log_lines(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    project = _make_project(
+        tmp_path,
+        {
+            "staging/stg_customers.thread": _THREAD + "execution: {trace: true}\n",
+            "staging.weave": _WEAVE,
+            "daily.loom": _LOOM,
+        },
+    )
+    monkeypatch.chdir(project)
+    result = runner.invoke(app, ["--json", "validate"])
+    data = json.loads(result.output)
+    assert result.exit_code == 0
+    assert data["warnings"] >= 1
+    assert all(not i["message"].startswith("WARN") for i in data["issues"])

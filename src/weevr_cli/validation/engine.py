@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Any, Literal
@@ -31,6 +32,10 @@ FABRIC_PLACEHOLDERS: dict[str, Any] = {
 
 _NO_PROJECT_HINT = "(run from inside a .weevr project so references resolve)"
 
+# weevr-core logs load warnings as well as returning them. The CLI reports
+# them as issues, so keep the raw log lines off the terminal.
+logging.getLogger("weevr").addHandler(logging.NullHandler())
+
 
 def _upgrade_hint() -> str:
     try:
@@ -43,7 +48,7 @@ def _upgrade_hint() -> str:
     )
 
 
-def _display_path(path: Path, project_root: Path | None) -> str:
+def display_path(path: Path, project_root: Path | None) -> str:
     """Return ``path`` relative to the project root in POSIX form, if inside it."""
     if project_root is not None:
         try:
@@ -64,8 +69,8 @@ def _issue_file(exc: WeevError, validated: Path, project_root: Path | None) -> s
     if file_path:
         candidate = Path(file_path)
         if candidate.exists():
-            return _display_path(candidate, project_root)
-    return _display_path(validated, project_root)
+            return display_path(candidate, project_root)
+    return display_path(validated, project_root)
 
 
 def _severity(exc: WeevError) -> Literal["error", "warning"]:
