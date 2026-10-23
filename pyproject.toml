@@ -3,7 +3,8 @@ name = "weevr-cli"
 version = "2.0.0"
 description = "CLI for managing weevr projects — scaffolding, validation, and deployment to Microsoft Fabric."
 readme = "README.md"
-license = { file = "LICENSE" }
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 authors = [
     { name = "Pierre LaFromboise", email = "44212292+DataInsightPro@users.noreply.github.com" }
 ]
@@ -12,7 +13,6 @@ keywords = ["weevr", "fabric", "onelake", "cli", "yaml", "deployment", "data-pip
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.11",
     "Topic :: Software Development :: Build Tools",
