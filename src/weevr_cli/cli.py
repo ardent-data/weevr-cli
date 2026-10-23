@@ -247,7 +247,9 @@ def status(
 @app.command(name="list")
 def list_cmd(
     ctx: typer.Context,
-    format: str = typer.Option("tree", "--format", "-f", help="Output format: tree or table."),
+    format: str = typer.Option(
+        "tree", "--format", "-f", help="Output format: tree, table, or dag."
+    ),
 ) -> None:
     """Display project structure and dependency relationships."""
     from weevr_cli.commands.list_cmd import run_list

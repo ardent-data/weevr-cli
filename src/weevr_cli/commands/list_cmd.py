@@ -8,6 +8,7 @@ from weevr_cli.ignore import (
     has_deploy_ignore,
     load_combined_ignore,
 )
+from weevr_cli.listing.dag import DagError, build_weave_plans, render_dag, render_dag_json
 from weevr_cli.listing.graph import build_dependency_graph
 from weevr_cli.listing.table import render_table, render_table_json
 from weevr_cli.listing.tree import render_tree, render_tree_json
@@ -19,7 +20,7 @@ def run_list(*, format: str, state: AppState) -> None:
     """Execute the list command.
 
     Args:
-        format: Output format — "tree" or "table".
+        format: Output format — "tree", "table", or "dag".
         state: Application state.
 
     Raises:
@@ -57,9 +58,24 @@ def run_list(*, format: str, state: AppState) -> None:
             print_json(render_table_json(graph))
         else:
             render_table(graph, state.console)
+    elif format == "dag":
+        try:
+            plans = build_weave_plans(project_root, graph)
+        except DagError as exc:
+            print_error(
+                f"Cannot build execution plan — {exc}",
+                "plan_failed",
+                json_mode=state.json_mode,
+                console=state.console,
+            )
+            raise SystemExit(1) from exc
+        if state.json_mode:
+            print_json(render_dag_json(plans))
+        else:
+            render_dag(plans, state.console)
     else:
         print_error(
-            f"Unknown format: {format}. Valid options are 'tree' or 'table'.",
+            f"Unknown format: {format}. Valid options are 'tree', 'table', or 'dag'.",
             "invalid_format",
             json_mode=state.json_mode,
             console=state.console,
