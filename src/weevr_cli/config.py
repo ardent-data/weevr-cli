@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import functools
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -16,15 +17,10 @@ SCHEMA_DEPRECATION_MESSAGE = (
     "Validation schemas are now provided by the weevr-core package."
 )
 
-_schema_deprecation_warned = False
 
-
+@functools.cache
 def _warn_schema_deprecated() -> None:
     """Print the schema.version deprecation warning once per process."""
-    global _schema_deprecation_warned
-    if _schema_deprecation_warned:
-        return
-    _schema_deprecation_warned = True
     sys.stderr.write(f"Warning: {SCHEMA_DEPRECATION_MESSAGE}\n")
 
 

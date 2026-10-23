@@ -1,3 +1,4 @@
+from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
@@ -191,8 +192,10 @@ _TARGETS = {"dev": {"workspace_id": "ws-111", "lakehouse_id": "lh-222"}}
 
 
 @pytest.fixture()
-def fresh_deprecation(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(config_module, "_schema_deprecation_warned", False)
+def fresh_deprecation() -> Iterator[None]:
+    config_module._warn_schema_deprecated.cache_clear()
+    yield
+    config_module._warn_schema_deprecated.cache_clear()
 
 
 @pytest.mark.usefixtures("fresh_deprecation")
