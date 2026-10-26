@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -244,3 +247,78 @@ def test_non_string_ref_is_an_error_not_a_crash(tmp_path: Path) -> None:
     path = _write(tmp_path, "num.loom", 'config_version: "1.0"\nweaves:\n  - ref: 7\n')
     issues = validate_file(path, project_root=tmp_path)
     assert [(i.severity, i.file) for i in issues] == [("error", "num.loom")]
+
+
+def test_duplicate_weave_names_in_loom_are_error_on_loom(tmp_path: Path) -> None:
+    _write(tmp_path, "a/t1.thread", GOOD_THREAD.replace("silver.good", "silver.a"))
+    _write(tmp_path, "b/t2.thread", GOOD_THREAD.replace("silver.good", "silver.b"))
+    _write(tmp_path, "a/main.weave", 'config_version: "1.0"\nthreads: [{ref: a/t1.thread}]\n')
+    _write(tmp_path, "b/main.weave", 'config_version: "1.0"\nthreads: [{ref: b/t2.thread}]\n')
+    path = _write(
+        tmp_path,
+        "daily.loom",
+        'config_version: "1.0"\nweaves: [{ref: a/main.weave}, {ref: b/main.weave}]\n',
+    )
+    issues = validate_file(path, project_root=tmp_path)
+    assert [(i.severity, i.file) for i in issues] == [("error", "daily.loom")]
+    assert "Duplicate weave name 'main'" in issues[0].message
+
+
+def test_dimension_thread_with_write_mode_is_error_on_thread(tmp_path: Path) -> None:
+    _write(
+        tmp_path,
+        "dim.thread",
+        'config_version: "1.0"\n'
+        "sources: {main: {type: delta, alias: silver.raw}}\n"
+        "target:\n"
+        "  alias: gold.dim\n"
+        "  dimension:\n"
+        "    business_key: [id]\n"
+        "    surrogate_key: {name: dim_sk, columns: [id]}\n"
+        "write: {mode: overwrite}\n",
+    )
+    path = _write(tmp_path, "w.weave", 'config_version: "1.0"\nthreads: [{ref: dim.thread}]\n')
+    issues = validate_file(path, project_root=tmp_path)
+    assert [(i.severity, i.file) for i in issues] == [("error", "dim.thread")]
+    assert "write.mode" in issues[0].message
+
+
+def test_resolve_with_undefined_lookup_is_error_on_thread(tmp_path: Path) -> None:
+    _write(
+        tmp_path,
+        "res.thread",
+        'config_version: "1.0"\n'
+        "sources: {main: {type: delta, alias: silver.raw}}\n"
+        "steps:\n"
+        "  - resolve: {name: cust_sk, lookup: missing, match: {cust_id: id}, pk: sk}\n"
+        "target: {alias: silver.res}\n",
+    )
+    path = _write(tmp_path, "w.weave", 'config_version: "1.0"\nthreads: [{ref: res.thread}]\n')
+    issues = validate_file(path, project_root=tmp_path)
+    assert [(i.severity, i.file) for i in issues] == [("error", "res.thread")]
+    assert "undefined lookup 'missing'" in issues[0].message
+
+
+def test_hierarchy_variables_in_export_path_are_deferred(tmp_path: Path) -> None:
+    path = _write(
+        tmp_path,
+        "exp.thread",
+        GOOD_THREAD + "exports:\n"
+        "  - name: archive\n"
+        "    type: parquet\n"
+        '    path: "/archive/${loom.name}/${weave.name}/${thread.name}/"\n',
+    )
+    assert validate_file(path, project_root=tmp_path) == []
+
+
+def test_import_is_quiet_with_unrelated_src_on_path(tmp_path: Path) -> None:
+    src = tmp_path / "src"
+    (src / "other").mkdir(parents=True)
+    result = subprocess.run(
+        [sys.executable, "-W", "error::UserWarning", "-c", "import weevr.config"],
+        env={**os.environ, "PYTHONPATH": str(src)},
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr

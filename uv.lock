@@ -944,7 +944,7 @@ requires-dist = [
     { name = "pyyaml", specifier = ">=6.0,<7.0" },
     { name = "rich", specifier = ">=13.0.0" },
     { name = "typer", specifier = ">=0.15.0" },
-    { name = "weevr-core", specifier = ">=1.20.0,<2.0" },
+    { name = "weevr-core", specifier = ">=1.20.2,<2.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -963,13 +963,13 @@ docs = [
 
 [[package]]
 name = "weevr-core"
-version = "1.20.0"
+version = "1.20.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
     { name = "pyyaml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a0/2e/09a35d715200a95163979913d72ccb52773097201a0cd0a7187b82e5880c/weevr_core-1.20.0.tar.gz", hash = "sha256:c5728d7a04cc3a9195e8e70b0a309b12b372eaa77764c2c2b0e0d2fe2c8a2080", size = 103976, upload-time = "2026-10-23T16:40:41.964Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/fe/84/871ce58c3fdb67b3e93d02e7566f58965dc091450ef11596a2512e42f464/weevr_core-1.20.2.tar.gz", hash = "sha256:6d141a23e34ef2300a9ff64ff30a9ecc25a12fdc70ee64739fe5a2ab234deaa5", size = 106710, upload-time = "2026-10-26T17:16:59.422Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5f/e8/13c1cb21128c4a229d3f75c27ea5a94daeb44381d66a9eaabc111b69b9eb/weevr_core-1.20.0-py3-none-any.whl", hash = "sha256:7eef55f52a2f878978e33cae3d315d82c79bc81cb61b856a5fe650d4e086acf0", size = 125257, upload-time = "2026-10-23T16:40:39.35Z" },
+    { url = "https://files.pythonhosted.org/packages/09/a3/09f368cb4eb4af5266cdddf7f7c54e3b6d538b412e9ea55b9afe75cf6c96/weevr_core-1.20.2-py3-none-any.whl", hash = "sha256:d2727e5bd3450e6ca37eb4f987b1f388445ad4cf85a3bee1005d908cd2c8094d", size = 128136, upload-time = "2026-10-26T17:16:57.43Z" },
 ]
