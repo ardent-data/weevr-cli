@@ -631,3 +631,145 @@ def test_validate_silences_weevr_logging(tmp_path: Path, monkeypatch: pytest.Mon
     monkeypatch.chdir(project)
     runner.invoke(app, ["validate"])
     assert any(isinstance(h, logging.NullHandler) for h in logger.handlers)
+
+
+_SOURCE = "sources: {main: {type: delta, alias: silver.raw}}\n"
+_WATERMARK = (
+    "load: {mode: incremental_watermark, watermark_column: ts, watermark_type: timestamp}\n"
+)
+_CDC = "load: {mode: cdc, cdc: {preset: delta_cdf}}\n"
+_DIMENSION = (
+    "  dimension:\n    business_key: [id]\n    surrogate_key: {name: dim_sk, columns: [id]}\n"
+)
+_FOREACH = (
+    "with:\n"
+    "  sub:\n"
+    "    from: main\n"
+    "    steps:\n"
+    "      - foreach:\n"
+    "          values: [a]\n"
+    "          as: x\n"
+    "          steps:\n"
+    "            - filter: {expr: \"id = '{x}'\"}\n"
+)
+
+
+@pytest.mark.parametrize(
+    ("body", "expected"),
+    [
+        pytest.param(
+            _SOURCE + "target: {alias: silver.t, warp: missing}\n",
+            "missing",
+            id="target-warp-not-found",
+        ),
+        pytest.param(
+            "sources:\n"
+            "  main:\n"
+            "    type: delta\n"
+            "    alias: silver.raw\n"
+            "    dedup: {keys: [id], order_by: ts ASC}\n"
+            "target: {alias: silver.t}\n" + _WATERMARK,
+            "ts DESC",
+            id="watermark-dedup-order",
+        ),
+        pytest.param(
+            "sources:\n"
+            "  main:\n"
+            "    type: delta\n"
+            "    alias: silver.raw\n"
+            "    dedup: {keys: [id]}\n"
+            "target: {alias: silver.t}\n" + _CDC,
+            "sets dedup",
+            id="cdc-dedup",
+        ),
+        pytest.param(
+            _SOURCE + "target:\n  alias: gold.dim\n" + _DIMENSION + _CDC,
+            "target.dimension is not supported with load.mode: cdc",
+            id="cdc-dimension",
+        ),
+        pytest.param(
+            _SOURCE + "target:\n  alias: gold.dim\n" + _DIMENSION + "write: {mode: merge}\n",
+            "write.mode 'merge' cannot be set",
+            id="dimension-write-mode",
+        ),
+        pytest.param(
+            _SOURCE + "target: {alias: silver.t}\n" + _FOREACH,
+            "foreach is not supported in with.sub.steps",
+            id="foreach-in-with",
+        ),
+    ],
+)
+def test_validate_rejects_stricter_load_rules(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, body: str, expected: str
+) -> None:
+    """Configs weevr-core 1.20.4 stopped loading fail `weevr validate`."""
+    project = _make_project(tmp_path, {"t.thread": 'config_version: "1.0"\n' + body})
+    monkeypatch.chdir(project)
+    result = runner.invoke(app, ["--json", "validate", "t.thread"])
+    assert result.exit_code == 1, result.output
+    issues = json.loads(result.output)["issues"]
+    assert [i["severity"] for i in issues] == ["error"]
+    assert expected in issues[0]["message"]
+
+
+_LOOKUP_THREAD = (
+    'config_version: "1.0"\n'
+    "sources: {main: {type: delta, alias: silver.raw}, dim: {lookup: shared}}\n"
+    "target: {alias: silver.t}\n"
+)
+_LOOM_ON_WEAVE = 'config_version: "1.0"\nweaves:\n  - ref: w.weave\n'
+
+
+def test_validate_undefined_source_lookup_in_weave_is_error_on_thread(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A lookup no visible scope defines fails when the thread loads through a weave."""
+    project = _make_project(
+        tmp_path,
+        {
+            "t.thread": _LOOKUP_THREAD,
+            "w.weave": 'config_version: "1.0"\nthreads:\n  - ref: t.thread\n',
+        },
+    )
+    monkeypatch.chdir(project)
+    result = runner.invoke(app, ["--json", "validate", "w.weave"])
+    assert result.exit_code == 1, result.output
+    issues = json.loads(result.output)["issues"]
+    assert [(i["severity"], i["file"]) for i in issues] == [("error", "t.thread")]
+    assert "undefined lookup 'shared'" in issues[0]["message"]
+
+
+@pytest.mark.parametrize(
+    "args",
+    [
+        pytest.param(["validate", "t.thread", "--strict"], id="single-file"),
+        pytest.param(["validate", "--strict"], id="project-scan"),
+    ],
+)
+def test_validate_weave_scoped_lookup_passes_strict(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, args: list[str]
+) -> None:
+    """A thread relying on its weave's lookup stays clean.
+
+    weevr-core warns when such a thread loads alone. The CLI doesn't show that
+    warning: the project scan loads every thread alone, so it would fire on
+    valid threads and `--strict` would then block their deploy.
+    """
+    project = _make_project(
+        tmp_path,
+        {
+            "t.thread": _LOOKUP_THREAD,
+            "w.weave": (
+                'config_version: "1.0"\n'
+                "lookups:\n"
+                "  shared:\n"
+                "    source: {type: delta, alias: silver.dim}\n"
+                "threads:\n"
+                "  - ref: t.thread\n"
+            ),
+            "daily.loom": _LOOM_ON_WEAVE,
+        },
+    )
+    monkeypatch.chdir(project)
+    result = runner.invoke(app, args)
+    assert result.exit_code == 0, result.output
