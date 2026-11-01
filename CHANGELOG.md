@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.3](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v2.0.2...weevr-cli-v2.0.3) (2026-11-01)
+
+
+### Bug Fixes
+
+* **deps:** require weevr-core 1.20.5 ([#66](https://github.com/ardent-data/weevr-cli/issues/66)) ([02f7279](https://github.com/ardent-data/weevr-cli/commit/02f727922f2968090e3e28e35126803db85e6287))
+
 ## [2.0.2](https://github.com/ardent-data/weevr-cli/compare/weevr-cli-v2.0.1...weevr-cli-v2.0.2) (2026-10-26)
 
 
