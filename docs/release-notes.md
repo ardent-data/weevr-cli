@@ -1,5 +1,27 @@
 # Release Notes
 
+## Stricter validation with weevr-core 1.20.5
+
+The CLI now requires weevr-core 1.20.5 or later. Rules added in weevr-core
+1.20.4 make these configs fail to load, so a project that passed
+`weevr validate` before may now report errors:
+
+- `target.warp` names an explicit warp that can't be found.
+- `load.mode: incremental_watermark` has a `dedup` on the primary source whose
+  `order_by` isn't `<watermark_column> DESC`.
+- `source.dedup` is set on a primary source with `load.mode: cdc`.
+- `target.dimension` is used with `load.mode: cdc`.
+- `foreach` appears inside `with.<name>.steps`.
+- A thread loaded through a weave or loom has a source `lookup` that no visible
+  scope defines.
+
+`write.mode: merge` under `target.dimension` was already rejected; it now gets
+the same message as the other write modes.
+
+Validating a thread file on its own doesn't check its source lookups, because
+the lookup may come from a weave or loom. Validate the weave or loom, or run
+`weevr validate` with no path, to check them.
+
 ## Upgrading to 2.0
 
 Version 2.0 replaces the CLI's own validation with
